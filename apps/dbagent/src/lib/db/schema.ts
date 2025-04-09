@@ -59,7 +59,9 @@ export const connections = pgTable(
     projectId: uuid('project_id').notNull(),
     name: text('name').notNull(),
     isDefault: boolean('is_default').default(false).notNull(),
-    connectionString: text('connection_string').notNull()
+    connectionString: text('connection_string').notNull(),
+    username: text('username').notNull(),
+    password: text('password').notNull()
   },
   (table) => [
     foreignKey({

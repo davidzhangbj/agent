@@ -102,7 +102,7 @@ function ChatsUIContent({
       setConnectionId(defaultConnection.id);
       setMessages([]);
 
-      const initialMessage = `Run playbook ${playbookParam}`;
+      const initialMessage = `运行 playbook ${playbookParam}`;
       setInput(initialMessage);
     }
   }, [searchParams, defaultConnection?.id]);
@@ -209,55 +209,62 @@ function ChatsUIContent({
                   Current context: {connections.find((c) => c.id === connectionId)?.name} database
                 </div>
               )}
-              {messages.map((message) => (
-                <div key={message.id} className="space-y-4">
-                  {message.parts.map((part, index) => (
-                    <div
-                      key={`${message.id}-${index}`}
-                      className={`flex gap-3 ${message.role === 'assistant' ? 'flex-row' : 'flex-row-reverse'}`}
-                    >
-                      <Avatar>
-                        <AvatarFallback>
-                          {part.type === 'text' && message.role === 'user' ? (
-                            <User className="h-6 w-6" />
-                          ) : part.type === 'text' ? (
-                            <Bot className="h-6 w-6" />
-                          ) : part.type === 'tool-invocation' ? (
-                            <Wrench className="h-6 w-6" />
-                          ) : part.type === 'reasoning' ? (
-                            <Lightbulb className="h-6 w-6" />
-                          ) : null}
-                        </AvatarFallback>
-                      </Avatar>
+              {messages.map((message) => {
+                return (
+                  <div key={message.id} className="space-y-4">
+                    {message.parts.map((part, index) => (
                       <div
-                        className={`prose prose-sm max-w-[80%] rounded-lg px-4 py-2 ${
-                          message.role === 'assistant' ? 'bg-muted' : 'bg-primary text-primary-foreground ml-auto'
-                        }`}
+                        key={`${message.id}-${index}`}
+                        className={`flex gap-3 ${message.role === 'assistant' ? 'flex-row' : 'flex-row-reverse'}`}
                       >
-                        {part.type === 'text' ? (
-                          <ReactMarkdown
-                            components={{
-                              code: ({ children }) => <Code>{children}</Code>
-                            }}
-                          >
-                            {message.content}
-                          </ReactMarkdown>
-                        ) : part.type === 'tool-invocation' ? (
-                          <div className="text-muted-foreground mt-1 text-xs">
-                            <Clock className="mr-1 inline-block h-4 w-4" />
-                            Tool called: <Code>{part.toolInvocation.toolName}</Code>
-                          </div>
-                        ) : part.type === 'reasoning' ? (
-                          <div className="text-muted-foreground mt-1 text-xs">
-                            <Clock className="mr-1 inline-block h-4 w-4" />
-                            <Code>{part.type}</Code>
-                          </div>
-                        ) : null}
+                        <Avatar>
+                          <AvatarFallback>
+                            {part.type === 'text' && message.role === 'user' ? (
+                              <User className="h-6 w-6" />
+                            ) : part.type === 'text' ? (
+                              <Bot className="h-6 w-6" />
+                            ) : part.type === 'tool-invocation' ? (
+                              <Wrench className="h-6 w-6" />
+                            ) : part.type === 'reasoning' ? (
+                              <Lightbulb className="h-6 w-6" />
+                            ) : null}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div
+                          className={`prose prose-sm max-w-[80%] rounded-lg px-4 py-2 ${
+                            message.role === 'assistant' ? 'bg-muted' : 'bg-primary text-primary-foreground ml-auto'
+                          }`}
+                        >
+                          {part.type === 'text' ? (
+                            <ReactMarkdown
+                              components={{
+                                code: ({ children }) => (
+                                  <Code className="not-prose font-code overflow-x-auto rounded-sm bg-zinc-200 p-1 px-1.5 font-semibold text-black">
+                                    {children}
+                                  </Code>
+                                )
+                              }}
+                            >
+                              {/* {message.content} */}
+                              {part.text}
+                            </ReactMarkdown>
+                          ) : part.type === 'tool-invocation' ? (
+                            <div className="text-muted-foreground mt-1 text-xs">
+                              <Clock className="mr-1 inline-block h-4 w-4" />
+                              Tool called: <Code>{part.toolInvocation.toolName}</Code>
+                            </div>
+                          ) : part.type === 'reasoning' ? (
+                            <div className="text-muted-foreground mt-1 text-xs">
+                              <Clock className="mr-1 inline-block h-4 w-4" />
+                              <Code>{part.type}</Code>
+                            </div>
+                          ) : null}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              ))}
+                    ))}
+                  </div>
+                );
+              })}
 
               {status !== 'ready' && (
                 <div className="flex gap-3">

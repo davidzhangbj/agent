@@ -10,7 +10,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Xata Agent | Your AI PostgreSQL expert'
+  title: 'Chat to OB | Your AI OceanBase expert'
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

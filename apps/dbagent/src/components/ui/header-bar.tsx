@@ -20,7 +20,6 @@ import { useSession } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
 import { PropsWithChildren } from 'react';
-import { XataAgentLogo } from '~/components/logo/xata-agent-logo';
 
 export type User = {
   name?: string | null;
@@ -31,7 +30,8 @@ export type User = {
 export function Logo() {
   return (
     <Link href="/" className="flex items-center gap-1">
-      <XataAgentLogo size={160} />
+      {/* <XataAgentLogo size={160} /> */}
+      <img src="/images/logos/chattoOB.png" alt="ChattoOB" className="w-1/7 h-auto"></img>
       <h1 className="sr-only">xata agent</h1>
     </Link>
   );

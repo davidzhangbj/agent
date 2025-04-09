@@ -23,7 +23,7 @@ export function PlaybookView({ playbook }: { playbook: Playbook }) {
         <CardHeader>
           <CardTitle>Playbook:{playbook.name}</CardTitle>
           <CardDescription>
-            <p className="text-muted-foreground">{playbook.description}</p>
+            <div className="text-muted-foreground">{playbook.description}</div>
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -11,6 +11,8 @@ export type Connection = {
   name: string;
   isDefault: boolean;
   connectionString: string;
+  username: string;
+  password: string;
 };
 
 export async function listConnections(projectId: string): Promise<Connection[]> {
@@ -78,11 +80,15 @@ export async function deleteConnection(id: string): Promise<void> {
 export async function addConnection({
   projectId,
   name,
-  connectionString
+  connectionString,
+  username,
+  password
 }: {
   projectId: string;
   name: string;
   connectionString: string;
+  username: string;
+  password: string;
 }): Promise<Connection> {
   return queryDb(async ({ db }) => {
     const existingConnections = await db.select().from(connections).where(eq(connections.projectId, projectId));
@@ -92,7 +98,9 @@ export async function addConnection({
         projectId,
         name,
         connectionString,
-        isDefault: existingConnections.length === 0
+        isDefault: existingConnections.length === 0,
+        username: username,
+        password: password
       })
       .returning();
     if (!result[0]) {
@@ -105,16 +113,20 @@ export async function addConnection({
 export async function updateConnection({
   id,
   name,
-  connectionString
+  connectionString,
+  username,
+  password
 }: {
   id: string;
   name: string;
   connectionString: string;
+  username: string;
+  password: string;
 }): Promise<Connection> {
   return queryDb(async ({ db }) => {
     const result = await db
       .update(connections)
-      .set({ name, connectionString })
+      .set({ name, connectionString, username, password })
       .where(eq(connections.id, id))
       .returning();
     if (!result[0]) {

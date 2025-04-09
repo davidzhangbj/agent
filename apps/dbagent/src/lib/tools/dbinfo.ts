@@ -1,7 +1,7 @@
 import { getConnectionInfo } from '../db/connection-info';
 import { Connection } from '../db/connections';
 import { getProjectById } from '../db/projects';
-import { findTableSchema, getPerformanceSettings, getVacuumSettings } from '../targetdb/db';
+import { findTableSchema } from '../targetdb/db-oceanbase';
 
 export async function getTablesAndInstanceInfo(connection: Connection, asUserId?: string): Promise<string> {
   try {
@@ -23,13 +23,10 @@ ${JSON.stringify(project)}
   }
 }
 
-export async function getPerformanceAndVacuumSettings(connString: string): Promise<string> {
-  const performanceSettings = await getPerformanceSettings(connString);
-  const vacuumSettings = await getVacuumSettings(connString);
-
+export async function getPerformanceAndVacuumSettings(connection: Connection): Promise<string> {
   return `
-Performance settings: ${JSON.stringify(performanceSettings)}
-Vacuum settings: ${JSON.stringify(vacuumSettings)}
+Performance settings: ${JSON.stringify('performanceSettings')}
+Vacuum settings: ${JSON.stringify('vacuumSettings')}
 `;
 }
 
@@ -38,9 +35,14 @@ export async function getPostgresExtensions(connection: Connection, asUserId?: s
   return `Extensions: ${JSON.stringify(extensions)}`;
 }
 
-export async function toolFindTableSchema(connString: string, tableName: string): Promise<string> {
+export async function toolFindTableSchema(
+  connString: string,
+  username: string,
+  password: string,
+  tableName: string
+): Promise<string> {
   try {
-    const result = await findTableSchema(connString, tableName);
+    const result = await findTableSchema(connString, username, password, tableName);
     return result;
   } catch (error) {
     console.error('Error finding schema for table', error);
