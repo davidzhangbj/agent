@@ -103,7 +103,7 @@ export function ConnectionForm({ projectId, id }: ConnectionFormProps) {
         <p className="text-muted-foreground text-sm">
           {id
             ? 'Edit your database connection.'
-            : "Let's start by setting up the connection to the Postgres/OceanBase database."}
+            : "Let's start by setting up the connection to the OceanBase database."}
         </p>
       </div>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

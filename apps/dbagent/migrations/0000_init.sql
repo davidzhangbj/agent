@@ -57,7 +57,7 @@ CREATE TABLE "connections" (
 	"is_default" boolean DEFAULT false NOT NULL,
 	"connection_string" text NOT NULL,
 	"username" text NOT NULL,
-	"password" text NOT NULL
+	"password" text NOT NULL,
 	CONSTRAINT "uq_connections_name" UNIQUE("project_id", "name"),
 	CONSTRAINT "uq_connections_connection_string" UNIQUE("project_id", "connection_string")
 );
