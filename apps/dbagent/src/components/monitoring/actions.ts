@@ -15,14 +15,15 @@ import {
   updateScheduleRunData
 } from '~/lib/db/schedules';
 import { Schedule, ScheduleInsert, ScheduleRun } from '~/lib/db/schema';
+import { env } from '~/lib/env/server';
 import { scheduleGetNextRun, utcToLocalDate } from '~/lib/monitoring/scheduler';
 import { listPlaybooks } from '~/lib/tools/playbooks';
 const config = {
-  baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
-  apiKey: ''
+  baseURL: env.CUSTOM_BASE_URL,
+  apiKey: env.CUSTOM_API_KEY
 };
 const openai = createOpenAI(config);
-const llmModel = 'qwen-max-latest';
+const llmModel = env.CUSTOM_MODEL_NAME || 'qwen-max-latest';
 export async function generateCronExpression(description: string): Promise<string> {
   const prompt = `Generate a cron expression for the following schedule description: "${description}". 
   Return strictly the cron expression, no quotes or anything else.`;

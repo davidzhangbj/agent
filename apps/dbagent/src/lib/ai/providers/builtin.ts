@@ -4,6 +4,7 @@ import { google } from '@ai-sdk/google';
 // import { openai } from '@ai-sdk/openai';
 import { createOpenAI } from '@ai-sdk/openai';
 import { LanguageModel } from 'ai';
+import { env } from '~/lib/env/server';
 
 import { Model, ModelWithFallback, Provider, ProviderInfo, ProviderModel, ProviderRegistry } from './types';
 
@@ -34,11 +35,11 @@ class BuiltinModel implements Model {
   }
 }
 const config = {
-  baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
-  apiKey: ''
+  baseURL: env.CUSTOM_BASE_URL,
+  apiKey: env.CUSTOM_API_KEY
 };
 const openai = createOpenAI(config);
-const llmModel = 'qwen-max-latest';
+const llmModel = env.CUSTOM_MODEL_NAME || 'qwen-max-latest';
 const builtinOpenAIModels: BuiltinProvider = {
   info: {
     name: 'OpenAI',

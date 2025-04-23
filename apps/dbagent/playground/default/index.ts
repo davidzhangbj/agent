@@ -7,6 +7,7 @@ import { CloudProvider } from '~/lib/db/schema';
 import { createOpenAI } from '@ai-sdk/openai';
 import { getChatSystemPrompt, getMonitoringSystemPrompt } from '~/lib/ai/agent';
 import { getBuiltinProviderRegistry } from '~/lib/ai/providers';
+import { env } from '~/lib/env/server';
 import { buildPlaygroundTools } from '../tools';
 
 /* eslint-disable no-process-env */
@@ -24,11 +25,11 @@ const defaultTools = buildPlaygroundTools({
 const chatPrompt = getChatSystemPrompt({ cloudProvider });
 const monitoringPrompt = getMonitoringSystemPrompt({ cloudProvider });
 const config = {
-  baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
-  apiKey: ''
+  baseURL: env.CUSTOM_BASE_URL,
+  apiKey: env.CUSTOM_API_KEY
 };
 const openai = createOpenAI(config);
-const llmModel = 'qwen-max-latest';
+const llmModel = env.CUSTOM_MODEL_NAME || 'qwen-max-latest';
 export function createAgents() {
   const evals = {
     completeness: new CompletenessMetric(),
