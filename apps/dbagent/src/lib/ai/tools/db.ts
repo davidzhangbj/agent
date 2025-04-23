@@ -1,27 +1,28 @@
 import { Tool, tool } from 'ai';
 import { z } from 'zod';
-import { getPerformanceAndVacuumSettings, toolFindTableSchema } from '~/lib/tools/dbinfo';
-import { toolDescribeTable, toolExplainQuery, toolGetSlowQueries } from '~/lib/tools/slow-queries';
 import {
-  toolCurrentActiveQueries,
-  toolGetConnectionsGroups,
-  toolGetConnectionsStats,
-  toolGetQueriesWaitingOnLocks,
-  toolGetVacuumStats
-} from '~/lib/tools/stats';
+  toolGetSqlLockWaitTimeout,
+  toolGetSqlOfBlockTrx,
+  toolGetSqlOfHoldLockTrx,
+  toolGetTrxOfBlock,
+  toolGetTrxOfHoldLock
+} from '~/lib/tools/lock-conflict';
+import { toolDescribeTable, toolExplainQuery, toolFindTableSchema, toolGetSlowQueries } from '~/lib/tools/slow-queries';
 import { ToolsetGroup } from './types';
 
-export function getDBSQLTools(connString: string): DBSQLTools {
-  return new DBSQLTools(connString);
+import { Pool, withPoolConnection } from '~/lib/targetdb/db-oceanbase';
+
+export function getDBSQLTools(targetDb: Pool): DBSQLTools {
+  return new DBSQLTools(targetDb);
 }
 
 // The DBSQLTools toolset provides tools for querying the postgres database
 // directly via SQL to collect system performance information.
 export class DBSQLTools implements ToolsetGroup {
-  private _connstr: string;
+  #pool: Pool | (() => Promise<Pool>);
 
-  constructor(connString: string) {
-    this._connstr = connString;
+  constructor(pool: Pool | (() => Promise<Pool>)) {
+    this.#pool = pool;
   }
 
   toolset(): Record<string, Tool> {
@@ -30,148 +31,170 @@ export class DBSQLTools implements ToolsetGroup {
       explainQuery: this.explainQuery(),
       describeTable: this.describeTable(),
       findTableSchema: this.findTableSchema(),
-      getCurrentActiveQueries: this.getCurrentActiveQueries(),
-      getQueriesWaitingOnLocks: this.getQueriesWaitingOnLocks(),
-      getVacuumStats: this.getVacuumStats(),
-      getConnectionsStats: this.getConnectionsStats(),
-      getConnectionsGroups: this.getConnectionsGroups(),
-      getPerformanceAndVacuumSettings: this.getPerformanceAndVacuumSettings()
+      getTrxOfHoldLock: this.getTrxOfHoldLock(),
+      getSqlOfHoldLockTrx: this.getSqlOfHoldLockTrx(),
+      getTrxOfBlock: this.getTrxOfBlock(),
+      getSqlOfBlockTrx: this.getSqlOfBlockTrx(),
+      getSqlLockWaitTimeout: this.getSqlLockWaitTimeout()
     };
   }
 
   getSlowQueries(): Tool {
-    const connstr = this._connstr;
+    const pool = this.#pool;
     return tool({
-      description: `Get a list of slow queries formatted as a JSON array. Contains how many times the query was called,
-the max execution time in seconds, the mean execution time in seconds, the total execution time
-(all calls together) in seconds, and the query itself.`,
+      description: `Contains request time the query was called,elapsed time in milliseconds, 
+      the execution time in milliseconds, and the query sql itself.`,
       parameters: z.object({}),
       execute: async () => {
-        console.log('getSlowQueries');
-        const slowQueries = await toolGetSlowQueries(connstr, 2000);
-        console.log('slowQueries', JSON.stringify(slowQueries));
-        return JSON.stringify(slowQueries);
+        try {
+          // 单位是微秒,100000是0.1秒
+          return await withPoolConnection(pool, async (client) => await toolGetSlowQueries(client, 100000));
+        } catch (error) {
+          return `Error getting slow queries: ${error}`;
+        }
       }
     });
   }
 
   explainQuery(): Tool {
-    const connstr = this._connstr;
+    const pool = this.#pool;
     return tool({
-      description: `Run explain on a a query. Returns the explain plan as received from PostgreSQL.
-The query needs to be complete, it cannot contain $1, $2, etc. If you need to, replace the parameters with your own made up values.
-It's very important that $1, $2, etc. are not passed to this tool. Use the tool describeTable to get the types of the columns.
-If you know the schema, pass it in as well.`,
+      description: `解释一个SQL语句,返回的是从oceanbase中取得的执行计划.
+      返回的结果中partitions(p[0-12])表示使用了13个分区,而表总共13个分区,说明没有用上分区裁剪.
+      is_index_back=false,说明没有回表
+      is_global_index=false,说明没有全局索引
+      给用户输出一个explain的summary,示例如下:
+      分析 explain 结果可知， SQL扫描了**个分区，未使用分区键, 未使用全局索引，没有产生回表，建议：
+      1. 增加分区键***为过滤条件；
+      2. 如***字段不需要，可以从查询条件中移除
+      3. **字段使用了全表扫描,建议增加索引
+      4. ....`,
       parameters: z.object({
-        schema: z.string(),
         query: z.string()
       }),
-      execute: async ({ schema, query }) => {
-        if (!schema) {
-          schema = 'public';
-        }
-        const explain = await toolExplainQuery(connstr, schema, query);
-        if (explain) {
+      execute: async ({ query }) => {
+        try {
+          const explain = await withPoolConnection(pool, async (client) => await toolExplainQuery(client, query));
+          if (!explain) return 'Could not run EXPLAIN on the query';
+
           return explain;
-        } else {
-          return 'Could not run EXPLAIN on the query';
+        } catch (error) {
+          return `Error running EXPLAIN on the query: ${error}`;
         }
       }
     });
   }
 
   describeTable(): Tool {
-    const connstr = this._connstr;
+    const pool = this.#pool;
     return tool({
-      description: `Describe a table. If you know the schema, pass it as a parameter. If you don't, use public.`,
+      description: `Describe a table. If you know the schema, pass it as a parameter. If you don't, use test.`,
       parameters: z.object({
         schema: z.string(),
         table: z.string()
       }),
-      execute: async ({ schema, table }) => {
-        if (!schema) {
-          schema = 'public';
+      execute: async ({ schema = 'test', table }) => {
+        try {
+          return await withPoolConnection(pool, async (client) => await toolDescribeTable(client, schema, table));
+        } catch (error) {
+          return `Error describing table: ${error}`;
         }
-        return await toolDescribeTable(connstr, schema, table);
       }
     });
   }
 
   findTableSchema(): Tool {
-    const connstr = this._connstr;
+    const pool = this.#pool;
     return tool({
       description: `Find the schema of a table. Use this tool to find the schema of a table.`,
       parameters: z.object({
         table: z.string()
       }),
       execute: async ({ table }) => {
-        return await toolFindTableSchema(connstr, table);
+        try {
+          return await withPoolConnection(pool, async (client) => await toolFindTableSchema(client, table));
+        } catch (error) {
+          return `Error finding table schema: ${error}`;
+        }
       }
     });
   }
 
-  getCurrentActiveQueries(): Tool {
-    const connstr = this._connstr;
+  getTrxOfHoldLock(): Tool {
+    const pool = this.#pool;
     return tool({
-      description: `Get the currently active queries.`,
+      description: `查看当前持有锁的事务`,
       parameters: z.object({}),
       execute: async () => {
-        return await toolCurrentActiveQueries(connstr);
+        try {
+          return await withPoolConnection(pool, async (client) => await toolGetTrxOfHoldLock(client));
+        } catch (error) {
+          return `Error get trx of hold lock: ${error}`;
+        }
       }
     });
   }
 
-  getQueriesWaitingOnLocks(): Tool {
-    const connstr = this._connstr;
+  getSqlOfHoldLockTrx(): Tool {
+    const pool = this.#pool;
     return tool({
-      description: `Get the queries that are currently blocked waiting on locks.`,
-      parameters: z.object({}),
-      execute: async () => {
-        return await toolGetQueriesWaitingOnLocks(connstr);
+      description: `查看当前持有锁的事务正在执行的Sql语句`,
+      parameters: z.object({
+        trans_id: z.string()
+      }),
+      execute: async ({ trans_id }) => {
+        try {
+          return await withPoolConnection(pool, async (client) => await toolGetSqlOfHoldLockTrx(client, trans_id));
+        } catch (error) {
+          return `Error get sql of hold lock trx: ${error}`;
+        }
       }
     });
   }
 
-  getVacuumStats(): Tool {
-    const connstr = this._connstr;
+  getTrxOfBlock(): Tool {
+    const pool = this.#pool;
     return tool({
-      description: `Get the vacuum stats for the top tables in the database. They are sorted by the number of dead tuples descending.`,
+      description: `查看当前被阻塞的事务`,
       parameters: z.object({}),
       execute: async () => {
-        return await toolGetVacuumStats(connstr);
+        try {
+          return await withPoolConnection(pool, async (client) => await toolGetTrxOfBlock(client));
+        } catch (error) {
+          return `Error get trx of block: ${error}`;
+        }
       }
     });
   }
 
-  getConnectionsStats(): Tool {
-    const connstr = this._connstr;
+  getSqlOfBlockTrx(): Tool {
+    const pool = this.#pool;
     return tool({
-      description: `Get the connections stats for the database.`,
-      parameters: z.object({}),
-      execute: async () => {
-        return await toolGetConnectionsStats(connstr);
+      description: `查看当前持有锁的事务正在执行的Sql语句`,
+      parameters: z.object({
+        trans_id: z.string()
+      }),
+      execute: async ({ trans_id }) => {
+        try {
+          return await withPoolConnection(pool, async (client) => await toolGetSqlOfBlockTrx(client, trans_id));
+        } catch (error) {
+          return `Error get sql of block trx: ${error}`;
+        }
       }
     });
   }
 
-  getConnectionsGroups(): Tool {
-    const connstr = this._connstr;
+  getSqlLockWaitTimeout(): Tool {
+    const pool = this.#pool;
     return tool({
-      description: `Get the connections groups for the database. This is a view in the pg_stat_activity table, grouped by (state, user, application_name, client_addr, wait_event_type, wait_event).`,
+      description: `查看曾经等待锁超时的Sql`,
       parameters: z.object({}),
       execute: async () => {
-        return await toolGetConnectionsGroups(connstr);
-      }
-    });
-  }
-
-  getPerformanceAndVacuumSettings(): Tool {
-    const connstr = this._connstr;
-    return tool({
-      description: `Get the performance and vacuum settings for the database.`,
-      parameters: z.object({}),
-      execute: async () => {
-        return await getPerformanceAndVacuumSettings(connstr);
+        try {
+          return await withPoolConnection(pool, async (client) => await toolGetSqlLockWaitTimeout(client));
+        } catch (error) {
+          return `Error get sql of lock wait timeout: ${error}`;
+        }
       }
     });
   }

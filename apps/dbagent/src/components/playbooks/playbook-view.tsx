@@ -22,9 +22,7 @@ export function PlaybookView({ playbook }: { playbook: Playbook }) {
       <Card>
         <CardHeader>
           <CardTitle>Playbook:{playbook.name}</CardTitle>
-          <CardDescription>
-            <div className="text-muted-foreground">{playbook.description}</div>
-          </CardDescription>
+          <CardDescription>{playbook.description}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="bg-muted prose prose-sm whitespace-pre-wrap rounded-md p-4">{playbook.content}</div>
@@ -36,7 +34,7 @@ export function PlaybookView({ playbook }: { playbook: Playbook }) {
               Schedule Playbook
             </Button>
           </Link>
-          <Link href={`/projects/${project}/chats?playbook=${playbook.name}`}>
+          <Link href={`/projects/${project}/chats/new?playbook=${playbook.name}`}>
             <Button>
               <PlayCircle className="mr-2 h-4 w-4" />
               Run Playbook

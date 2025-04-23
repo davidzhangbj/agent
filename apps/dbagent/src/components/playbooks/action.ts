@@ -1,18 +1,27 @@
 'use server';
 
-import { openai } from '@ai-sdk/openai';
+// import { openai } from '@ai-sdk/openai';
+import { createOpenAI } from '@ai-sdk/openai';
 import { generateText } from 'ai';
 import { auth } from '~/auth';
 
 import { dbCreatePlaybook, dbDeletePlaybook, dbUpdatePlaybook } from '~/lib/db/custom-playbooks';
+import { getUserDBAccess, getUserSessionDBAccess } from '~/lib/db/db';
+import { getSchedulesByUserIdAndProjectId } from '~/lib/db/schedules';
+import { Schedule } from '~/lib/db/schema';
 import {
-  customPlaybook,
+  CustomPlaybook,
   getCustomPlaybook,
   getCustomPlaybooks,
   getListOfCustomPlaybooksNames
 } from '~/lib/tools/custom-playbooks';
 import { Playbook } from '~/lib/tools/playbooks';
-
+const config = {
+  baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+  apiKey: ''
+};
+const openai = createOpenAI(config);
+const llmModel = 'qwen-max-latest';
 //playbook content generation
 export async function actionGeneratePlaybookContent(name: string, description: string): Promise<string> {
   const prompt = `Generate a detailed playbook content for a database task with the following details:
@@ -29,7 +38,7 @@ export async function actionGeneratePlaybookContent(name: string, description: s
                   Please generate the playbook content:`;
 
   const { text } = await generateText({
-    model: openai('gpt-4o'),
+    model: openai(llmModel),
     messages: [
       {
         role: 'system',
@@ -56,8 +65,9 @@ export async function actionGeneratePlaybookContent(name: string, description: s
 }
 
 //playbook db get
-export async function actionGetCustomPlaybooks(projectId: string, asUserId?: string): Promise<customPlaybook[]> {
-  return getCustomPlaybooks(projectId, asUserId);
+export async function actionGetCustomPlaybooks(projectId: string, asUserId?: string): Promise<CustomPlaybook[]> {
+  const dbAccess = await getUserDBAccess(asUserId);
+  return getCustomPlaybooks(dbAccess, projectId);
 }
 
 //get a custom playbook by id
@@ -65,21 +75,24 @@ export async function actionGetCustomPlaybook(
   projectId: string,
   id: string,
   asUserId?: string
-): Promise<customPlaybook> {
-  return getCustomPlaybook(projectId, id, asUserId);
+): Promise<CustomPlaybook> {
+  const dbAccess = await getUserDBAccess(asUserId);
+  return getCustomPlaybook(dbAccess, projectId, id);
 }
 
 //get a list of custom playbook names
 export async function actionListCustomPlaybooksNames(projectId: string, asUserId?: string): Promise<string[] | null> {
-  return getListOfCustomPlaybooksNames(projectId, asUserId);
+  const dbAccess = await getUserDBAccess(asUserId);
+  return getListOfCustomPlaybooksNames(dbAccess, projectId);
 }
 
 //playbook db insert
-export async function actionCreatePlaybook(input: customPlaybook): Promise<Playbook> {
+export async function actionCreatePlaybook(input: CustomPlaybook): Promise<Playbook> {
   const session = await auth();
   const userId = session?.user?.id ?? '';
   console.log('Creating playbook {input: ', input, '}');
-  return await dbCreatePlaybook({ ...input, createdBy: userId });
+  const dbAccess = await getUserSessionDBAccess();
+  return await dbCreatePlaybook(dbAccess, { ...input, createdBy: userId });
 }
 
 //playbook db update
@@ -88,11 +101,18 @@ export async function actionUpdatePlaybook(
   input: { description?: string; content?: string }
 ): Promise<Playbook | null> {
   console.log('Updating playbook {id: ', id, '} with {input: ', input, '}');
-  return await dbUpdatePlaybook(id, input);
+  const dbAccess = await getUserSessionDBAccess();
+  return await dbUpdatePlaybook(dbAccess, id, input);
 }
 
 //playbook db delete
 export async function actionDeletePlaybook(id: string): Promise<void> {
   console.log('Deleting playbook {id: ', id, '}');
-  return await dbDeletePlaybook(id);
+  const dbAccess = await getUserSessionDBAccess();
+  return await dbDeletePlaybook(dbAccess, id);
+}
+
+export async function actionGetSchedulesByUserIdAndProjectId(userId: string, projectId: string): Promise<Schedule[]> {
+  const dbAccess = await getUserDBAccess(userId);
+  return await getSchedulesByUserIdAndProjectId(dbAccess, userId, projectId);
 }

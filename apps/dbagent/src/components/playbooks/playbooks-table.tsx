@@ -18,14 +18,14 @@ import { BookOpenIcon, ClockIcon, CopyIcon, MoreVerticalIcon, PencilIcon, PlayIc
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { customPlaybook } from '~/lib/tools/custom-playbooks';
+import { CustomPlaybook } from '~/lib/tools/custom-playbooks';
 import { Playbook, getBuiltInPlaybooks } from '~/lib/tools/playbooks';
 import { actionGetCustomPlaybooks } from './action';
 
 export function PlaybooksTable() {
   const router = useRouter();
   const [playbooks, setPlaybooks] = useState<Playbook[]>([]);
-  const [customPlaybooks, setCustomPlaybooks] = useState<customPlaybook[]>([]);
+  const [customPlaybooks, setCustomPlaybooks] = useState<CustomPlaybook[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { project } = useParams<{ project: string }>();
 
@@ -101,7 +101,7 @@ export function PlaybooksTable() {
                     variant="outline"
                     size="icon"
                     title="Run playbook"
-                    onClick={() => router.push(`/projects/${project}/chats?playbook=${playbook.name}`)}
+                    onClick={() => router.push(`/projects/${project}/chats/new?playbook=${playbook.name}`)}
                   >
                     <PlayIcon className="h-3 w-3" />
                   </Button>
@@ -150,7 +150,7 @@ export function PlaybooksTable() {
                     variant="outline"
                     size="icon"
                     title="Run playbook"
-                    onClick={() => router.push(`/projects/${project}/chats?playbook=${customPlaybook.name}`)}
+                    onClick={() => router.push(`/projects/${project}/chats/new?playbook=${customPlaybook.name}`)}
                   >
                     <PlayIcon className="h-3 w-3" />
                   </Button>
