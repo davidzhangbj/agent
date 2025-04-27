@@ -24,3 +24,10 @@ tsconfig.tsbuildinfo
 *.bun-build
 
 .eval-run-id
+
+.env.*
+.gitignore
+.vscode
+
+
+.apps/dbagent/scripts/obdoc

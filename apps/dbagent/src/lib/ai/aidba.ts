@@ -12,10 +12,11 @@ import {
 import { getTablesAndInstanceInfo, toolFindTableSchema } from '~/lib/tools/dbinfo';
 import { getPlaybook, listPlaybooks } from '~/lib/tools/playbooks';
 import { toolDescribeTable, toolExplainQuery, toolGetSlowQueries } from '~/lib/tools/slow-queries';
+import { toolQueryRAG } from '../tools/rag';
 
 export const commonSystemPrompt = `
-You are an AI assistant expert in OceanBase and database administration.
-Your name is Xata Agent.
+You are an AI assistant expert in OceanBase database administration.
+Your name is OceanBase Assistant.
 Always answer SUCCINCTLY and to the point.
 Be CONCISE.
 `;
@@ -24,6 +25,9 @@ export const chatSystemPrompt = `${commonSystemPrompt}
 Provide clear, concise, and accurate responses to questions.
 Use the provided tools to get context from the OceanBase database to answer questions.
 When asked to run a playbook, use the getPlaybook tool to get the playbook contents. Then use the contents of the playbook as an action plan. Execute the plan step by step.
+
+You should use the [toolQueryRAG] tool to get the oceanbase contents for each step of the playbook if necessay.
+[toolQueryRAG] tool can give you all the information about oceanbase database.
 `;
 
 export const monitoringSystemPrompt = `${commonSystemPrompt}
@@ -173,6 +177,15 @@ instance/cluster on which the DB is running. Useful during the initial assessmen
       parameters: z.object({}),
       execute: async () => {
         return await getSqlLockWaitTimeout(connection.connectionString, connection.username, connection.password);
+      }
+    },
+    toolQueryRAG: {
+      description: `从知识库中检索信息，知识库中包含了 OceanBase（OB）数据库的各种文档，用于补充 LLM 所需的上下文信息。`,
+      parameters: z.object({
+        query: z.string()
+      }),
+      execute: async ({ query }) => {
+        return await toolQueryRAG(query, 2);
       }
     },
     // getPerformanceAndVacuumSettings: {
