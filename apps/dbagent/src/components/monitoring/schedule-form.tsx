@@ -29,9 +29,9 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import * as z from 'zod';
-import { Connection } from '~/lib/db/connections';
-import { Schedule } from '~/lib/db/schedules';
-import { ModelSelector } from '../chats/model-selector';
+import { Connection, Schedule } from '~/lib/db/schema';
+import { actionGetDefaultLanguageModel } from '../chat/actions';
+import { ModelSelector } from '../chat/model-selector';
 import { actionCreateSchedule, actionDeleteSchedule, actionGetSchedule, actionUpdateSchedule } from './actions';
 import { CronExpressionModal } from './cron-expression-modal';
 
@@ -73,12 +73,20 @@ export function ScheduleForm({ projectId, isEditMode, scheduleId, playbooks, con
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const playbook = searchParams.get('playbook');
 
+  const [defaultModel, setDefaultModel] = useState<{ id: string; name: string }>();
+  useEffect(() => {
+    void actionGetDefaultLanguageModel().then((model) => {
+      setDefaultModel(model);
+      form.setValue('model', model.id);
+    });
+  }, []);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       playbook: playbook || playbooks[0] || '',
       connection: connections.find((c) => c.isDefault)?.name || '',
-      model: 'openai-gpt-4o',
+      model: defaultModel?.id || 'chat',
       scheduleType: 'cron',
       minInterval: '5',
       maxInterval: '1440',
@@ -95,10 +103,11 @@ export function ScheduleForm({ projectId, isEditMode, scheduleId, playbooks, con
     if (isEditMode) {
       const fetchSchedule = async () => {
         const schedule = await actionGetSchedule(scheduleId);
+
         form.reset({
           playbook: schedule.playbook,
           connection: connections.find((c) => c.id === schedule.connectionId)?.name || '',
-          model: schedule.model || 'openai-gpt-4o',
+          model: schedule.model,
           scheduleType: schedule.scheduleType as 'automatic' | 'cron',
           cronExpression: schedule.cronExpression ?? undefined,
           minInterval: schedule.minInterval?.toString(),
@@ -112,7 +121,7 @@ export function ScheduleForm({ projectId, isEditMode, scheduleId, playbooks, con
       };
       void fetchSchedule();
     }
-  }, [isEditMode, form.reset, scheduleId]);
+  }, [isEditMode, form.reset, scheduleId, defaultModel]);
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     const schedule: Omit<Schedule, 'id' | 'userId'> = {
@@ -121,23 +130,26 @@ export function ScheduleForm({ projectId, isEditMode, scheduleId, playbooks, con
       model: data.model,
       playbook: data.playbook,
       scheduleType: data.scheduleType,
-      cronExpression: data.cronExpression,
-      additionalInstructions: data.additionalInstructions,
+      cronExpression: data.cronExpression ?? null,
+      additionalInstructions: data.additionalInstructions ?? null,
       minInterval: Number(data.minInterval),
       maxInterval: Number(data.maxInterval),
       maxSteps: Number(data.maxSteps),
       notifyLevel: data.notifyLevel,
-      extraNotificationText: data.extraNotificationText,
+      extraNotificationText: data.extraNotificationText ?? null,
       enabled: data.enabled,
       keepHistory: 300,
-      status: data.enabled ? 'scheduled' : 'disabled'
+      status: data.enabled ? 'scheduled' : 'disabled',
+      lastRun: null,
+      nextRun: data.enabled ? new Date(Date.now() + 1000 * 60 * Number(data.minInterval)).toISOString() : null,
+      failures: 0
     };
     if (isEditMode) {
       await actionUpdateSchedule({ ...schedule, id: scheduleId });
     } else {
       await actionCreateSchedule(schedule);
     }
-    console.log(data);
+
     router.push(`/projects/${projectId}/monitoring`);
   };
 
@@ -206,8 +218,8 @@ export function ScheduleForm({ projectId, isEditMode, scheduleId, playbooks, con
               control={form.control}
               name="model"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Model</FormLabel>
+                <FormItem className="flex flex-col space-y-2">
+                  <FormLabel className="block">Model</FormLabel>
                   <FormControl>
                     <ModelSelector value={field.value} onValueChange={field.onChange} />
                   </FormControl>

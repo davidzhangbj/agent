@@ -34,8 +34,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { ScheduleRun } from '~/lib/db/schedule-runs';
-import { Schedule } from '~/lib/db/schedules';
+import { NotificationLevel, Schedule, ScheduleRun } from '~/lib/db/schema';
 import { actionGetScheduleRuns } from './actions';
 
 export function ScheduleRunsTable({ schedule }: { schedule: Schedule }) {
@@ -64,7 +63,7 @@ export function ScheduleRunsTable({ schedule }: { schedule: Schedule }) {
     }));
   };
 
-  const getLevelIcon = (level: 'info' | 'warning' | 'alert') => {
+  const getLevelIcon = (level: NotificationLevel) => {
     switch (level) {
       case 'info':
         return <Info className="h-5 w-5 text-blue-500" />;
@@ -210,7 +209,7 @@ export function ScheduleRunsTable({ schedule }: { schedule: Schedule }) {
                               <TooltipProvider>
                                 <Tooltip>
                                   <TooltipTrigger asChild>
-                                    <Link href={`/projects/${project}/chats?runId=${run.id}`}>
+                                    <Link href={`/projects/${project}/chats/new?scheduleRun=${run.id}`}>
                                       <Button variant="outline" size="icon" onClick={() => {}}>
                                         <MessageSquare className="h-4 w-4" />
                                         <span className="sr-only">Load in chat</span>

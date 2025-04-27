@@ -1,34 +1,35 @@
-import { describeTable, explainQuery, getSlowQueries } from '../targetdb/db-oceanbase';
+import { ClientBase, describeTable, explainQuery, findTableSchema, getSlowQueries } from '../targetdb/db-oceanbase';
 
-export async function toolGetSlowQueries(connString: string, username: string, password: string): Promise<string> {
-  const slowQueries = await getSlowQueries(connString, username, password);
-  const result = JSON.stringify(slowQueries);
+export async function toolGetSlowQueries(client: ClientBase, thresholdMs: number): Promise<string> {
+  const slowQueries = await getSlowQueries(client, thresholdMs);
+  // Filter out slow queries with query text larger than 5k characters
+  const filteredSlowQueries = slowQueries.map((query) => {
+    if (query.query_sql && query.query_sql.length > 5000) {
+      return {
+        ...query,
+        query: 'Err: query too long to analyze'
+      };
+    }
+    return query;
+  });
+
+  const result = JSON.stringify(filteredSlowQueries);
   console.log(result);
-  return JSON.stringify(slowQueries);
+
+  return JSON.stringify(filteredSlowQueries);
 }
 
-export async function toolExplainQuery(
-  connString: string,
-  username: string,
-  password: string,
-  query: string
-): Promise<string> {
-  const result = await explainQuery(connString, username, password, query);
-  return result;
+export async function toolExplainQuery(client: ClientBase, query: string): Promise<string> {
+  const result = await explainQuery(client, query);
+  return JSON.stringify(result);
 }
 
-export async function toolDescribeTable(
-  connString: string,
-  username: string,
-  password: string,
-  schema: string,
-  tableName: string
-): Promise<string> {
-  const result = await describeTable(connString, username, password, schema, tableName);
-  return result;
+export async function toolDescribeTable(client: ClientBase, schema: string, table: string): Promise<string> {
+  const result = await describeTable(client, schema, table);
+  return JSON.stringify(result);
 }
 
-// export async function toolGetPlanId(connString: string, username: string, password: string, sql_id: string): Promise<string> {
-//   const result = await getPlanID(connString, schema, query);
-//   return result;
-// }
+export async function toolFindTableSchema(client: ClientBase, table: string): Promise<string> {
+  const result = await findTableSchema(client, table);
+  return JSON.stringify(result);
+}

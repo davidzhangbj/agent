@@ -14,15 +14,25 @@ const schema = z.object({
   AUTH_OPENID_ISSUER: z.string().optional(),
 
   // LLM API credentials
-  OPENAI_API_KEY: z.string(),
+  OPENAI_API_KEY: z.string().optional(),
   DEEPSEEK_API_KEY: z.string().optional(),
   ANTHROPIC_API_KEY: z.string().optional(),
+  GOOGLE_GENERATIVE_AI_API_KEY: z.string().optional(),
+
+  // LiteLLM settings
+  LITELLM_BASE_URL: z.string().optional(),
+  LITELLM_API_KEY: z.string().optional(),
 
   // Scheduler
   MAX_PARALLEL_RUNS: z.number().default(20), // How many schedules can be run in parallel
   TIMEOUT_FOR_RUNNING_SCHEDULE_SECS: z.number().default(15 * 60), // How long to wait before assuming it's dead and restart
 
-  EVAL: z.string(z.enum(['true', 'false'])).default('false')
+  EVAL: z.string(z.enum(['true', 'false'])).default('false'),
+
+  // custom baseurl and api key
+  CUSTOM_BASE_URL: z.string().optional(),
+  CUSTOM_API_KEY: z.string().optional(),
+  CUSTOM_MODEL_NAME: z.string().optional()
 });
 
 const serverEnv = schema.parse(process.env);

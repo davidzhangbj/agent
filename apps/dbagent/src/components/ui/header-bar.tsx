@@ -32,7 +32,7 @@ export function Logo() {
     <Link href="/" className="flex items-center gap-1">
       {/* <XataAgentLogo size={160} /> */}
       <img src="/images/logos/chattoOB.png" alt="ChattoOB" className="w-1/7 h-auto"></img>
-      <h1 className="sr-only">xata agent</h1>
+      <h1 className="sr-only">chat to OB</h1>
     </Link>
   );
 }
