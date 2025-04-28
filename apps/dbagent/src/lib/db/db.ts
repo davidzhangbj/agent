@@ -72,7 +72,7 @@ export async function getVectorSearchResult(queryText: string, topK: number): Pr
 
     const result = await client.query(
       `SELECT id, content, metadata, embedding <=> $1 as similarity
-       FROM document_embeddings
+       FROM oba_obdoc
        ORDER BY similarity
        LIMIT $2`,
       [queryEmbedding, topK]

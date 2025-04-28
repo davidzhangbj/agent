@@ -1,8 +1,7 @@
-import mysql from 'mysql2';
-import { PoolConnection } from 'mysql2/promise';
+import mysql, { Connection, PoolConnection } from 'mysql2/promise';
 export type PoolConfig = mysql.PoolOptions;
 export type Pool = mysql.Pool;
-export type Client = mysql.Connection;
+export type Client = Connection;
 export type ClientBase = PoolConnection;
 
 export function getTargetDbPool(
@@ -21,9 +20,9 @@ export async function getTargetDbConnection(
   password: string
 ): Promise<any> {
   const parsed = parseConnectionString(connectionString);
-  parsed.username = username;
+  parsed.user = username;
   parsed.password = password;
-  const client = mysql.createConnection({ ...parsed });
+  const client = await mysql.createConnection({ ...parsed });
   return client;
 }
 
@@ -53,7 +52,7 @@ export async function withPoolConnection<T>(
   fn: (client: ClientBase) => Promise<T>
 ): Promise<T> {
   const poolInstance = typeof pool === 'function' ? await pool() : pool;
-  const client = await poolInstance.promise().getConnection();
+  const client = await poolInstance.getConnection();
   try {
     return await fn(client);
   } finally {

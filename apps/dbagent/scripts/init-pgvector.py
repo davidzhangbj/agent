@@ -46,12 +46,16 @@ async def main():
   
   # 检查并创建document_embeddings表
   with conn.cursor() as cur:
+    cur.execute(
+      """CREATE EXTENSION IF NOT EXISTS vector"""
+    )
+
     cur.execute("""
-      DROP TABLE IF EXISTS document_embeddings
+      DROP TABLE IF EXISTS oba_obdoc
     """)
     
     cur.execute("""
-      CREATE TABLE document_embeddings (
+      CREATE TABLE oba_obdoc (
         id TEXT PRIMARY KEY,
         content TEXT,
         metadata JSONB,
@@ -59,7 +63,7 @@ async def main():
       )
     """)
     conn.commit()
-    print("Created document_embeddings table")
+    print("Created oba_obdoc table")
   
   # 初始化embedding模型
   model = SentenceTransformer(EMBEDDING_MODEL)

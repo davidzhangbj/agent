@@ -16,6 +16,8 @@ During the initial assessment use the getTablesAndInstanceInfo, getPerfromanceAn
 and getPostgresExtensions tools.
 When asked to run a playbook, use the getPlaybook tool to get the playbook contents. Then use the contents of the playbook
 as an action plan. Execute the plan step by step.
+You should use the [queryRAG] tool to get the oceanbase contents for each step of the playbook if necessay.
+[queryRAG] tool can give you all the information about oceanbase database.
 `;
 
 export const monitoringSystemPrompt = `

@@ -675,3 +675,28 @@ export const playbooks = pgTable(
 
 export type Playbook = InferSelectModel<typeof playbooks>;
 export type PlaybookInsert = InferInsertModel<typeof playbooks>;
+
+export const obaObdoc = pgTable(
+  'oba_obdoc',
+  {
+    id: text('id').primaryKey().notNull(),
+    content: text('content'),
+    metadata: jsonb('metadata').notNull(),
+    embedding: text('embedding').notNull().$type<string[]>()
+  },
+  (table) => [
+    index('idx_oba_obdoc_id').on(table.id),
+    index('idx_oba_obdoc_embedding').on(table.embedding),
+    pgPolicy('oba_obdoc_policy', {
+      to: authenticatedUser,
+      for: 'all',
+      using: sql`EXISTS (
+        SELECT 1 FROM project_members
+        WHERE project_id = current_setting('app.current_user', true)::TEXT
+      )`
+    })
+  ]
+);
+
+export type ObaObdoc = InferSelectModel<typeof obaObdoc>;
+export type ObaObdocInsert = InferInsertModel<typeof obaObdoc>;

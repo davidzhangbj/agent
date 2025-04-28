@@ -6,6 +6,19 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: false,
   transpilePackages: ['@internal/components'],
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-store'
+          }
+        ]
+      }
+    ];
+  },
   async redirects() {
     return [
       {
@@ -16,7 +29,12 @@ const nextConfig: NextConfig = {
     ];
   },
   async rewrites() {
-    return [];
+    return [
+      {
+        source: '/:path*.map',
+        destination: '/_next/static/:path*.map'
+      }
+    ];
   }
 };
 

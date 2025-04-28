@@ -38,6 +38,12 @@ Initialize the database:
 pnpm run db:migrate
 ```
 
+Initialize the ob knowledge base:
+
+```bash
+pnpm run db:init-obdoc
+```
+
 Run the app:
 
 ```bash
