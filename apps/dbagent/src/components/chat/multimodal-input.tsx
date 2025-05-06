@@ -80,7 +80,9 @@ function PureMultimodalInput({
   };
 
   const submitForm = useCallback(() => {
-    handleSubmit(undefined);
+    if (!input) return;
+
+    handleSubmit(input);
     setLocalStorageInput('');
     resetHeight();
 

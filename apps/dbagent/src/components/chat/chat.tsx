@@ -36,7 +36,30 @@ function PureChat({
   const [connectionId, setConnectionId] = useState<string>(defaultConnection?.id || '');
   const [model, setModel] = useState<string>(defaultLanguageModel);
 
-  const { messages, setMessages, handleSubmit, input, setInput, append, status, stop, reload } = useChat({
+  // 包装 handleSubmit 以在发送消息时更新记忆
+  const handleMemoryUpdate = async (message: string) => {
+    try {
+      await fetch('/api/memory', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: message })
+      });
+    } catch (error) {
+      console.error('Failed to update memory:', error);
+    }
+  };
+
+  const {
+    messages,
+    setMessages,
+    handleSubmit: originalHandleSubmit,
+    input,
+    setInput,
+    append,
+    status,
+    stop,
+    reload
+  } = useChat({
     id,
     body: { id, connectionId, model, useArtifacts: true },
     initialMessages,
@@ -83,6 +106,37 @@ function PureChat({
     }
   }, [initialized, initialMessages, reload]);
 
+  // 包装 handleSubmit 以在发送消息时更新记忆并获取相关上下文
+  const handleSubmit = async (input: string, options?: { data?: Record<string, unknown> }) => {
+    console.log('handleSubmit 开始执行，input:', input, 'options:', options);
+    try {
+      // 搜索相关记忆
+      console.log('准备搜索记忆...');
+      const response = await fetch(`/api/memory?query=${encodeURIComponent(input)}`);
+      const { results } = await response.json();
+      console.log('搜索记忆结果:', results);
+
+      // 更新当前消息的记忆
+      console.log('准备更新记忆...');
+      await handleMemoryUpdate(input);
+      console.log('记忆更新完成');
+
+      // 将相关记忆作为上下文添加到消息中
+      const contextMessage =
+        results.length > 0 ? `相关上下文：\n${results.map((m: string) => `- ${m}`).join('\n')}` : '';
+      console.log('构建的上下文消息:', contextMessage);
+
+      const messageWithContext = contextMessage ? `${contextMessage}\n\n${input}` : input;
+
+      // 调用原始 handleSubmit
+      console.log('准备调用原始 handleSubmit，messageWithContext:', messageWithContext);
+      return originalHandleSubmit(messageWithContext, options);
+    } catch (error) {
+      console.error('Error handling memory:', error);
+      return originalHandleSubmit(input, options);
+    }
+  };
+
   return (
     <>
       <div className="relative flex flex-col" style={{ height: heightScreen }}>
@@ -114,7 +168,9 @@ function PureChat({
             chatId={id}
             input={input}
             setInput={setInput}
-            handleSubmit={handleSubmit}
+            handleSubmit={(input, options) => {
+              return handleSubmit(input, options);
+            }}
             status={status}
             stop={stop}
             messages={messages}

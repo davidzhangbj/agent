@@ -161,9 +161,10 @@ export async function getPhysicalPlan(client: ClientBase, plan_id: string): Prom
 }
 
 export async function explainQuery(client: ClientBase, query: string): Promise<string> {
-  const [rows] = await client.query(`EXPLAIN FORMAT=JSON ${query}`);
+  const [rows] = await client.query(`EXPLAIN  ${query}`);
   console.log('explainQuery');
-  const explainQuery = JSON.stringify({ 'Query Plan': (rows as []).map((item) => item['Query Plan']).join('') });
+  // const explainQuery = JSON.stringify({ 'Query Plan': (rows as []).map((item) => item['Query Plan']).join('') });
+  const explainQuery = JSON.stringify(rows);
   return explainQuery;
 }
 
