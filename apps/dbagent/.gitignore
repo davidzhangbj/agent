@@ -57,3 +57,6 @@ yarn-error.log*
 /public/robots.txt
 /public/sitemap.xml
 /public/sitemap-*.xml
+
+# mcp source are custom local files
+/mcp-source/*

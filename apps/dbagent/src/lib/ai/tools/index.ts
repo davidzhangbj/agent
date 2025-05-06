@@ -8,6 +8,9 @@ import { commonToolset } from './common';
 import { getDBSQLTools } from './db';
 import { getPlaybookToolset } from './playbook';
 import { mergeToolsets } from './types';
+import { userMCPToolset } from './user-mcp';
+import { getCustomQueryTools } from './query';
+import { dbGetCustomTools } from '~/lib/db/custom-tool';
 
 export * from './cluster';
 export * from './common';
@@ -35,8 +38,11 @@ export async function getTools({
   const dbTools = getDBSQLTools(targetDb);
   const clusterTools = getDBClusterTools(dbAccess, connection, project.cloudProvider);
   const playbookToolset = getPlaybookToolset(dbAccess, project.id);
+  const customQueryTools = await getCustomQueryTools(targetDb);
+  const mcpTools = await userMCPToolset.getTools(userId);
+
   const artifactsToolset =
     useArtifacts && dataStream ? getArtifactTools({ dbAccess, userId, projectId: project.id, dataStream }) : {};
 
-  return mergeToolsets(commonToolset, playbookToolset, dbTools, clusterTools, artifactsToolset);
+  return mergeToolsets(mcpTools, customQueryTools, commonToolset, playbookToolset, dbTools, clusterTools, artifactsToolset);
 }
