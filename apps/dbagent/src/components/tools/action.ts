@@ -4,17 +4,22 @@ import { getDBClusterTools } from '~/lib/ai/tools/cluster';
 import { commonToolset } from '~/lib/ai/tools/common';
 import { getDBSQLTools } from '~/lib/ai/tools/db';
 import { getPlaybookToolset } from '~/lib/ai/tools/playbook';
+import { getCustomQueryTools } from '~/lib/ai/tools/query';
 import { mergeToolsets } from '~/lib/ai/tools/types';
 import { userMCPToolset } from '~/lib/ai/tools/user-mcp';
 import { getConnection, listConnections } from '~/lib/db/connections';
+import { dbDeleteCustomToolByName, dbGetCustomToolByName } from '~/lib/db/custom-tool';
 import { getUserSessionDBAccess } from '~/lib/db/db';
+import { MCPServer } from '~/lib/db/schema';
 import { getTargetDbPool } from '~/lib/targetdb/db';
+import { UserMcpServer } from '~/lib/tools/user-mcp-servers';
 import { requireUserSession } from '~/utils/route';
 
 export interface Tool {
   name: string;
   description: string;
   isBuiltIn: boolean;
+  customType?: 'MCP' | 'QUERY';
 }
 
 export async function actionGetConnections(projectId: string) {
@@ -83,24 +88,39 @@ export async function actionGetCustomTools(connectionId: string): Promise<Tool[]
       throw new Error('Connection not found');
     }
 
+    // Get SQL tools
+    const targetDb = getTargetDbPool(connection.connectionString);
+
     // Get MCP tools
     const mcpTools = await userMCPToolset.getTools(userId);
+    // Get Custom Query tools
+    const customTools = await getCustomQueryTools(targetDb);
 
     // Convert to array format
-    return Object.entries(mcpTools).map(([name, tool]) => ({
-      name,
-      description: tool.description || 'No description available',
-      isBuiltIn: false
-    }));
+    return Object.entries(customTools)
+      .map(([name, tool]) => ({
+        name,
+        description: tool.description || 'No description available',
+        isBuiltIn: false,
+        customType: 'QUERY'
+      }))
+      .concat(
+        Object.entries(mcpTools).map(([name, tool]) => ({
+          name,
+          description: tool.description || 'No description available',
+          isBuiltIn: false,
+          customType: 'MCP'
+        }))
+      );
   } catch (error) {
     console.error('Error getting custom tools:', error);
     return [];
   }
 }
 
-export async function actionGetCustomToolsFromMCPServer(serverFileName: string): Promise<Tool[]> {
+export async function actionGetCustomToolsFromMCPServer(server: UserMcpServer): Promise<Tool[]> {
   try {
-    const mcpTools = await userMCPToolset.getToolsFromMCPServer(serverFileName);
+    const mcpTools = await userMCPToolset.getToolsFromMCPServer(server);
     return Object.entries(mcpTools).map(([name, tool]) => ({
       name,
       description: tool.description || 'No description available',
@@ -110,4 +130,15 @@ export async function actionGetCustomToolsFromMCPServer(serverFileName: string):
     console.error('Error getting custom tools from MCP server:', error);
     return [];
   }
+}
+
+export async function actionDeleteCustomQueryToolByName(name: string) {
+  const dbAccess = await getUserSessionDBAccess();
+  await dbDeleteCustomToolByName(dbAccess, { name });
+  return;
+}
+
+export async function actionGetCustomQueryToolByName(name: string) {
+  const dbAccess = await getUserSessionDBAccess();
+  return dbGetCustomToolByName(dbAccess, { name });
 }

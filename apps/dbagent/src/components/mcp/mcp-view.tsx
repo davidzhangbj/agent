@@ -28,6 +28,7 @@ interface Tool {
 }
 
 export function McpView({ server }: { server: UserMcpServer }) {
+  console.log('server: ', server);
   const { project } = useParams<{ project: string }>();
   const router = useRouter();
   const [tools, setTools] = useState<Tool[]>([]);
@@ -43,14 +44,14 @@ export function McpView({ server }: { server: UserMcpServer }) {
       try {
         const [connectionsData, serverExists] = await Promise.all([
           actionGetConnections(project),
-          actionCheckUserMcpServerExists(server.fileName)
+          actionCheckUserMcpServerExists(server.name)
         ]);
 
         setIsInDb(serverExists);
 
         const defaultConnection = connectionsData.find((c: Connection) => c.isDefault);
         if (defaultConnection) {
-          const tools = await actionGetCustomToolsFromMCPServer(server.fileName);
+          const tools = await actionGetCustomToolsFromMCPServer(server);
           setTools(tools);
         }
         setError(null);
@@ -63,11 +64,11 @@ export function McpView({ server }: { server: UserMcpServer }) {
       }
     };
     void loadData();
-  }, [project, server.fileName, server.enabled]);
+  }, [project, server.name, server.enabled]);
 
   const handleDeleteServer = async () => {
     try {
-      await actionDeleteUserMcpServerFromDBAndFiles(server.fileName);
+      await actionDeleteUserMcpServerFromDBAndFiles(server.name);
       router.push(`/projects/${project}/mcp`);
     } catch (error) {
       console.error('Error deleting server:', error);
@@ -87,7 +88,7 @@ export function McpView({ server }: { server: UserMcpServer }) {
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>MCP Server: {server.serverName}</CardTitle>
+          <CardTitle>MCP Server: {server.name}</CardTitle>
           <CardDescription>
             <p className="text-muted-foreground">Version: {server.version}</p>
           </CardDescription>
@@ -97,6 +98,19 @@ export function McpView({ server }: { server: UserMcpServer }) {
             <div>
               <h3 className="font-semibold">File Path</h3>
               <p className="text-muted-foreground">{server.filePath}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold">Args</h3>
+              <p className="text-muted-foreground">{server.args}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold">Env</h3>
+              {server.env?.map(([key, value]) => (
+                <div key={key} className="flex">
+                  <span>{key}</span>:<span>{value}</span>
+                </div>
+              ))}
+              <p className="text-muted-foreground">{server.args}</p>
             </div>
             <div>
               <h3 className="font-semibold">Status</h3>

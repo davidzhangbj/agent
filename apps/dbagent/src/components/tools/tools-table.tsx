@@ -89,6 +89,9 @@ export function ToolsTable() {
     <div>
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Tools</h1>
+        <Button onClick={() => router.push(`/projects/${project}/tools/create`)}>
+          Add Custom SQL Tool
+        </Button>
       </div>
       <Table>
         <TableHeader>
@@ -114,7 +117,7 @@ export function ToolsTable() {
                   <Link href={getToolUrl(tool.name)}>{tool.name}</Link>
                 </Code>
               </TableCell>
-              <TableCell className="whitespace-nowrap">{tool.isBuiltIn ? 'Built-in' : 'Custom'}</TableCell>
+              <TableCell className="whitespace-nowrap">{tool.isBuiltIn ? 'Built-in' : `Custom(${tool.customType})`}</TableCell>
               <TableCell>{tool.description}</TableCell>
               <TableCell>
                 <div className="flex gap-2">

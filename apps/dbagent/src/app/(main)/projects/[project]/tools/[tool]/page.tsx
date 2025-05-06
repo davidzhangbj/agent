@@ -38,7 +38,8 @@ export default async function ToolPage({ params }: { params: Promise<PageParams>
         tool={{
           name: tool.name,
           description: tool.description,
-          isBuiltIn: tool.isBuiltIn
+          isBuiltIn: tool.isBuiltIn,
+          customType: tool.customType
         }}
       />
     </div>

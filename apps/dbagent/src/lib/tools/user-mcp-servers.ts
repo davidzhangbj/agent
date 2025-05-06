@@ -4,21 +4,23 @@ import { dbGetUserMcpServer, dbGetUserMcpServers } from '~/lib/db/user-mcp-serve
 //file name is the name of the file in the mcp-source folder without the .ts extension
 //filepath is just the name of the file in the mcp-source folder
 export interface UserMcpServer {
-  fileName: string;
-  serverName: string;
+  name: string;
   version: string;
   filePath: string;
   enabled: boolean;
+  args?: string | null;
+  env?: [string, string][] | null;
 }
 
 export async function getUserMcpServers(dbAccess: DBAccess): Promise<UserMcpServer[]> {
   const servers = await dbGetUserMcpServers(dbAccess);
   return servers.map((server) => ({
-    fileName: server.name,
-    serverName: server.serverName,
+    name: server.name,
     version: server.version,
     filePath: server.filePath,
-    enabled: server.enabled
+    enabled: server.enabled,
+    args: server.args,
+    env: server.env ? JSON.parse(server.env) : undefined
   }));
 }
 
@@ -28,10 +30,11 @@ export async function getUserMcpServer(dbAccess: DBAccess, serverName: string): 
     throw new Error(`Server with name "${serverName}" not found`);
   }
   return {
-    fileName: server.name,
-    serverName: server.serverName,
+    name: server.name,
     version: server.version,
     filePath: server.filePath,
-    enabled: server.enabled
+    enabled: server.enabled,
+    args: server.args,
+    env: server.env ? JSON.parse(server.env) : undefined
   };
 }

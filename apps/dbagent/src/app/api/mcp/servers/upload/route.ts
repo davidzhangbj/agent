@@ -1,7 +1,7 @@
 import { exec } from 'child_process';
 import { promises as fs } from 'fs';
 import { NextResponse } from 'next/server';
-import path from 'path';
+import * as path from 'path';
 import { promisify } from 'util';
 
 const execAsync = promisify(exec);

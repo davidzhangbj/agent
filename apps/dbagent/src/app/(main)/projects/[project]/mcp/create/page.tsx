@@ -1,77 +1,58 @@
 'use client';
 
-import { Button } from '@internal/components';
-import { UploadIcon } from 'lucide-react';
+import {
+  Button,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  Input,
+  useFieldArray,
+  useForm,
+  zodResolver
+} from '@internal/components';
+import { ChevronDown, ChevronRight, Trash2Icon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
+import * as z from 'zod';
+
+const formSchema = z.object({
+  name: z.string(),
+  args: z.string().optional(),
+  env: z.array(z.array(z.string()).length(2))
+});
 
 export default function CreateMcpPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [envOpen, setEnvOpen] = useState(false);
 
-  const validateFile = (file: File): boolean => {
-    if (!file.name.endsWith('.ts')) {
-      setError('Only TypeScript (.ts) files are allowed');
-      return false;
-    }
-    setError(null);
-    return true;
-  };
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema)
+  });
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  }, []);
+  const { fields, append, remove } = useFieldArray({
+    name: 'env',
+    control: form.control
+  });
 
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  }, []);
-
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-
-    const droppedFile = e.dataTransfer.files[0];
-    if (droppedFile && validateFile(droppedFile)) {
-      setFile(droppedFile);
-    }
-  }, []);
-
-  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile && validateFile(selectedFile)) {
-      setFile(selectedFile);
-    }
-  }, []);
-
-  const handleSubmit = async () => {
-    if (!file) return;
-
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
-    setError(null);
-
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await fetch('/api/mcp/servers/upload', {
-        method: 'POST',
-        body: formData
-      });
-
+      const response = await fetch('/api/mcp/servers/install', { method: 'POST', body: JSON.stringify(data) });
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to upload file');
+        throw new Error(errorData || 'Failed to upload file');
+      } else {
+        router.back();
       }
-
-      router.back();
     } catch (error) {
-      console.error('Error uploading file:', error);
-      setError(error instanceof Error ? error.message : 'Failed to upload file');
+      setError(error instanceof Error ? error.message : 'Failed to install mcp');
     } finally {
       setIsSubmitting(false);
     }
@@ -81,44 +62,79 @@ export default function CreateMcpPage() {
     <div className="container">
       <div className="mb-8">
         <h1 className="text-2xl font-bold">Create MCP Server</h1>
-        <p className="text-muted-foreground mt-2">Upload a TypeScript file to create a new MCP server.</p>
+        <p className="text-muted-foreground mt-2">Configure to create a new MCP server.</p>
       </div>
 
       <div className="space-y-6">
-        <div
-          className={`rounded-lg border-2 border-dashed p-8 text-center ${
-            isDragging ? 'border-primary bg-primary/5' : 'border-muted-foreground'
-          } ${error ? 'border-destructive' : ''}`}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-        >
-          <div className="flex flex-col items-center justify-center gap-4">
-            <UploadIcon className="text-muted-foreground h-8 w-8" />
-            <div className="text-muted-foreground text-sm">
-              {file ? (
-                <p>Selected file: {file.name}</p>
-              ) : (
-                <p>Drag and drop a TypeScript file here, or click to select</p>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>name</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
               )}
+            />
+            <FormField
+              control={form.control}
+              name="args"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>args</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <Collapsible onOpenChange={setEnvOpen} open={envOpen}>
+              <CollapsibleTrigger className="w-full">
+                <Button className="mt-3 w-full" variant="outline" type="button">
+                  {envOpen ? <ChevronDown /> : <ChevronRight />}
+                  Environment Variables
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                {fields.map((field, index) => (
+                  <div className="mt-3 flex w-full gap-2" key={field.id}>
+                    <div className="flex-1">
+                      <Input {...form.register(`env.${index}.${0}`)} placeholder='your environment variable key' />
+                    </div>
+                    <div className="flex-1">
+                      <Input {...form.register(`env.${index}.${1}`)} placeholder='your environment variable value' />
+                    </div>
+                    <Button type="button" variant="destructive" onClick={() => remove(index)}>
+                      <Trash2Icon />
+                    </Button>
+                    {/* <Button type="button" variant="outline">
+                      <EyeOffIcon />
+                    </Button> */}
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  className="mt-3 w-full"
+                  variant="ghost"
+                  onClick={() => append([''])}
+                >
+                  Add Environment Variable
+                </Button>
+              </CollapsibleContent>
+            </Collapsible>
+            {error && <div className="text-destructive text-sm">{error}</div>}
+            <div className="mt-3 flex justify-start gap-4">
+              <Button type="submit">{isSubmitting ? 'Installing...' : 'Install MCP Server'}</Button>
+              <Button type="button" variant="outline" onClick={() => router.back()} disabled={isSubmitting}>
+                Cancel
+              </Button>
             </div>
-            <input type="file" accept=".ts" onChange={handleFileSelect} className="hidden" id="file-upload" />
-            <Button variant="outline" onClick={() => document.getElementById('file-upload')?.click()}>
-              Select File
-            </Button>
-          </div>
-        </div>
-
-        {error && <div className="text-destructive text-center text-sm">{error}</div>}
-
-        <div className="flex justify-end gap-4">
-          <Button type="button" variant="outline" onClick={() => router.back()} disabled={isSubmitting}>
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit} disabled={isSubmitting || !file || !!error}>
-            {isSubmitting ? 'Uploading...' : 'Upload MCP Server'}
-          </Button>
-        </div>
+          </form>
+        </Form>
       </div>
     </div>
   );

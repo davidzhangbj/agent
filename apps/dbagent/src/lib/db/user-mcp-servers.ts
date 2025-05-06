@@ -8,7 +8,6 @@ import { UserMcpServer } from '~/lib/tools/user-mcp-servers';
 export async function dbGetUserMcpServers(dbAccess: DBAccess) {
   return await dbAccess.query(async ({ db }) => {
     const results = await db.select().from(mcpServers);
-
     return results;
   });
 }
@@ -29,11 +28,11 @@ export async function dbUpdateUserMcpServer(dbAccess: DBAccess, input: UserMcpSe
       .set({
         enabled: input.enabled
       })
-      .where(eq(mcpServers.name, input.fileName))
+      .where(eq(mcpServers.name, input.name))
       .returning();
 
     if (result.length === 0) {
-      throw new Error(`[UPDATE]Server with name "${input.fileName}" not found`);
+      throw new Error(`[UPDATE]Server with name "${input.name}" not found`);
     }
 
     return result[0];
@@ -43,21 +42,22 @@ export async function dbUpdateUserMcpServer(dbAccess: DBAccess, input: UserMcpSe
 export async function dbAddUserMcpServerToDB(dbAccess: DBAccess, input: UserMcpServer): Promise<UserMcpServer> {
   return await dbAccess.query(async ({ db }) => {
     // Check if server with same name exists
-    const existingServer = await db.select().from(mcpServers).where(eq(mcpServers.name, input.serverName)).limit(1);
+    const existingServer = await db.select().from(mcpServers).where(eq(mcpServers.name, input.name)).limit(1);
 
     if (existingServer.length > 0) {
-      throw new Error(`Server with name "${input.serverName}" already exists`);
+      throw new Error(`Server with name "${input.name}" already exists`);
     }
 
     // Create new server
     const result = await db
       .insert(mcpServers)
       .values({
-        name: input.fileName,
-        serverName: input.serverName,
+        name: input.name,
+        serverName: input.name,
         version: input.version,
         filePath: input.filePath,
-        enabled: input.enabled
+        enabled: input.enabled,
+        env: input.env ? JSON.stringify(input.env) : null
       })
       .returning();
 
@@ -68,11 +68,12 @@ export async function dbAddUserMcpServerToDB(dbAccess: DBAccess, input: UserMcpS
     }
 
     return {
-      fileName: server.name,
-      serverName: server.name,
+      name: server.name,
       version: server.version,
       filePath: server.filePath,
-      enabled: server.enabled
+      enabled: server.enabled,
+      args: server.args,
+      env: server.env ? JSON.parse(server.env) : undefined
     };
   });
 }

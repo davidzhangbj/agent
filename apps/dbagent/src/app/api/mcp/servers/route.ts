@@ -1,34 +1,12 @@
-import { promises as fs } from 'fs';
 import { NextResponse } from 'next/server';
-import path from 'path';
-import { getMCPSourceDir } from '~/lib/ai/tools/user-mcp';
-
-const mcpSourceDir = getMCPSourceDir();
+import { getUserSessionDBAccess } from '~/lib/db/db';
+import { getUserMcpServers } from '~/lib/tools/user-mcp-servers';
 
 export async function GET() {
+  const dbAccess = await getUserSessionDBAccess();
+
   try {
-    const files = await fs.readdir(mcpSourceDir);
-    const serverFiles = files.filter((file) => file.endsWith('.ts') && !file.endsWith('.d.ts'));
-
-    const servers = await Promise.all(
-      serverFiles.map(async (file) => {
-        const filePath = path.join(mcpSourceDir, file);
-        const content = await fs.readFile(filePath, 'utf-8');
-
-        // Extract server name and version from the file content
-        const nameMatch = content.match(/name:\s*['"]([^'"]+)['"]/);
-        const versionMatch = content.match(/version:\s*['"]([^'"]+)['"]/);
-
-        return {
-          fileName: path.basename(file, '.ts'),
-          serverName: nameMatch ? nameMatch[1] : path.basename(file, '.ts'),
-          version: versionMatch ? versionMatch[1] : '1.0.0',
-          filePath: file,
-          enabled: false
-        };
-      })
-    );
-
+    const servers = await getUserMcpServers(dbAccess);
     return NextResponse.json(servers);
   } catch (error) {
     console.error('Error reading MCP servers:', error);

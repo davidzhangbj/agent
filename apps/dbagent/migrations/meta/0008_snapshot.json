@@ -1,6 +1,6 @@
 {
-  "id": "ae498fc6-0234-4edd-9584-f023ad7fe625",
-  "prevId": "35bc8b93-8a60-408c-8428-3bff3063184b",
+  "id": "0ef5947c-d995-4d02-ac45-f40c50d68a37",
+  "prevId": "3a10041d-ce41-4cb5-bcfc-ecef88fb4a7a",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -91,8 +91,12 @@
           "name": "fk_artifact_documents_project",
           "tableFrom": "artifact_documents",
           "tableTo": "projects",
-          "columnsFrom": ["project_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "project_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -100,7 +104,9 @@
       "compositePrimaryKeys": {
         "artifact_documents_id_pk": {
           "name": "artifact_documents_id_pk",
-          "columns": ["id"]
+          "columns": [
+            "id"
+          ]
         }
       },
       "uniqueConstraints": {},
@@ -109,7 +115,9 @@
           "name": "artifact_documents_policy",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": ["authenticated_user"],
+          "to": [
+            "authenticated_user"
+          ],
           "using": "EXISTS (\n          SELECT 1 FROM project_members\n          WHERE project_id = artifact_documents.project_id AND user_id = current_setting('app.current_user', true)::TEXT\n        )"
         }
       },
@@ -236,8 +244,12 @@
           "name": "fk_artifact_suggestions_project",
           "tableFrom": "artifact_suggestions",
           "tableTo": "projects",
-          "columnsFrom": ["project_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "project_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -245,8 +257,12 @@
           "name": "fk_artifact_suggestions_document",
           "tableFrom": "artifact_suggestions",
           "tableTo": "artifact_documents",
-          "columnsFrom": ["document_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "document_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -254,7 +270,9 @@
       "compositePrimaryKeys": {
         "artifact_suggestions_id_pk": {
           "name": "artifact_suggestions_id_pk",
-          "columns": ["id"]
+          "columns": [
+            "id"
+          ]
         }
       },
       "uniqueConstraints": {},
@@ -263,7 +281,9 @@
           "name": "artifact_suggestions_policy",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": ["authenticated_user"],
+          "to": [
+            "authenticated_user"
+          ],
           "using": "EXISTS (\n          SELECT 1 FROM project_members\n          WHERE project_id = artifact_suggestions.project_id AND user_id = current_setting('app.current_user', true)::TEXT\n        )"
         }
       },
@@ -352,8 +372,12 @@
           "name": "fk_aws_cluster_connections_project",
           "tableFrom": "aws_cluster_connections",
           "tableTo": "projects",
-          "columnsFrom": ["project_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "project_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -361,8 +385,12 @@
           "name": "fk_aws_cluster_connections_cluster",
           "tableFrom": "aws_cluster_connections",
           "tableTo": "aws_clusters",
-          "columnsFrom": ["cluster_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "cluster_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -370,8 +398,12 @@
           "name": "fk_aws_cluster_connections_connection",
           "tableFrom": "aws_cluster_connections",
           "tableTo": "connections",
-          "columnsFrom": ["connection_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "connection_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -383,7 +415,9 @@
           "name": "aws_cluster_connections_policy",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": ["authenticated_user"],
+          "to": [
+            "authenticated_user"
+          ],
           "using": "EXISTS (\n        SELECT 1 FROM project_members\n        WHERE project_id = aws_cluster_connections.project_id AND user_id = current_setting('app.current_user', true)::TEXT\n      )"
         }
       },
@@ -449,8 +483,12 @@
           "name": "fk_aws_clusters_project",
           "tableFrom": "aws_clusters",
           "tableTo": "projects",
-          "columnsFrom": ["project_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "project_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -460,7 +498,9 @@
         "uq_aws_clusters_integration_identifier": {
           "name": "uq_aws_clusters_integration_identifier",
           "nullsNotDistinct": false,
-          "columns": ["cluster_identifier"]
+          "columns": [
+            "cluster_identifier"
+          ]
         }
       },
       "policies": {
@@ -468,7 +508,9 @@
           "name": "aws_clusters_policy",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": ["authenticated_user"],
+          "to": [
+            "authenticated_user"
+          ],
           "using": "EXISTS (\n        SELECT 1 FROM project_members\n        WHERE project_id = aws_clusters.project_id AND user_id = current_setting('app.current_user', true)::TEXT\n      )"
         }
       },
@@ -555,8 +597,12 @@
           "name": "fk_chats_project",
           "tableFrom": "chats",
           "tableTo": "projects",
-          "columnsFrom": ["project_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "project_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -568,7 +614,9 @@
           "name": "chats_policy",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": ["authenticated_user"],
+          "to": [
+            "authenticated_user"
+          ],
           "using": "EXISTS (\n        SELECT 1 FROM project_members\n        WHERE project_id = chats.project_id AND user_id = current_setting('app.current_user', true)::TEXT\n      )"
         }
       },
@@ -648,8 +696,12 @@
           "name": "fk_connection_info_project",
           "tableFrom": "connection_info",
           "tableTo": "projects",
-          "columnsFrom": ["project_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "project_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -657,8 +709,12 @@
           "name": "fk_connection_info_connection",
           "tableFrom": "connection_info",
           "tableTo": "connections",
-          "columnsFrom": ["connection_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "connection_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -668,7 +724,10 @@
         "uq_connection_info": {
           "name": "uq_connection_info",
           "nullsNotDistinct": false,
-          "columns": ["connection_id", "type"]
+          "columns": [
+            "connection_id",
+            "type"
+          ]
         }
       },
       "policies": {
@@ -676,7 +735,9 @@
           "name": "connection_info_policy",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": ["authenticated_user"],
+          "to": [
+            "authenticated_user"
+          ],
           "using": "EXISTS (\n        SELECT 1 FROM project_members\n        WHERE project_id = connection_info.project_id AND user_id = current_setting('app.current_user', true)::TEXT\n      )"
         }
       },
@@ -742,8 +803,12 @@
           "name": "fk_connections_project",
           "tableFrom": "connections",
           "tableTo": "projects",
-          "columnsFrom": ["project_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "project_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -753,12 +818,18 @@
         "uq_connections_name": {
           "name": "uq_connections_name",
           "nullsNotDistinct": false,
-          "columns": ["project_id", "name"]
+          "columns": [
+            "project_id",
+            "name"
+          ]
         },
         "uq_connections_connection_string": {
           "name": "uq_connections_connection_string",
           "nullsNotDistinct": false,
-          "columns": ["project_id", "connection_string"]
+          "columns": [
+            "project_id",
+            "connection_string"
+          ]
         }
       },
       "policies": {
@@ -766,10 +837,57 @@
           "name": "connections_policy",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": ["authenticated_user"],
+          "to": [
+            "authenticated_user"
+          ],
           "using": "EXISTS (\n        SELECT 1 FROM project_members\n        WHERE project_id = connections.project_id AND user_id = current_setting('app.current_user', true)::TEXT\n      )"
         }
       },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.custom_tools": {
+      "name": "custom_tools",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "script": {
+          "name": "script",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
     },
@@ -855,8 +973,12 @@
           "name": "fk_gcp_instance_connections_project",
           "tableFrom": "gcp_instance_connections",
           "tableTo": "projects",
-          "columnsFrom": ["project_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "project_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -864,8 +986,12 @@
           "name": "fk_gcp_instance_connections_instance",
           "tableFrom": "gcp_instance_connections",
           "tableTo": "gcp_instances",
-          "columnsFrom": ["instance_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "instance_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -873,8 +999,12 @@
           "name": "fk_gcp_instance_connections_connection",
           "tableFrom": "gcp_instance_connections",
           "tableTo": "connections",
-          "columnsFrom": ["connection_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "connection_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -886,7 +1016,9 @@
           "name": "gcp_instance_connections_policy",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": ["authenticated_user"],
+          "to": [
+            "authenticated_user"
+          ],
           "using": "EXISTS (\n        SELECT 1 FROM project_members\n        WHERE project_id = gcp_instance_connections.project_id AND user_id = current_setting('app.current_user', true)::TEXT\n      )"
         }
       },
@@ -951,8 +1083,12 @@
           "name": "fk_gcp_instances_project",
           "tableFrom": "gcp_instances",
           "tableTo": "projects",
-          "columnsFrom": ["project_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "project_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -962,7 +1098,11 @@
         "uq_gcp_instances_instance_name": {
           "name": "uq_gcp_instances_instance_name",
           "nullsNotDistinct": false,
-          "columns": ["project_id", "gcp_project_id", "instance_name"]
+          "columns": [
+            "project_id",
+            "gcp_project_id",
+            "instance_name"
+          ]
         }
       },
       "policies": {
@@ -970,7 +1110,9 @@
           "name": "gcp_instances_policy",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": ["authenticated_user"],
+          "to": [
+            "authenticated_user"
+          ],
           "using": "EXISTS (\n        SELECT 1 FROM project_members\n        WHERE project_id = gcp_instances.project_id AND user_id = current_setting('app.current_user', true)::TEXT\n      )"
         }
       },
@@ -1029,8 +1171,12 @@
           "name": "fk_integrations_project",
           "tableFrom": "integrations",
           "tableTo": "projects",
-          "columnsFrom": ["project_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "project_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1040,7 +1186,10 @@
         "uq_integrations_name": {
           "name": "uq_integrations_name",
           "nullsNotDistinct": false,
-          "columns": ["project_id", "name"]
+          "columns": [
+            "project_id",
+            "name"
+          ]
         }
       },
       "policies": {
@@ -1048,7 +1197,9 @@
           "name": "integrations_policy",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": ["authenticated_user"],
+          "to": [
+            "authenticated_user"
+          ],
           "using": "EXISTS (\n        SELECT 1 FROM project_members\n        WHERE project_id = integrations.project_id AND user_id = current_setting('app.current_user', true)::TEXT\n      )"
         }
       },
@@ -1072,6 +1223,36 @@
           "primaryKey": false,
           "notNull": true
         },
+        "server_name": {
+          "name": "server_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "file_path": {
+          "name": "file_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "version": {
+          "name": "version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "args": {
+          "name": "args",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "env": {
+          "name": "env",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "enabled": {
           "name": "enabled",
           "type": "boolean",
@@ -1094,7 +1275,16 @@
         "uq_mcp_servers_name": {
           "name": "uq_mcp_servers_name",
           "nullsNotDistinct": false,
-          "columns": ["name"]
+          "columns": [
+            "name"
+          ]
+        },
+        "uq_mcp_servers_server_name": {
+          "name": "uq_mcp_servers_server_name",
+          "nullsNotDistinct": false,
+          "columns": [
+            "server_name"
+          ]
         }
       },
       "policies": {
@@ -1102,7 +1292,9 @@
           "name": "mcp_servers_policy",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": ["authenticated_user"],
+          "to": [
+            "authenticated_user"
+          ],
           "using": "true"
         }
       },
@@ -1218,8 +1410,12 @@
           "name": "fk_votes_chat",
           "tableFrom": "message_votes",
           "tableTo": "chats",
-          "columnsFrom": ["chat_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "chat_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1227,8 +1423,12 @@
           "name": "fk_message_votes_message",
           "tableFrom": "message_votes",
           "tableTo": "messages",
-          "columnsFrom": ["message_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "message_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1236,8 +1436,12 @@
           "name": "fk_message_votes_project",
           "tableFrom": "message_votes",
           "tableTo": "projects",
-          "columnsFrom": ["project_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "project_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1245,7 +1449,11 @@
       "compositePrimaryKeys": {
         "message_votes_chat_id_message_id_user_id_pk": {
           "name": "message_votes_chat_id_message_id_user_id_pk",
-          "columns": ["chat_id", "message_id", "user_id"]
+          "columns": [
+            "chat_id",
+            "message_id",
+            "user_id"
+          ]
         }
       },
       "uniqueConstraints": {},
@@ -1254,7 +1462,9 @@
           "name": "message_votes_policy",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": ["authenticated_user"],
+          "to": [
+            "authenticated_user"
+          ],
           "using": "EXISTS (\n          SELECT 1 FROM project_members\n          WHERE project_id = message_votes.project_id AND user_id = current_setting('app.current_user', true)::TEXT\n        )"
         }
       },
@@ -1341,8 +1551,12 @@
           "name": "fk_messages_project",
           "tableFrom": "messages",
           "tableTo": "projects",
-          "columnsFrom": ["project_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "project_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1350,8 +1564,12 @@
           "name": "fk_messages_chat",
           "tableFrom": "messages",
           "tableTo": "chats",
-          "columnsFrom": ["chat_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "chat_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1363,7 +1581,9 @@
           "name": "messages_policy",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": ["authenticated_user"],
+          "to": [
+            "authenticated_user"
+          ],
           "using": "EXISTS (\n        SELECT 1 FROM project_members\n        WHERE project_id = messages.project_id AND user_id = current_setting('app.current_user', true)::TEXT\n      )"
         }
       },
@@ -1441,8 +1661,12 @@
           "name": "fk_playbooks_project",
           "tableFrom": "playbooks",
           "tableTo": "projects",
-          "columnsFrom": ["project_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "project_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1452,7 +1676,10 @@
         "uq_playbooks_name": {
           "name": "uq_playbooks_name",
           "nullsNotDistinct": false,
-          "columns": ["project_id", "name"]
+          "columns": [
+            "project_id",
+            "name"
+          ]
         }
       },
       "policies": {
@@ -1460,7 +1687,9 @@
           "name": "playbooks_policy",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": ["authenticated_user"],
+          "to": [
+            "authenticated_user"
+          ],
           "using": "EXISTS (\n        SELECT 1 FROM project_members\n        WHERE project_id = playbooks.project_id AND user_id = current_setting('app.current_user', true)::TEXT\n      )"
         }
       },
@@ -1528,8 +1757,12 @@
           "name": "fk_project_members_project",
           "tableFrom": "project_members",
           "tableTo": "projects",
-          "columnsFrom": ["project_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "project_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1539,7 +1772,10 @@
         "uq_project_members_user_project": {
           "name": "uq_project_members_user_project",
           "nullsNotDistinct": false,
-          "columns": ["project_id", "user_id"]
+          "columns": [
+            "project_id",
+            "user_id"
+          ]
         }
       },
       "policies": {
@@ -1547,7 +1783,9 @@
           "name": "project_members_policy",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": ["authenticated_user"],
+          "to": [
+            "authenticated_user"
+          ],
           "using": "true"
         }
       },
@@ -1588,28 +1826,36 @@
           "name": "projects_view_policy",
           "as": "PERMISSIVE",
           "for": "SELECT",
-          "to": ["authenticated_user"],
+          "to": [
+            "authenticated_user"
+          ],
           "using": "EXISTS (\n      SELECT 1 FROM project_members\n      WHERE project_id = projects.id AND user_id = current_setting('app.current_user', true)::TEXT\n    )"
         },
         "projects_create_policy": {
           "name": "projects_create_policy",
           "as": "PERMISSIVE",
           "for": "INSERT",
-          "to": ["authenticated_user"],
+          "to": [
+            "authenticated_user"
+          ],
           "withCheck": "true"
         },
         "projects_update_policy": {
           "name": "projects_update_policy",
           "as": "PERMISSIVE",
           "for": "UPDATE",
-          "to": ["authenticated_user"],
+          "to": [
+            "authenticated_user"
+          ],
           "using": "EXISTS (\n      SELECT 1 FROM project_members\n      WHERE project_id = projects.id AND user_id = current_setting('app.current_user', true)::TEXT AND role = 'owner'\n    )"
         },
         "projects_delete_policy": {
           "name": "projects_delete_policy",
           "as": "PERMISSIVE",
           "for": "DELETE",
-          "to": ["authenticated_user"],
+          "to": [
+            "authenticated_user"
+          ],
           "using": "EXISTS (\n      SELECT 1 FROM project_members\n      WHERE project_id = projects.id AND user_id = current_setting('app.current_user', true)::TEXT AND role = 'owner'\n    )"
         }
       },
@@ -1746,8 +1992,12 @@
           "name": "fk_schedule_runs_project",
           "tableFrom": "schedule_runs",
           "tableTo": "projects",
-          "columnsFrom": ["project_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "project_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1755,8 +2005,12 @@
           "name": "fk_schedule_runs_schedule",
           "tableFrom": "schedule_runs",
           "tableTo": "schedules",
-          "columnsFrom": ["schedule_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "schedule_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1768,7 +2022,9 @@
           "name": "schedule_runs_policy",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": ["authenticated_user"],
+          "to": [
+            "authenticated_user"
+          ],
           "using": "EXISTS (\n        SELECT 1 FROM project_members\n        WHERE project_id = schedule_runs.project_id AND user_id = current_setting('app.current_user', true)::TEXT\n      )"
         }
       },
@@ -1990,8 +2246,12 @@
           "name": "fk_schedules_project",
           "tableFrom": "schedules",
           "tableTo": "projects",
-          "columnsFrom": ["project_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "project_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1999,8 +2259,12 @@
           "name": "fk_schedules_connection",
           "tableFrom": "schedules",
           "tableTo": "connections",
-          "columnsFrom": ["connection_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "connection_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2012,7 +2276,9 @@
           "name": "schedules_policy",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": ["authenticated_user"],
+          "to": [
+            "authenticated_user"
+          ],
           "using": "EXISTS (\n        SELECT 1 FROM project_members\n        WHERE project_id = schedules.project_id AND user_id = current_setting('app.current_user', true)::TEXT\n      )"
         }
       },
@@ -2024,22 +2290,37 @@
     "public.cloud_provider": {
       "name": "cloud_provider",
       "schema": "public",
-      "values": ["aws", "gcp", "other"]
+      "values": [
+        "aws",
+        "gcp",
+        "other"
+      ]
     },
     "public.member_role": {
       "name": "member_role",
       "schema": "public",
-      "values": ["owner", "member"]
+      "values": [
+        "owner",
+        "member"
+      ]
     },
     "public.notification_level": {
       "name": "notification_level",
       "schema": "public",
-      "values": ["info", "warning", "alert"]
+      "values": [
+        "info",
+        "warning",
+        "alert"
+      ]
     },
     "public.schedule_status": {
       "name": "schedule_status",
       "schema": "public",
-      "values": ["disabled", "scheduled", "running"]
+      "values": [
+        "disabled",
+        "scheduled",
+        "running"
+      ]
     }
   },
   "schemas": {},

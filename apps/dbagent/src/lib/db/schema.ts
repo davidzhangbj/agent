@@ -682,6 +682,8 @@ export const mcpServers = pgTable(
     serverName: text('server_name').notNull(),
     filePath: text('file_path').notNull(),
     version: text('version').notNull(),
+    args: text('args'),
+    env: text('env'),
     enabled: boolean('enabled').default(true).notNull(),
     createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull()
   },
@@ -698,3 +700,18 @@ export const mcpServers = pgTable(
 
 export type MCPServer = InferSelectModel<typeof mcpServers>;
 export type MCPServerInsert = InferInsertModel<typeof mcpServers>;
+
+
+export const customTools = pgTable(
+  'custom_tools',
+  {
+    id: uuid('id').primaryKey().defaultRandom().notNull(),
+    name: text('name').notNull(),
+    description: text('description'),
+    script: text('script').notNull(),
+    createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull()
+  }
+)
+
+export type CustomTool = InferSelectModel<typeof customTools>;
+export type CustomToolInsert = InferInsertModel<typeof customTools>;
