@@ -67,7 +67,13 @@ function PureChat({
     experimental_throttle: 100,
     sendExtraMessageFields: true,
     generateId: generateUUID,
+    onResponse: (response) => {
+      console.log('收到响应:', response);
+    },
     onFinish: () => {
+      console.log('Chat finished');
+      console.log('最后一条消息:', messages[messages.length - 1]);
+      console.log('完整消息列表:', messages);
       void queryClient.invalidateQueries({ queryKey: ['chats'] });
     },
     onError: (error) => {
@@ -75,6 +81,44 @@ function PureChat({
       toast.error('An error occured, please try again!');
     }
   });
+
+  // 包装 handleSubmit 以在发送消息时更新记忆并获取相关上下文
+  const handleSubmit = async (input: string, options?: { data?: Record<string, unknown> }) => {
+    console.log('handleSubmit 开始执行，input:', input, 'options:', options);
+    try {
+      // 搜索相关记忆
+      console.log('准备搜索记忆...');
+      const response = await fetch(`/api/memory?query=${encodeURIComponent(input)}`);
+      const { results } = await response.json();
+      console.log('搜索记忆结果:', results);
+
+      // 更新当前消息的记忆
+      console.log('准备更新记忆...');
+      await handleMemoryUpdate(input);
+      console.log('记忆更新完成');
+
+      // 将相关记忆作为上下文添加到消息中
+      const contextMessage =
+        results.length > 0
+          ? `相关上下文：
+${results.map((m: any) => `- ${m.memory}`).join('\n')}`
+          : '';
+      console.log('构建的上下文消息:', contextMessage);
+
+      const messageWithContext = contextMessage ? `${contextMessage}\n\n${input}` : input;
+      console.log('完整的消息内容:', messageWithContext);
+
+      // 调用原始 handleSubmit
+      console.log('准备调用原始 handleSubmit，参数:', { messageWithContext, options });
+      const result = await originalHandleSubmit(messageWithContext, options);
+      console.log('originalHandleSubmit 调用完成，返回结果:', result);
+      console.log('当前消息列表:', messages);
+      return result;
+    } catch (error) {
+      console.error('Error handling memory:', error);
+      return originalHandleSubmit(input, options);
+    }
+  };
 
   useEffect(() => {
     // On first load, refresh the chat history cache
@@ -105,37 +149,6 @@ function PureChat({
       }
     }
   }, [initialized, initialMessages, reload]);
-
-  // 包装 handleSubmit 以在发送消息时更新记忆并获取相关上下文
-  const handleSubmit = async (input: string, options?: { data?: Record<string, unknown> }) => {
-    console.log('handleSubmit 开始执行，input:', input, 'options:', options);
-    try {
-      // 搜索相关记忆
-      console.log('准备搜索记忆...');
-      const response = await fetch(`/api/memory?query=${encodeURIComponent(input)}`);
-      const { results } = await response.json();
-      console.log('搜索记忆结果:', results);
-
-      // 更新当前消息的记忆
-      console.log('准备更新记忆...');
-      await handleMemoryUpdate(input);
-      console.log('记忆更新完成');
-
-      // 将相关记忆作为上下文添加到消息中
-      const contextMessage =
-        results.length > 0 ? `相关上下文：\n${results.map((m: string) => `- ${m}`).join('\n')}` : '';
-      console.log('构建的上下文消息:', contextMessage);
-
-      const messageWithContext = contextMessage ? `${contextMessage}\n\n${input}` : input;
-
-      // 调用原始 handleSubmit
-      console.log('准备调用原始 handleSubmit，messageWithContext:', messageWithContext);
-      return originalHandleSubmit(messageWithContext, options);
-    } catch (error) {
-      console.error('Error handling memory:', error);
-      return originalHandleSubmit(input, options);
-    }
-  };
 
   return (
     <>
