@@ -23,7 +23,7 @@ const config = {
   apiKey: env.CUSTOM_API_KEY
 };
 const openai = createOpenAI(config);
-const llmModel = env.CUSTOM_MODEL_NAME || 'qwen-max-latest';
+const llmModel = env.CUSTOM_CHAT_MODEL_NAME || 'qwen-max-latest';
 export async function generateCronExpression(description: string): Promise<string> {
   const prompt = `Generate a cron expression for the following schedule description: "${description}". 
   Return strictly the cron expression, no quotes or anything else.`;

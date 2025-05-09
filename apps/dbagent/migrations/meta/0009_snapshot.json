@@ -1,6 +1,6 @@
 {
-  "id": "dc39eca8-a042-4d4c-bd1e-dbf090603859",
-  "prevId": "35bc8b93-8a60-408c-8428-3bff3063184b",
+  "id": "3a10041d-ce41-4cb5-bcfc-ecef88fb4a7a",
+  "prevId": "ae498fc6-0234-4edd-9584-f023ad7fe625",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -718,18 +718,6 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
-        },
-        "username": {
-          "name": "username",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "password": {
-          "name": "password",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
         }
       },
       "indexes": {
@@ -782,51 +770,6 @@
           "using": "EXISTS (\n        SELECT 1 FROM project_members\n        WHERE project_id = connections.project_id AND user_id = current_setting('app.current_user', true)::TEXT\n      )"
         }
       },
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.custom_tools": {
-      "name": "custom_tools",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "script": {
-          "name": "script",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
     },
@@ -1147,18 +1090,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "args": {
-          "name": "args",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "env": {
-          "name": "env",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "enabled": {
           "name": "enabled",
           "type": "boolean",
@@ -1457,82 +1388,6 @@
           "for": "ALL",
           "to": ["authenticated_user"],
           "using": "EXISTS (\n        SELECT 1 FROM project_members\n        WHERE project_id = messages.project_id AND user_id = current_setting('app.current_user', true)::TEXT\n      )"
-        }
-      },
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.oba_obdoc": {
-      "name": "oba_obdoc",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "content": {
-          "name": "content",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "metadata": {
-          "name": "metadata",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "embedding": {
-          "name": "embedding",
-          "type": "vector",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {
-        "idx_oba_obdoc_id": {
-          "name": "idx_oba_obdoc_id",
-          "columns": [
-            {
-              "expression": "id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_oba_obdoc_embedding": {
-          "name": "idx_oba_obdoc_embedding",
-          "columns": [
-            {
-              "expression": "embedding",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {
-        "oba_obdoc_policy": {
-          "name": "oba_obdoc_policy",
-          "as": "PERMISSIVE",
-          "for": "ALL",
-          "to": ["authenticated_user"],
-          "using": "EXISTS (\n        SELECT 1 FROM project_members\n        WHERE project_id = current_setting('app.current_user', true)::TEXT\n      )"
         }
       },
       "checkConstraints": {},
