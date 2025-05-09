@@ -39,6 +39,8 @@ const schema = z.object({
   // custom baseurl and api key
   CUSTOM_BASE_URL: z.string().optional(),
   CUSTOM_API_KEY: z.string().optional(),
+  // mem0
+  MEM0_API_KEY: z.string().optional()
   CUSTOM_CHAT_MODEL_NAME: z.string().optional(),
   CUSTOM_EMBEDDING_MODEL_NAME: z.string().optional()
 });

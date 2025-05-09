@@ -59,16 +59,7 @@ export class DBSQLTools implements ToolsetGroup {
   explainQuery(): Tool {
     const pool = this.#pool;
     return tool({
-      description: `解释一个SQL语句,返回的是从oceanbase中取得的执行计划.
-      返回的结果中partitions(p[0-12])表示使用了13个分区,而表总共13个分区,说明没有用上分区裁剪.
-      is_index_back=false,说明没有回表
-      is_global_index=false,说明没有全局索引
-      给用户输出一个explain的summary,示例如下:
-      分析 explain 结果可知， SQL扫描了**个分区，未使用分区键, 未使用全局索引，没有产生回表，建议：
-      1. 增加分区键***为过滤条件；
-      2. 如***字段不需要，可以从查询条件中移除
-      3. **字段使用了全表扫描,建议增加索引
-      4. ....`,
+      description: `解释一个SQL语句,返回的是从oceanbase中取得的执行计划，应当结合 queryRAG 检索的 Explain 解释内容解读。`,
       parameters: z.object({
         query: z.string()
       }),
