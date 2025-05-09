@@ -25,7 +25,7 @@ function PureMessages({ projectId, chatId, status, votes, messages, setMessages,
       {messages.length === 0 && (
         <div className="flex h-full flex-col items-center justify-center">
           {/* <XataAgentLogo size={300} /> */}
-          <img src="/images/logos/chattoOB-heng.png" alt="ChattoOB" className="h-auto w-1/2"></img>
+          <img src="/images/logos/obAgent2.png" alt="obAgent" className="h-auto w-1/2"></img>
         </div>
       )}
 

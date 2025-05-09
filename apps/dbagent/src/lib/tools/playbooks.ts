@@ -18,7 +18,13 @@ const OCEANBASE_SLOW_QUERIES_PLAYBOOK = `
 使用工具findTableSchema去发现你挑选的慢查询所关联表的Schema.
 使用工具describeTable去描述你发现的表
 步骤四:
-使用工具explainQuery去解释慢查询,把你找到的schema传递给工具
+使用工具explainQuery去解释慢查询,把你找到的schema传递给工具；
+注意 “Outputs & filters” 部分的输出：
+1. [!必须]输出 partitions 的数量，并与表结构的分区信息进行对比，是否扫描了所有分区导致效率下降；
+2. 输出 is_index_back 字段是否为 true，回表导致性能下降；
+3. 关注 is_index_range 字段是否为 true，范围扫描导致性能下降；
+步骤五:
+使用工具queryRAG查询相关的文档，帮助解释 explain 的结果。
 最后:
 在你完成之后,对你的发现做一个总结,并给用户一个建议SQL语句的示例.
 `;
