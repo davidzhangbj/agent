@@ -1,8 +1,9 @@
-// import { env as modelenv, pipeline } from '@xenova/transformers';
+import { env as modelenv, pipeline } from '@xenova/transformers';
 import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
-// import path from 'path';
 import OpenAI from 'openai';
+import path from 'path';
+
 import pg from 'pg';
 import { toSql } from 'pgvector/pg';
 import { requireUserSession } from '~/utils/route';
@@ -47,29 +48,29 @@ export class DBAdminAccess implements DBAccess {
   }
 }
 
-// async function generateEmbedding(text: string): Promise<number[]> {
-//   console.log('Starting embedding generation for text:', text.substring(0, 50) + '...');
-//   const modelPath = path.resolve(process.cwd(), 'public', 'model');
-//   console.log('Setting model path to:', modelPath);
-//   modelenv.localModelPath = modelPath;
-//   modelenv.allowRemoteModels = false;
-//   try {
-//     console.log('Loading feature extraction model...');
-//     const extractor = await pipeline('feature-extraction', 'Xenova/bge-base-zh-v1.5');
-//     console.log('Model loaded successfully');
+async function generateEmbedding(text: string): Promise<number[]> {
+  console.log('Starting embedding generation for text:', text.substring(0, 50) + '...');
+  const modelPath = path.resolve(process.cwd(), 'public', 'model');
+  console.log('Setting model path to:', modelPath);
+  modelenv.localModelPath = modelPath;
+  modelenv.allowRemoteModels = false;
+  try {
+    console.log('Loading feature extraction model...');
+    const extractor = await pipeline('feature-extraction', 'Xenova/bge-base-zh-v1.5');
+    console.log('Model loaded successfully');
 
-//     console.log('Generating embedding...');
-//     const output = await extractor(text, { pooling: 'mean', normalize: true });
-//     console.log('Embedding generated successfully');
+    console.log('Generating embedding...');
+    const output = await extractor(text, { pooling: 'mean', normalize: true });
+    console.log('Embedding generated successfully');
 
-//     const embedding = toSql(Array.from(output.data));
-//     console.log('Embedding converted to array, length:', embedding.length);
-//     return embedding;
-//   } catch (error) {
-//     console.error('Error generating embedding:', error);
-//     throw error;
-//   }
-// }
+    const embedding = toSql(Array.from(output.data));
+    console.log('Embedding converted to array, length:', embedding.length);
+    return embedding;
+  } catch (error) {
+    console.error('Error generating embedding:', error);
+    throw error;
+  }
+}
 
 async function generateEmbedding2(text: string): Promise<number[]> {
   const completion = await client.embeddings.create({
@@ -88,7 +89,7 @@ async function generateEmbedding2(text: string): Promise<number[]> {
 export async function getVectorSearchResult(queryText: string, topK: number): Promise<string[]> {
   const client = await pool.connect();
   try {
-    const queryEmbedding = await generateEmbedding2(queryText);
+    const queryEmbedding = await generateEmbedding(queryText);
     const result = await client.query(
       `SELECT id, content, metadata, embedding <=> $1 as similarity
        FROM oba_obdoc
