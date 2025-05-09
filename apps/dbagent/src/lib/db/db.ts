@@ -1,11 +1,8 @@
 import { env as modelenv, pipeline } from '@xenova/transformers';
 import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
-import path from 'path';
-
-// import { env as modelenv, pipeline } from '@xenova/transformers';
-// import path from 'path';
 import OpenAI from 'openai';
+import path from 'path';
 
 import pg from 'pg';
 import { toSql } from 'pgvector/pg';
@@ -92,7 +89,7 @@ async function generateEmbedding2(text: string): Promise<number[]> {
 export async function getVectorSearchResult(queryText: string, topK: number): Promise<string[]> {
   const client = await pool.connect();
   try {
-    const queryEmbedding = await generateEmbedding2(queryText);
+    const queryEmbedding = await generateEmbedding(queryText);
     const result = await client.query(
       `SELECT id, content, metadata, embedding <=> $1 as similarity
        FROM oba_obdoc
