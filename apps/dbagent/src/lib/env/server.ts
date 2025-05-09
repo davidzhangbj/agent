@@ -7,6 +7,9 @@ const schema = z.object({
   // The URL of the database that we use to store data
   DATABASE_URL: z.string(),
 
+  // MCP settings
+  MCP_SOURCE_DIR: z.string().optional(),
+
   // The OpenID client settings
   AUTH_SECRET: z.string().optional(),
   AUTH_OPENID_ID: z.string().optional(),
@@ -23,6 +26,10 @@ const schema = z.object({
   LITELLM_BASE_URL: z.string().optional(),
   LITELLM_API_KEY: z.string().optional(),
 
+  // Ollama settings
+  OLLAMA_HOST: z.string().optional(),
+  OLLAMA_HEADERS: z.record(z.string(), z.string()).optional(),
+
   // Scheduler
   MAX_PARALLEL_RUNS: z.number().default(20), // How many schedules can be run in parallel
   TIMEOUT_FOR_RUNNING_SCHEDULE_SECS: z.number().default(15 * 60), // How long to wait before assuming it's dead and restart
@@ -32,10 +39,10 @@ const schema = z.object({
   // custom baseurl and api key
   CUSTOM_BASE_URL: z.string().optional(),
   CUSTOM_API_KEY: z.string().optional(),
-  CUSTOM_MODEL_NAME: z.string().optional(),
-
   // mem0
   MEM0_API_KEY: z.string().optional()
+  CUSTOM_CHAT_MODEL_NAME: z.string().optional(),
+  CUSTOM_EMBEDDING_MODEL_NAME: z.string().optional()
 });
 
 const serverEnv = schema.parse(process.env);

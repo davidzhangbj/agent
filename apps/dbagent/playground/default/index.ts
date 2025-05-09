@@ -29,7 +29,7 @@ const config = {
   apiKey: env.CUSTOM_API_KEY
 };
 const openai = createOpenAI(config);
-const llmModel = env.CUSTOM_MODEL_NAME || 'qwen-max-latest';
+const llmModel = env.CUSTOM_CHAT_MODEL_NAME || 'qwen-max-latest';
 export function createAgents() {
   const evals = {
     completeness: new CompletenessMetric(),

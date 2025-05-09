@@ -2,11 +2,16 @@ import { env as modelenv, pipeline } from '@xenova/transformers';
 import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import path from 'path';
+import OpenAI from 'openai';
 import pg from 'pg';
 import { toSql } from 'pgvector/pg';
 import { requireUserSession } from '~/utils/route';
 import { env } from '../env/server';
 import { authenticatedUser } from './schema';
+const client = new OpenAI({
+  baseURL: env.CUSTOM_BASE_URL,
+  apiKey: env.CUSTOM_API_KEY
+});
 
 const pool = new pg.Pool({
   connectionString: env.DATABASE_URL,
@@ -42,6 +47,7 @@ export class DBAdminAccess implements DBAccess {
   }
 }
 
+
 async function generateEmbedding(text: string): Promise<number[]> {
   console.log('Starting embedding generation for text:', text.substring(0, 50) + '...');
   const modelPath = path.resolve(process.cwd(), 'public', 'model');
@@ -52,7 +58,6 @@ async function generateEmbedding(text: string): Promise<number[]> {
     console.log('Loading feature extraction model...');
     const extractor = await pipeline('feature-extraction', 'Xenova/bge-base-zh-v1.5');
     console.log('Model loaded successfully');
-
     console.log('Generating embedding...');
     const output = await extractor(text, { pooling: 'mean', normalize: true });
     console.log('Embedding generated successfully');
@@ -66,11 +71,24 @@ async function generateEmbedding(text: string): Promise<number[]> {
   }
 }
 
+async function generateEmbedding2(text: string): Promise<number[]> {
+  const completion = await client.embeddings.create({
+    model: env.CUSTOM_EMBEDDING_MODEL_NAME || 'text-embedding-v3',
+    input: text,
+    encoding_format: 'float',
+    dimensions: 768
+  });
+  // console.log('embedding', completion.data[0]?.embedding);
+  if (!completion.data[0]?.embedding) {
+    throw new Error('Embedding generation failed: no embedding returned.');
+  }
+  return toSql(completion.data[0].embedding);
+}
+
 export async function getVectorSearchResult(queryText: string, topK: number): Promise<string[]> {
   const client = await pool.connect();
   try {
     const queryEmbedding = await generateEmbedding(queryText);
-
     const result = await client.query(
       `SELECT id, content, metadata, embedding <=> $1 as similarity
        FROM oba_obdoc
