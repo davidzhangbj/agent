@@ -1,4 +1,4 @@
-import { env as modelenv, pipeline } from '@xenova/transformers';
+import { env as modelenv, pipeline } from '@huggingface/transformers';
 import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import OpenAI from 'openai';
@@ -56,7 +56,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
   modelenv.allowRemoteModels = false;
   try {
     console.log('Loading feature extraction model...');
-    const extractor = await pipeline('feature-extraction', 'Xenova/bge-base-zh-v1.5');
+    const extractor = await pipeline('feature-extraction', 'Xenova/bge-base-zh-v1.5', { dtype: 'q4', device: 'cpu' });
     console.log('Model loaded successfully');
 
     console.log('Generating embedding...');
