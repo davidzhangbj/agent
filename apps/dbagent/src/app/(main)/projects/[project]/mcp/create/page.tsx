@@ -94,10 +94,10 @@ export default function CreateMcpPage() {
             />
             <Collapsible onOpenChange={setEnvOpen} open={envOpen}>
               <CollapsibleTrigger className="w-full">
-                <Button className="mt-3 w-full" variant="outline" type="button">
+                <div className="hover:bg-accent hover:text-accent-foreground mt-3 flex w-full items-center justify-center gap-2 rounded-md border px-4 py-2">
                   {envOpen ? <ChevronDown /> : <ChevronRight />}
                   Environment Variables
-                </Button>
+                </div>
               </CollapsibleTrigger>
               <CollapsibleContent>
                 {fields.map((field, index) => (
