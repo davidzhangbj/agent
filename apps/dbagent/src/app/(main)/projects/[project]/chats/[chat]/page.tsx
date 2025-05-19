@@ -17,20 +17,8 @@ export default async function Page({ params }: { params: Promise<PageParams> }) 
 
   const suggestedActions = [
     {
-      title: 'Are there any performance issues with my database?',
-      action: 'Are there any performance issues with my database?'
-    },
-    {
-      title: 'What are the most expensive queries in my database?',
-      action: 'What are the most expensive queries in my database?'
-    },
-    {
-      title: 'How can I optimize my database queries?',
-      action: 'How can I optimize my database queries?'
-    },
-    {
-      title: 'What are the most common errors in my database?',
-      action: 'What are the most common errors in my database?'
+      title: 'Are there any slow queries with my database?',
+      action: 'Are there any slow queries with my database?'
     }
   ];
 

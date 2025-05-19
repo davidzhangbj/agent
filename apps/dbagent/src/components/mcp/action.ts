@@ -1,9 +1,7 @@
 'use server';
 
 import { exec } from 'child_process';
-import { promises as fs } from 'fs';
 import { promisify } from 'util';
-import { getMCPSourceDir } from '~/lib/ai/tools/user-mcp';
 import { getUserDBAccess } from '~/lib/db/db';
 import {
   dbAddUserMcpServerToDB,
@@ -28,21 +26,19 @@ export async function actionCheckUserMcpServerExists(serverName: string, asUserI
   const dbAccess = await getUserDBAccess(asUserId);
   const result = await dbGetUserMcpServer(dbAccess, serverName);
 
-  if (result) {
-    try {
-      await fs.stat(result.filePath);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-  return false;
+  // TODO：根据不同类型的 mcp 检查
+  return true;
 }
 
 export async function actionUpdateUserMcpServer(input: UserMcpServer, asUserId?: string) {
   // console.log('updating user mcp server {userMcpServer: ', input, '}');
   const dbAccess = await getUserDBAccess(asUserId);
   return await dbUpdateUserMcpServer(dbAccess, input);
+}
+
+export async function actionDeleteUserMcpServerFromDB(serverName: string, asUserId?: string) {
+  const dbAccess = await getUserDBAccess(asUserId);
+  return await dbDeleteUserMcpServer(dbAccess, serverName);
 }
 
 export async function actionGetUserMcpServer(serverName: string, asUserId?: string): Promise<UserMcpServer | null> {
@@ -71,24 +67,4 @@ export async function actionGetUserMcpServers(asUserId?: string): Promise<UserMc
     args: server.args,
     env: server.env ? JSON.parse(server.env) : undefined
   }));
-}
-
-export async function actionDeleteUserMcpServerFromDBAndFiles(serverName: string, asUserId?: string): Promise<void> {
-  const dbAccess = await getUserDBAccess(asUserId);
-
-  // Get the server details before deleting from DB
-  const server = await dbGetUserMcpServer(dbAccess, serverName);
-  if (server) {
-    await dbDeleteUserMcpServer(dbAccess, serverName);
-  }
-
-  // Delete the files
-  const mcpSourceDir = getMCPSourceDir();
-
-  try {
-    await execAsync(`pnpm uninstall --dir ${mcpSourceDir} ${server?.name}`);
-  } catch (error) {
-    console.error('Error deleting server files:', error);
-    // Don't throw the error since the DB deletion was successful
-  }
 }

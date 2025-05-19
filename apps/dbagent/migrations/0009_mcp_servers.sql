@@ -5,7 +5,7 @@ CREATE TABLE "mcp_servers" (
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"server_name" text NOT NULL,
 	"file_path" text NOT NULL,
-	"version" text NOT NULL,
+	"version" text NULL,
 	CONSTRAINT "uq_mcp_servers_name" UNIQUE("name"),
 	CONSTRAINT "uq_mcp_servers_server_name" UNIQUE("server_name")
 );

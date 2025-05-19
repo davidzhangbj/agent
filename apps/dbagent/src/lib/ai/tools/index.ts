@@ -3,7 +3,6 @@ import { Pool } from 'mysql2';
 import { getUserDBAccess } from '~/lib/db/db';
 import { Connection, Project } from '~/lib/db/schema';
 import { getArtifactTools } from './artifacts';
-import { getDBClusterTools } from './cluster';
 import { commonToolset } from './common';
 import { getDBSQLTools } from './db';
 import { getPlaybookToolset } from './playbook';
@@ -35,7 +34,7 @@ export async function getTools({
   const dbAccess = await getUserDBAccess(userId);
 
   const dbTools = getDBSQLTools(targetDb);
-  const clusterTools = getDBClusterTools(dbAccess, connection, project.cloudProvider);
+  // const clusterTools = getDBClusterTools(dbAccess, connection, project.cloudProvider);
   const playbookToolset = getPlaybookToolset(dbAccess, project.id);
   const customQueryTools = await getCustomQueryTools(targetDb);
   const mcpTools = await userMCPToolset.getTools(userId);
@@ -45,11 +44,11 @@ export async function getTools({
 
   return mergeToolsets(
     mcpTools,
-    customQueryTools,
+    // customQueryTools,
     commonToolset,
     playbookToolset,
     dbTools,
-    clusterTools,
+    // clusterTools,
     artifactsToolset
   );
 }
