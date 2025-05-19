@@ -19,7 +19,7 @@ import { useEffect, useState } from 'react';
 import { actionGetConnections, actionGetCustomToolsFromMCPServer } from '~/components/tools/action';
 import { Connection } from '~/lib/db/schema';
 import { UserMcpServer } from '~/lib/tools/user-mcp-servers';
-import { actionCheckUserMcpServerExists, actionDeleteUserMcpServerFromDBAndFiles } from './action';
+import { actionCheckUserMcpServerExists, actionDeleteUserMcpServerFromDB } from './action';
 
 interface Tool {
   name: string;
@@ -68,7 +68,7 @@ export function McpView({ server }: { server: UserMcpServer }) {
 
   const handleDeleteServer = async () => {
     try {
-      await actionDeleteUserMcpServerFromDBAndFiles(server.name);
+      await actionDeleteUserMcpServerFromDB(server.name);
       router.push(`/projects/${project}/mcp`);
     } catch (error) {
       console.error('Error deleting server:', error);

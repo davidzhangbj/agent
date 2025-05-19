@@ -73,6 +73,7 @@ export function McpTable() {
   };
 
   const handleToggleEnabled = async (targetMcpServer: UserMcpServer) => {
+    console.log('Toggling enabled for:', targetMcpServer.name);
     setMcpServers((prevServers) =>
       prevServers.map((server) =>
         server.name === targetMcpServer.name ? { ...server, enabled: !server.enabled } : server
@@ -82,11 +83,8 @@ export function McpTable() {
 
     //adds mcp server to db if it doesn't exist
     //updates mcp servers enabled status in db otherwise
-    const serverExists = await actionCheckUserMcpServerExists(targetMcpServer.name);
 
-    if (serverExists) {
-      await actionUpdateUserMcpServer(targetMcpServer);
-    }
+    await actionUpdateUserMcpServer(targetMcpServer);
   };
 
   useEffect(() => {

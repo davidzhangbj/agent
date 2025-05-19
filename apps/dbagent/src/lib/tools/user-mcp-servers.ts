@@ -5,7 +5,7 @@ import { dbGetUserMcpServer, dbGetUserMcpServers } from '~/lib/db/user-mcp-serve
 //filepath is just the name of the file in the mcp-source folder
 export interface UserMcpServer {
   name: string;
-  version: string;
+  version: string | null;
   filePath: string;
   enabled: boolean;
   args?: string | null;

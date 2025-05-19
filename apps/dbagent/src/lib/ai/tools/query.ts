@@ -12,6 +12,7 @@ export async function getCustomQueryTools(targetDb: Pool) {
       return {
         ...acc,
         [row.name]: tool({
+          name: row.name,
           description: row.description ?? undefined,
           parameters: z.object({}),
           execute: async () => {
