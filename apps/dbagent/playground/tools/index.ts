@@ -12,7 +12,7 @@ import { getConnectionByName, getDefaultConnection } from '~/lib/db/connections'
 import { DBUserAccess } from '~/lib/db/db';
 import { getProjectByName } from '~/lib/db/projects';
 import { CloudProvider, Connection } from '~/lib/db/schema';
-import { getTargetDbPool, Pool } from '~/lib/targetdb/db';
+import { getTargetDbPool, Pool } from '~/lib/targetdb/db-oceanbase';
 
 type PlaygroundToolsConfig = {
   projectConnection?: string;
