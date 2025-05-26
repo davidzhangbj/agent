@@ -23,9 +23,10 @@ async function initObdoc() {
   try {
     client = await pool.connect();
 
-    // Read SQL file
+    // Read SQL file as Buffer to avoid serializing big strings
     const sqlPath = join(CURRENT_DIR, 'oba_obdoc.sql');
-    const sqlContent = readFileSync(sqlPath, 'utf-8');
+    const sqlBuffer = readFileSync(sqlPath);
+    const sqlContent = sqlBuffer.toString('utf-8');
 
     // Execute SQL
     await client.query(sqlContent);

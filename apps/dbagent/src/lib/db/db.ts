@@ -1,7 +1,7 @@
 import { env as modelenv, pipeline } from '@huggingface/transformers';
 import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
-import OpenAI from 'openai';
+// import OpenAI from 'openai';
 import path from 'path';
 
 import pg from 'pg';
@@ -9,10 +9,10 @@ import { toSql } from 'pgvector/pg';
 import { requireUserSession } from '~/utils/route';
 import { env } from '../env/server';
 import { authenticatedUser } from './schema';
-const client = new OpenAI({
-  baseURL: env.CUSTOM_BASE_URL,
-  apiKey: env.CUSTOM_API_KEY
-});
+// const client = new OpenAI({
+//   baseURL: env.CUSTOM_BASE_URL,
+//   apiKey: env.CUSTOM_API_KEY
+// });
 
 const pool = new pg.Pool({
   connectionString: env.DATABASE_URL,
@@ -72,19 +72,19 @@ async function generateEmbedding(text: string): Promise<number[]> {
   }
 }
 
-async function generateEmbedding2(text: string): Promise<number[]> {
-  const completion = await client.embeddings.create({
-    model: env.CUSTOM_EMBEDDING_MODEL_NAME || 'text-embedding-v3',
-    input: text,
-    encoding_format: 'float',
-    dimensions: 768
-  });
-  // console.log('embedding', completion.data[0]?.embedding);
-  if (!completion.data[0]?.embedding) {
-    throw new Error('Embedding generation failed: no embedding returned.');
-  }
-  return toSql(completion.data[0].embedding);
-}
+// async function generateEmbedding2(text: string): Promise<number[]> {
+//   const completion = await client.embeddings.create({
+//     model: env.CUSTOM_EMBEDDING_MODEL_NAME || 'text-embedding-v3',
+//     input: text,
+//     encoding_format: 'float',
+//     dimensions: 768
+//   });
+//   // console.log('embedding', completion.data[0]?.embedding);
+//   if (!completion.data[0]?.embedding) {
+//     throw new Error('Embedding generation failed: no embedding returned.');
+//   }
+//   return toSql(completion.data[0].embedding);
+// }
 
 export async function getVectorSearchResult(queryText: string, topK: number): Promise<string[]> {
   const client = await pool.connect();

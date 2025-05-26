@@ -1,7 +1,7 @@
 'use server';
 
-import { exec } from 'child_process';
-import { promisify } from 'util';
+// import { exec } from 'child_process';
+// import { promisify } from 'util';
 import { getUserDBAccess } from '~/lib/db/db';
 import {
   dbAddUserMcpServerToDB,
@@ -12,7 +12,7 @@ import {
 } from '~/lib/db/user-mcp-servers';
 import { UserMcpServer } from '~/lib/tools/user-mcp-servers';
 
-const execAsync = promisify(exec);
+// const execAsync = promisify(exec);
 
 //playbook db insert
 export async function actionAddUserMcpServerToDB(input: UserMcpServer, asUserId?: string): Promise<UserMcpServer> {
@@ -21,10 +21,10 @@ export async function actionAddUserMcpServerToDB(input: UserMcpServer, asUserId?
   return await dbAddUserMcpServerToDB(dbAccess, input);
 }
 
-export async function actionCheckUserMcpServerExists(serverName: string, asUserId?: string): Promise<boolean> {
+export async function actionCheckUserMcpServerExists(_serverName: string, _asUserId?: string): Promise<boolean> {
   // console.log(`checking if mcp server exists {serverName: ${serverName}}`);
-  const dbAccess = await getUserDBAccess(asUserId);
-  const result = await dbGetUserMcpServer(dbAccess, serverName);
+  // const dbAccess = await getUserDBAccess(asUserId);
+  // const result = await dbGetUserMcpServer(dbAccess, serverName);
 
   // TODO：根据不同类型的 mcp 检查
   return true;

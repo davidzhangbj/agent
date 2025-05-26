@@ -147,8 +147,8 @@ const builtinCustomModels: Record<string, BuiltinModel> = {
   chat: defaultLanguageModel,
   // title: builtinProviderModels['openai:gpt-4.1-mini']!,
   // summary: builtinProviderModels['openai:gpt-4.1-mini']!
-  title: defaultLanguageModel!,
-  summary: defaultLanguageModel!
+  title: defaultLanguageModel,
+  summary: defaultLanguageModel
 };
 
 const builtinModels: Record<string, BuiltinModel> = {

@@ -26,9 +26,13 @@ export function ToolView({ tool }: { tool: Tool }) {
 
   useEffect(() => {
     if (tool.customType === 'QUERY') {
-      actionGetCustomQueryToolByName(tool.name).then((data) => {
-        setSQL(data?.script as string);
-      });
+      actionGetCustomQueryToolByName(tool.name)
+        .then((data) => {
+          setSQL(data?.script as string);
+        })
+        .catch((error) => {
+          console.error('Error fetching custom query tool:', error);
+        });
     }
   }, []);
 

@@ -5,7 +5,7 @@ import { getChatSystemPrompt, getModelInstance } from '~/lib/ai/agent';
 import { getTools } from '~/lib/ai/tools';
 import { Connection, Project } from '~/lib/db/schema';
 import { env } from '~/lib/env/eval';
-import { getTargetDbPool } from '~/lib/targetdb/db';
+import { getTargetDbPool } from '~/lib/targetdb/db-oceanbase';
 import { traceVercelAiResponse } from './trace';
 
 export const evalChat = async ({
@@ -28,12 +28,14 @@ export const evalChat = async ({
     name: 'evaldb',
     connectionString: dbConnection,
     projectId: project.id,
-    isDefault: true
+    isDefault: true,
+    username: 'evalUser',
+    password: 'evalPassword'
   };
 
   const targetDb = getTargetDbPool(connection.connectionString);
   try {
-    const tools = await getTools({ project, connection, targetDb, userId: 'evalUser' });
+    const tools = await getTools({ project, _connection: connection, targetDb, userId: 'evalUser' });
     const response = await generateText({
       model: await getModelInstance(env.CHAT_MODEL),
       system: getChatSystemPrompt({ cloudProvider: project.cloudProvider }),

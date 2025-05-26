@@ -9,7 +9,7 @@ import { getToolsFromMCPServer, userMCPToolset } from '~/lib/ai/tools/user-mcp';
 import { getConnection, listConnections } from '~/lib/db/connections';
 import { dbDeleteCustomToolByName, dbGetCustomToolByName } from '~/lib/db/custom-tool';
 import { getUserSessionDBAccess } from '~/lib/db/db';
-import { getTargetDbPool } from '~/lib/targetdb/db';
+import { getTargetDbPool } from '~/lib/targetdb/db-oceanbase';
 import { UserMcpServer } from '~/lib/tools/user-mcp-servers';
 import { requireUserSession } from '~/utils/route';
 
@@ -99,7 +99,7 @@ export async function actionGetCustomTools(connectionId: string): Promise<Tool[]
       name,
       description: tool.description || 'No description available',
       isBuiltIn: false,
-      customType: 'MCP'
+      customType: 'MCP' as const
     }));
 
     // 合并 customTools 的内容
@@ -107,7 +107,7 @@ export async function actionGetCustomTools(connectionId: string): Promise<Tool[]
       name,
       description: tool.description || 'No description available',
       isBuiltIn: false,
-      customType: 'QUERY'
+      customType: 'QUERY' as const
     }));
 
     return [...result, ...customToolsArray];

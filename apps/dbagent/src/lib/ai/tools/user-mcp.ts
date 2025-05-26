@@ -28,7 +28,7 @@ async function getToolsFromAllEnabledMCPServers(userId?: string) {
     return mcpServersTools.reduce((acc, tools) => ({ ...acc, ...tools }), {});
   } catch (error) {
     console.error('Error in getToolsFromMCPServer:', error);
-    return [];
+    return {};
   }
 }
 
@@ -116,7 +116,7 @@ async function getToolsFromSSE(server: UserMcpServer) {
     const rawTools = await client.listTools();
     const rowToolsList = rawTools.tools;
     const wrappedTools = Object.entries(rowToolsList).reduce(
-      (acc, [toolName, toolDef]) => {
+      (acc, [_toolName, toolDef]) => {
         acc[toolDef.name] = tool({
           description: toolDef.description,
           parameters: convertSchemaToZod(toolDef.inputSchema), // 使用新的转换函数

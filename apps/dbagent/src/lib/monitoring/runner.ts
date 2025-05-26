@@ -9,7 +9,7 @@ import { getProjectById } from '../db/projects';
 import { insertScheduleRunLimitHistory } from '../db/schedule-runs';
 import { Connection, Project, Schedule } from '../db/schema';
 import { sendScheduleNotification } from '../notifications/slack-webhook';
-import { getTargetDbPool } from '../targetdb/db';
+import { getTargetDbPool } from '../targetdb/db-oceanbase';
 import { listPlaybooks } from '../tools/playbooks';
 
 type RunModelPlaybookParams = {
@@ -41,7 +41,7 @@ async function runModelPlaybook({
   const monitoringSystemPrompt = getMonitoringSystemPrompt({ cloudProvider: project.cloudProvider });
   const targetDb = getTargetDbPool(connection.connectionString);
   try {
-    const tools = await getTools({ project, connection, targetDb, userId: schedule.userId });
+    const tools = await getTools({ project, _connection: connection, targetDb, userId: schedule.userId });
     const result = await generateText({
       model: modelInstance,
       system: monitoringSystemPrompt,

@@ -11,7 +11,7 @@ export async function POST(request: Request) {
 
   await actionAddUserMcpServerToDB({
     name: name,
-    version: null,
+    version: '',
     filePath: filePath,
     enabled: false,
     env

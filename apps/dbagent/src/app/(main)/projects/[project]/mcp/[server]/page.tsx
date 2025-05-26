@@ -12,7 +12,7 @@ export default async function McpServerPage({ params }: { params: Promise<PagePa
   const { server: serverId } = await params;
   const serverName = decodeURIComponent(serverId);
 
-  let server: UserMcpServer | null;
+  let server: UserMcpServer | null = null;
 
   try {
     server = await actionGetUserMcpServer(serverName);
