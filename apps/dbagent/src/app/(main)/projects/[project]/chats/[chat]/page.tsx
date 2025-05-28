@@ -29,6 +29,7 @@ export default async function Page({ params }: { params: Promise<PageParams> }) 
   const chat = await getMessagesByChatId(dbAccess, { id: chatId });
 
   function convertToUIMessages(messages: Array<Message>): Array<UIMessage> {
+    console.log('messages', messages);
     return messages.map((message) => ({
       id: message.id,
       parts: message.parts ?? [],
