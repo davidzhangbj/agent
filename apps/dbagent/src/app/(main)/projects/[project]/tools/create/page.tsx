@@ -52,6 +52,8 @@ export default function CreateMcpPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: '',
+      description: '',
       script: 'select * from db;'
     }
   });
@@ -59,6 +61,7 @@ export default function CreateMcpPage() {
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     const script = (editorRef.current as any).getValue();
     try {
+      setIsSubmitting(true);
       const response = await fetch('/api/tool/custom', { method: 'POST', body: JSON.stringify({ ...data, script }) });
       if (!response.ok) {
         throw new Error(await response.json());

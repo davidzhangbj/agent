@@ -1,7 +1,7 @@
 'use client';
 
 import { UseChatHelpers } from '@ai-sdk/react';
-import { Button, cn, Code, Tooltip, TooltipContent, TooltipTrigger, Typography } from '@internal/components';
+import { Button, cn, Code, Tooltip, TooltipContent, TooltipTrigger } from '@internal/components';
 import type { UIMessage } from 'ai';
 import equal from 'fast-deep-equal';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -94,16 +94,12 @@ const PurePreviewMessage = ({
                       <div
                         data-testid="message-content"
                         className={cn('flex flex-col', {
-                          'bg-primary !text-primary-foreground rounded-xl px-3 py-2': message.role === 'user'
+                          'bg-primary !text-primary-foreground rounded-xl px-3 py-2': message.role === 'user',
+                          'prose prose-sm dark:prose-invert prose-code:before:content-none prose-code:after:content-none max-w-none text-gray-800 dark:text-gray-200':
+                            message.role === 'assistant'
                         })}
                       >
-                        {message.role === 'user' ? (
-                          <Markdown>{part.text}</Markdown>
-                        ) : (
-                          <Typography>
-                            <Markdown>{part.text}</Markdown>
-                          </Typography>
-                        )}
+                        {message.role === 'user' ? <Markdown>{part.text}</Markdown> : <Markdown>{part.text}</Markdown>}
                       </div>
                     </div>
                   );
