@@ -22,11 +22,6 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   Skeleton,
   toast
 } from '@internal/components';
@@ -41,8 +36,8 @@ interface ProjectListProps {
 }
 
 const CloudProviders: Array<{ name: string; value: CloudProvider }> = [
-  { name: 'AWS', value: 'aws' },
-  { name: 'GCP', value: 'gcp' },
+  // { name: 'AWS', value: 'aws' },
+  // { name: 'GCP', value: 'gcp' },
   { name: 'Other', value: 'other' }
 ];
 
@@ -92,7 +87,7 @@ function CreateProjectButton() {
                 className="border-primary/20 focus-visible:ring-primary/30"
               />
             </div>
-            <div className="flex flex-col space-y-1.5">
+            {/* <div className="flex flex-col space-y-1.5">
               <Label htmlFor="cloudProvider" className="text-sm font-medium">
                 Cloud Provider
               </Label>
@@ -108,7 +103,7 @@ function CreateProjectButton() {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
           </div>
           <div className="mt-4 flex justify-end space-x-2">
             <Button type="submit" disabled={isLoading || !projectName.trim()}>
@@ -350,7 +345,7 @@ function CreateProjectOnboarding() {
                   className="border-primary/20 focus-visible:ring-primary/30"
                 />
               </div>
-              <div className="flex flex-col space-y-1.5">
+              {/* <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="cloudProvider" className="text-sm font-medium">
                   Cloud Provider
                 </Label>
@@ -370,7 +365,7 @@ function CreateProjectOnboarding() {
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
+              </div> */}
             </div>
           </CardContent>
           <CardFooter>

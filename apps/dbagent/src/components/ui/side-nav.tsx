@@ -32,9 +32,6 @@ import {
 } from '@internal/components';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  ActivityIcon,
-  AlarmClock,
-  CloudIcon,
   DatabaseIcon,
   Drill,
   HistoryIcon,
@@ -42,7 +39,6 @@ import {
   MoreVertical,
   NotebookPen,
   PanelLeft,
-  Server,
   WrenchIcon,
   ZapIcon
 } from 'lucide-react';
@@ -165,29 +161,29 @@ export function SideNav({ className, project, onboardingComplete }: SideNavProps
           url: `${basePath}/start/connect`,
           icon: DatabaseIcon,
           className: 'text-xs'
-        },
-        {
-          title: 'Collect Database Info',
-          url: `${basePath}/start/collect`,
-          icon: Server,
-          className: 'text-xs'
-        },
-        ...(project.cloudProvider === 'aws' || project.cloudProvider === 'gcp'
-          ? [
-              {
-                title: 'Cloud connect',
-                url: `${basePath}/start/cloud`,
-                icon: CloudIcon,
-                className: 'text-xs'
-              }
-            ]
-          : []),
-        {
-          title: 'Setup notifications',
-          url: `${basePath}/start/notifications`,
-          icon: AlarmClock,
-          className: 'text-xs'
         }
+        // {
+        //   title: 'Collect Database Info',
+        //   url: `${basePath}/start/collect`,
+        //   icon: Server,
+        //   className: 'text-xs'
+        // },
+        // ...(project.cloudProvider === 'aws' || project.cloudProvider === 'gcp'
+        //   ? [
+        //       {
+        //         title: 'Cloud connect',
+        //         url: `${basePath}/start/cloud`,
+        //         icon: CloudIcon,
+        //         className: 'text-xs'
+        //       }
+        //     ]
+        //   : []),
+        // {
+        //   title: 'Setup notifications',
+        //   url: `${basePath}/start/notifications`,
+        //   icon: AlarmClock,
+        //   className: 'text-xs'
+        // }
       ]
     },
     {
@@ -213,13 +209,13 @@ export function SideNav({ className, project, onboardingComplete }: SideNavProps
       url: `${basePath}/mcp`,
       icon: WrenchIcon,
       className: 'text-sm'
-    },
-    {
-      title: 'Monitoring',
-      url: `${basePath}/monitoring`,
-      icon: ActivityIcon,
-      className: 'text-sm'
     }
+    // {
+    //   title: 'Monitoring',
+    //   url: `${basePath}/monitoring`,
+    //   icon: ActivityIcon,
+    //   className: 'text-sm'
+    // }
   ];
 
   return (

@@ -1,8 +1,7 @@
 'use client';
 
-import { Button } from '@internal/components';
 import confetti from 'canvas-confetti';
-import { Activity, Check, Database, GitBranch, Server } from 'lucide-react';
+import { Check, Database } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Project } from '~/lib/db/schema';
@@ -18,32 +17,32 @@ export const getOnboardingTasks = (project: Project) => {
       description: `Add at least a database connection. You'd normally configure your production database connection here. Don't worry, I won't run any destructive queries.`,
       icon: <Database className="text-primary h-5 w-5" />,
       navigateTo: '/start/connect'
-    },
-    {
-      id: 'collect',
-      title: 'Collect Database Info',
-      description: `Let's check that I have proper access and that I can collect some basic information about your database.`,
-      icon: <Server className="text-primary h-5 w-5" />,
-      navigateTo: '/start/collect'
-    },
-    ...(project.cloudProvider === 'aws' || project.cloudProvider === 'gcp'
-      ? [
-          {
-            id: 'cloud',
-            title: 'Connect cloud management',
-            description: `Use an integration to allow me to read your relevant instance and observability data.`,
-            icon: <Activity className="text-primary h-5 w-5" />,
-            navigateTo: '/start/cloud'
-          }
-        ]
-      : []),
-    {
-      id: 'notifications',
-      title: 'Setup Slack notifications',
-      description: 'Configure a Slack integration so I can notify you if I find any issues with your database.',
-      icon: <GitBranch className="text-primary h-5 w-5" />,
-      navigateTo: '/start/notifications'
     }
+    // {
+    //   id: 'collect',
+    //   title: 'Collect Database Info',
+    //   description: `Let's check that I have proper access and that I can collect some basic information about your database.`,
+    //   icon: <Server className="text-primary h-5 w-5" />,
+    //   navigateTo: '/start/collect'
+    // },
+    // ...(project.cloudProvider === 'aws' || project.cloudProvider === 'gcp'
+    //   ? [
+    //       {
+    //         id: 'cloud',
+    //         title: 'Connect cloud management',
+    //         description: `Use an integration to allow me to read your relevant instance and observability data.`,
+    //         icon: <Activity className="text-primary h-5 w-5" />,
+    //         navigateTo: '/start/cloud'
+    //       }
+    //     ]
+    //   : []),
+    // {
+    //   id: 'notifications',
+    //   title: 'Setup Slack notifications',
+    //   description: 'Configure a Slack integration so I can notify you if I find any issues with your database.',
+    //   icon: <GitBranch className="text-primary h-5 w-5" />,
+    //   navigateTo: '/start/notifications'
+    // }
   ];
 };
 
@@ -120,14 +119,14 @@ export function Onboarding({ project }: { project: Project }) {
                     optimize your database.
                   </p>
                 </div>
-                <div className="flex gap-4">
+                {/* <div className="flex gap-4">
                   <Button onClick={() => router.push(`/projects/${project.id}/chats/new?start=report`)}>
                     Get Initial Assessment
                   </Button>
                   <Button onClick={() => router.push(`/projects/${project.id}/monitoring`)} variant="outline">
                     Setup Periodic Monitoring
                   </Button>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
