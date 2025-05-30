@@ -7,7 +7,13 @@ import {
   toolGetTrxOfBlock,
   toolGetTrxOfHoldLock
 } from '~/lib/tools/lock-conflict';
-import { toolDescribeTable, toolExplainQuery, toolFindTableSchema, toolGetSlowQueries } from '~/lib/tools/slow-queries';
+import {
+  toolDescribeTable,
+  toolExecuteSQL,
+  toolExplainQuery,
+  toolFindTableSchema,
+  toolGetSlowQueries
+} from '~/lib/tools/slow-queries';
 import { ToolsetGroup } from './types';
 
 import { Pool, withPoolConnection } from '~/lib/targetdb/db-oceanbase';
@@ -35,7 +41,8 @@ export class DBSQLTools implements ToolsetGroup {
       getSqlOfHoldLockTrx: this.getSqlOfHoldLockTrx(),
       getTrxOfBlock: this.getTrxOfBlock(),
       getSqlOfBlockTrx: this.getSqlOfBlockTrx(),
-      getSqlLockWaitTimeout: this.getSqlLockWaitTimeout()
+      getSqlLockWaitTimeout: this.getSqlLockWaitTimeout(),
+      executeSQL: this.executeSQL()
     };
   }
 
@@ -194,6 +201,23 @@ export class DBSQLTools implements ToolsetGroup {
           return await withPoolConnection(pool, async (client) => await toolGetSqlLockWaitTimeout(client));
         } catch (error) {
           return `Error get sql of lock wait timeout: ${error}`;
+        }
+      }
+    });
+  }
+
+  executeSQL(): Tool {
+    const pool = this.#pool;
+    return tool({
+      description: `执行SQL，结果返回JSON格式，应当在 code 区域渲染成表格`,
+      parameters: z.object({
+        sql: z.string()
+      }),
+      execute: async ({ sql }) => {
+        try {
+          return await withPoolConnection(pool, async (client) => await toolExecuteSQL(client, sql));
+        } catch (error) {
+          return `Error execute sql: ${error}`;
         }
       }
     });
