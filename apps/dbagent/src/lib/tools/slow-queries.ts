@@ -33,3 +33,8 @@ export async function toolFindTableSchema(client: ClientBase, table: string): Pr
   const result = await findTableSchema(client, table);
   return JSON.stringify(result);
 }
+
+export async function toolExecuteSQL(client: ClientBase, sql: string): Promise<string> {
+  const [rows] = await client.query(sql);
+  return JSON.stringify(rows);
+}
