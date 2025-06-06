@@ -38,10 +38,10 @@ const STYLES = {
 
 const components: Partial<Components> = {
   // 代码块处理
-  code: ({ node, inline, className, children, ...props }) => {
+  code: ({ node, className, children, ...props }) => {
     const match = /language-(\w+)/.exec(className || '');
 
-    if (!inline && match) {
+    if (match) {
       // 多行代码块
       return (
         <div className="max-w-full overflow-x-auto">
@@ -59,9 +59,8 @@ const components: Partial<Components> = {
                 wordBreak: 'break-word'
               }
             }}
-            {...props}
           >
-            {String(children).replace(/\n$/, '')}
+            {JSON.stringify(children)}
           </SyntaxHighlighter>
         </div>
       );
@@ -204,7 +203,7 @@ const components: Partial<Components> = {
 
   // 其他元素
   hr: ({ ...props }) => <hr className="my-6 border-gray-300 dark:border-gray-700" {...props} />,
-  img: ({ ...props }) => <img className="my-5 h-auto max-w-full rounded-md shadow-md" {...props} />
+  img: ({ ...props }) => <img className="my-5 h-auto max-w-full rounded-md shadow-md" alt="" {...props} />
 };
 
 const remarkPlugins = [remarkGfm];

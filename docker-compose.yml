@@ -1,27 +1,39 @@
 services:
   postgres:
-    image: postgres:17
+    image: bitnami/postgresql:17
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-dbagent}
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
       POSTGRES_DB: ${POSTGRES_DB:-dbagent}
+    ports:
+      - '5432:5432'
     volumes:
       - agent_postgres_data:/var/lib/postgresql/data
       - ./apps/dbagent/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - db_network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d ${POSTGRES_DB:-dbagent}']
+      interval: 3s
+      timeout: 1s
+      retries: 5
 
-  xata-agent:
-    image: xataio/agent:0.2.1
+  oceanbase-agent:
+    image: oceanbaseagent:v0.1
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-dbagent}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-dbagent}
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-dbagent}
       NODE_ENV: production
-      AUTH_TRUST_HOST: ${AUTH_TRUST_HOST:-localhost}
+      AUTH_TRUST_HOST: 'true'
+      PORT: 8080
+      CUSTOM_BASE_URL:
+      CUSTOM_API_KEY:
+      CUSTOM_MODEL_NAME:
     env_file: '.env.production'
     ports:
       - '8080:8080'
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - db_network
 

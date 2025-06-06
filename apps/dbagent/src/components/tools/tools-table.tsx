@@ -62,10 +62,10 @@ export function ToolsTable() {
   };
 
   useEffect(() => {
-    if (connections.length > 0) {
-      void loadTools();
-    }
-  }, [connections]);
+    // if (connections.length > 0) {
+    void loadTools();
+    // }
+  }, [project]);
 
   const SkeletonRow = () => (
     <TableRow>

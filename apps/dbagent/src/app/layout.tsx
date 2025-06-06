@@ -1,13 +1,13 @@
 import '@internal/theme';
 import { GeistSans } from 'geist/font/sans';
 import { Metadata } from 'next';
-import { Geist_Mono } from 'next/font/google';
+// import { Geist_Mono } from 'next/font/google';
+import localFont from 'next/font/local';
 import { Providers } from '~/components/providers';
 import './globals.css';
-
-const geistMono = Geist_Mono({
-  variable: '--font-code',
-  subsets: ['latin']
+const geistMono = localFont({
+  src: '../../public/fonts/GeistMono-VariableFont_wght.ttf', // 替换为你的字体文件路径
+  variable: '--font-code'
 });
 
 export const metadata: Metadata = {

@@ -26,7 +26,8 @@ export default [
           ]
         }
       ],
-      'react-hooks/exhaustive-deps': 'off'
+      'react-hooks/exhaustive-deps': 'off',
+      "@typescript-eslint/no-unused-vars": "warn" // 对于未使用的变量只发出警告
     },
     languageOptions: {
       parserOptions: {

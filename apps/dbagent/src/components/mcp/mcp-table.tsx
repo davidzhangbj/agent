@@ -137,7 +137,7 @@ export function McpTable() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Sever Name</TableHead>
+            <TableHead>Server Name</TableHead>
             <TableHead>File</TableHead>
             <TableHead>Enabled</TableHead>
             <TableHead>Actions</TableHead>

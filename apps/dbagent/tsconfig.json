@@ -4,8 +4,7 @@
   "compilerOptions": {
     "paths": {
       "~/*": ["./src/*"]
-    },
-    "noEmit": true
+    }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.mjs", ".next/types/**/*.ts", "images.d.ts"],
   "exclude": ["node_modules"]
