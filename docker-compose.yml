@@ -19,7 +19,7 @@ services:
       retries: 5
 
   oceanbase-agent:
-    image: oceanbaseagent:v0.1
+    image: davidzhangbj/oceanbaseagent:v0.1
     environment:
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-dbagent}
       NODE_ENV: production
