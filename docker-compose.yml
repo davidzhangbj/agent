@@ -24,9 +24,6 @@ services:
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-dbagent}
       NODE_ENV: production
       PORT: 8000
-      CUSTOM_BASE_URL:
-      CUSTOM_API_KEY:
-      CUSTOM_MODEL_NAME:
     env_file: '.env.production'
     ports:
       - '8000:8000'

@@ -19,15 +19,15 @@ We provide docker images for the agent itself. The only other dependency is a Po
 
 We provide a docker-compose file to start the agent and the Postgres database.
 
-Edit the `.env.production` file in the root of the project. You need to set the `PUBLIC_URL` and the API key for at least OpenAI.
+Edit the `.env.production` file in the root of the project. If you are not using the official API addresses of Openai, Deepseek, Anthropic, or Gemini, you need to add the configurations of CUSTOM_BASE_URL, CUSTOM_API_KEY, and CUSTOM_CHAT_MODEL_NAME.
 
 Start a local instance via docker compose:
 
 ```bash
-docker compose up
+docker compose up or docker-compose up
 ```
 
-Open the app at `http://localhost:8080` (or the public URL you set in the `.env.production` file) and follow the onboarding steps.
+Open the app at `http://localhost:8000` (or the public URL you set in the `.env.production` file) and follow the onboarding steps.
 
 We have a more detailed [guide](https://github.com/xataio/agent/wiki/Xata-Agent-%E2%80%90-Deploy-on-EC2) on how to deploy via docker-compose on an EC2 instance.
 
