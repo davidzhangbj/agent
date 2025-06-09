@@ -23,14 +23,13 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-dbagent}
       NODE_ENV: production
-      AUTH_TRUST_HOST: 'true'
-      PORT: 8080
+      PORT: 8000
       CUSTOM_BASE_URL:
       CUSTOM_API_KEY:
       CUSTOM_MODEL_NAME:
     env_file: '.env.production'
     ports:
-      - '8080:8080'
+      - '8000:8000'
     depends_on:
       postgres:
         condition: service_healthy
