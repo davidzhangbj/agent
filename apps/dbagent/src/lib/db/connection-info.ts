@@ -3,7 +3,7 @@
 import { and, eq } from 'drizzle-orm';
 import { PerformanceSetting, PgExtension, TableStat } from '../targetdb/db';
 import { DBAccess } from './db';
-import { connectionInfo, ConnectionInfoInsert } from './schema';
+import { connectionInfo, ConnectionInfoInsert } from './schema-sqlite';
 
 type ConnectionInfoDataTypes =
   | {

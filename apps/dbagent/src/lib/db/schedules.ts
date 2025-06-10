@@ -2,7 +2,7 @@
 
 import { and, eq, sql } from 'drizzle-orm';
 import { DBAccess } from './db';
-import { Schedule, ScheduleInsert, schedules } from './schema';
+import { Schedule, ScheduleInsert, schedules } from './schema-sqlite';
 
 export async function insertSchedule(dbAccess: DBAccess, schedule: ScheduleInsert): Promise<Schedule> {
   return await dbAccess.query(async ({ db }) => {
@@ -81,12 +81,11 @@ export async function setScheduleStatusRunning(dbAccess: DBAccess, schedule: Sch
       const result = await trx
         .select({ status: schedules.status })
         .from(schedules)
-        .for('update')
         .where(eq(schedules.id, schedule.id));
-      if (result[0]?.status === 'running') {
+      if (result[0]?.status === 1) {
         throw new Error(`Schedule ${schedule.id} is already running`);
       }
-      await trx.update(schedules).set({ status: 'running' }).where(eq(schedules.id, schedule.id));
+      await trx.update(schedules).set({ status: 1 }).where(eq(schedules.id, schedule.id));
     });
   });
 }

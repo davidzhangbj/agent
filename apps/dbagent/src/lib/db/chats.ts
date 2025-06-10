@@ -2,6 +2,7 @@ import 'server-only';
 
 import { and, asc, desc, eq, gt, gte, inArray } from 'drizzle-orm';
 
+import { format } from 'date-fns';
 import { ArtifactKind } from '~/components/chat/artifacts/artifact';
 import { DBAccess } from './db';
 import {
@@ -14,7 +15,7 @@ import {
   messages,
   messageVotes,
   type ArtifactSuggestion
-} from './schema';
+} from './schema-sqlite';
 
 export async function saveChat(dbAccess: DBAccess, chat: ChatInsert, chatMessages: Array<MessageInsert> = []) {
   return dbAccess.query(async ({ db }) => {
@@ -111,7 +112,7 @@ export async function voteMessage(
     messageId: string;
     userId: string;
     projectId: string;
-    type: 'up' | 'down';
+    type: number;
   }
 ) {
   return dbAccess.query(async ({ db }) => {
@@ -124,7 +125,7 @@ export async function voteMessage(
       if (existingVote) {
         await tx
           .update(messageVotes)
-          .set({ isUpvoted: type === 'up' })
+          .set({ isUpvoted: 1 })
           .where(and(eq(messageVotes.messageId, messageId), eq(messageVotes.chatId, chatId)));
       } else {
         await tx.insert(messageVotes).values({
@@ -132,7 +133,8 @@ export async function voteMessage(
           messageId,
           projectId,
           userId,
-          isUpvoted: type === 'up'
+          isUpvoted: 0,
+          createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
         });
       }
       return { success: true };
@@ -168,13 +170,13 @@ export async function saveDocument(
     return await db
       .insert(artifactDocuments)
       .values({
-        id,
-        title,
-        kind,
-        content,
-        userId,
-        createdAt: new Date(),
-        projectId
+        id: id,
+        projectId: projectId,
+        createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
+        title: title,
+        content: content,
+        kind: kind,
+        userId: userId
       })
       .onConflictDoUpdate({
         target: [artifactDocuments.id],
@@ -218,7 +220,9 @@ export async function deleteDocumentsByIdAfterTimestamp(
   return dbAccess.query(async ({ db }) => {
     return await db
       .delete(artifactDocuments)
-      .where(and(eq(artifactDocuments.id, id), gt(artifactDocuments.createdAt, timestamp)));
+      .where(
+        and(eq(artifactDocuments.id, id), gt(artifactDocuments.createdAt, format(timestamp, 'yyyy-MM-dd HH:mm:ss')))
+      );
   });
 }
 
@@ -255,7 +259,7 @@ export async function deleteMessagesByChatIdAfterTimestamp(
       const messagesToDelete = await tx
         .select({ id: messages.id })
         .from(messages)
-        .where(and(eq(messages.chatId, chatId), gte(messages.createdAt, timestamp)));
+        .where(and(eq(messages.chatId, chatId), gte(messages.createdAt, format(timestamp, 'yyyy-MM-dd HH:mm:ss'))));
 
       const messageIds = messagesToDelete.map((message) => message.id);
 

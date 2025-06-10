@@ -31,3 +31,4 @@ tsconfig.tsbuildinfo
 
 
 .apps/dbagent/scripts/obdoc
+local.db/

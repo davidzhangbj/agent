@@ -1,8 +1,9 @@
 'use server';
 
 import { and, eq } from 'drizzle-orm';
+import { generateUUID } from '~/components/chat/utils';
 import { DBAccess } from './db';
-import { Connection, connections, Schedule } from './schema';
+import { Connection, connections, Schedule } from './schema-sqlite';
 
 export async function listConnections(dbAccess: DBAccess, projectId: string): Promise<Connection[]> {
   return dbAccess.query(async ({ db }) => {
@@ -15,7 +16,7 @@ export async function getDefaultConnection(dbAccess: DBAccess, projectId: string
     const result = await db
       .select()
       .from(connections)
-      .where(and(eq(connections.projectId, projectId), eq(connections.isDefault, true)));
+      .where(and(eq(connections.projectId, projectId), eq(connections.isDefault, 1)));
     return result[0] ?? null;
   });
 }
@@ -51,8 +52,8 @@ export async function getConnectionFromSchedule(dbAccess: DBAccess, schedule: Sc
 export async function makeConnectionDefault(dbAccess: DBAccess, id: string): Promise<void> {
   return dbAccess.query(async ({ db }) => {
     await db.transaction(async (trx) => {
-      await trx.update(connections).set({ isDefault: false }).where(eq(connections.isDefault, true));
-      await trx.update(connections).set({ isDefault: true }).where(eq(connections.id, id));
+      await trx.update(connections).set({ isDefault: 0 }).where(eq(connections.isDefault, 1));
+      await trx.update(connections).set({ isDefault: 1 }).where(eq(connections.id, id));
     });
   });
 }
@@ -68,7 +69,7 @@ export async function deleteConnection(dbAccess: DBAccess, id: string): Promise<
       if (wasDefault[0]?.isDefault) {
         const nextConnection = await trx.select({ id: connections.id }).from(connections).limit(1);
         if (nextConnection[0]) {
-          await trx.update(connections).set({ isDefault: true }).where(eq(connections.id, nextConnection[0].id));
+          await trx.update(connections).set({ isDefault: 1 }).where(eq(connections.id, nextConnection[0].id));
         }
       }
     });
@@ -96,10 +97,11 @@ export async function addConnection(
     const result = await db
       .insert(connections)
       .values({
+        id: generateUUID(),
         projectId,
         name,
         connectionString,
-        isDefault: existingConnections.length === 0,
+        isDefault: existingConnections.length === 0 ? 1 : 0,
         username,
         password
       })

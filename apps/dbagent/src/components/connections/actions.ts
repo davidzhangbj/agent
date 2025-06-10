@@ -91,7 +91,7 @@ export async function validateConnection(connectionString: string, username: str
     try {
       const versionResult = await client.query('SELECT version() as version');
       const version = (versionResult[0] as unknown as [{ version: string }])[0].version;
-      console.log('Connection validated successfully. Postgres version: ', version);
+      console.log('Connection validated successfully. OceanBase version: ', version);
       return { success: true, message: `Connection validated successfully.` };
     } finally {
       await client.end();

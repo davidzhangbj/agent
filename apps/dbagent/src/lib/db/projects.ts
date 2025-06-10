@@ -1,9 +1,10 @@
 'use server';
 
+import { format } from 'date-fns';
 import { eq } from 'drizzle-orm';
 import { generateUUID } from '~/components/chat/utils';
 import { DBAccess } from './db';
-import { Project, ProjectInsert, projectMembers, projects } from './schema';
+import { Project, ProjectInsert, projectMembers, projects } from './schema-sqlite';
 
 export async function generateProjectId(): Promise<string> {
   return generateUUID();
@@ -14,12 +15,12 @@ export async function createProject(dbAccess: DBAccess, project: ProjectInsert):
   return await dbAccess.query(async ({ db, userId }) => {
     // Create the project
     await db.insert(projects).values({ ...project, id: projectId });
-
     // Create the project member relationship with owner role
     await db.insert(projectMembers).values({
       projectId: projectId,
       userId: userId,
-      role: 'owner'
+      role: 'owner',
+      addedAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
     });
 
     return projectId;

@@ -4,9 +4,9 @@ import type { Config } from 'drizzle-kit';
 config({ path: ['.env.local', '.env'] });
 
 export default {
-  schema: './src/lib/db/schema.ts',
-  out: './migrations',
-  dialect: 'postgresql',
+  schema: './src/lib/db/schema-sqlite.ts',
+  out: './migrations-sqlite',
+  dialect: 'sqlite',
   introspect: {
     casing: 'camel'
   },
@@ -14,8 +14,5 @@ export default {
   dbCredentials: {
     // eslint-disable-next-line no-process-env
     url: process.env.DATABASE_URL!
-  },
-  entities: {
-    roles: true
   }
 } satisfies Config;

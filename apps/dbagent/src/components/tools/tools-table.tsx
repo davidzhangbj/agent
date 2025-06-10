@@ -18,7 +18,7 @@ import { BookOpenIcon, ChevronLeftIcon, ChevronRightIcon, MoreVerticalIcon, Play
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Connection } from '~/lib/db/schema';
+import { Connection } from '~/lib/db/schema-sqlite';
 import { Tool, actionGetBuiltInAndCustomTools, actionGetConnections } from './action';
 
 const ITEMS_PER_PAGE = 10;
@@ -46,8 +46,9 @@ export function ToolsTable() {
   const loadTools = async () => {
     setIsLoading(true);
     try {
-      const defaultConnection = connections.find((c: Connection) => c.isDefault);
+      const defaultConnection = connections.find((c: Connection) => c.isDefault === 1);
       if (!defaultConnection) {
+        console.log(333);
         throw new Error('No default connection found');
       }
 
@@ -62,10 +63,10 @@ export function ToolsTable() {
   };
 
   useEffect(() => {
-    // if (connections.length > 0) {
-    void loadTools();
-    // }
-  }, [project]);
+    if (connections.length > 0) {
+      void loadTools();
+    }
+  }, [connections]);
 
   const SkeletonRow = () => (
     <TableRow>

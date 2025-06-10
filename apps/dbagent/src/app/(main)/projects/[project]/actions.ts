@@ -10,7 +10,7 @@ import {
   insertSchedule,
   updateSchedule
 } from '~/lib/db/schedules';
-import { Schedule, ScheduleInsert } from '~/lib/db/schema';
+import { Schedule, ScheduleInsert } from '~/lib/db/schema-sqlite';
 
 export async function getProject(projectId: string) {
   const dbAccess = await getUserSessionDBAccess();

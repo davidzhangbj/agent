@@ -9,7 +9,7 @@ import { env } from '~/lib/env/server';
 import { dbCreatePlaybook, dbDeletePlaybook, dbUpdatePlaybook } from '~/lib/db/custom-playbooks';
 import { getUserDBAccess, getUserSessionDBAccess } from '~/lib/db/db';
 import { getSchedulesByUserIdAndProjectId } from '~/lib/db/schedules';
-import { Schedule } from '~/lib/db/schema';
+import { Schedule } from '~/lib/db/schema-sqlite';
 import {
   CustomPlaybook,
   getCustomPlaybook,
