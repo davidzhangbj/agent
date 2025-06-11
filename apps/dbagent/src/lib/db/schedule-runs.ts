@@ -2,7 +2,7 @@
 
 import { desc, eq, lt } from 'drizzle-orm';
 import { DBAccess } from './db';
-import { ScheduleRun, ScheduleRunInsert, scheduleRuns } from './schema';
+import { ScheduleRun, ScheduleRunInsert, scheduleRuns } from './schema-sqlite';
 
 export async function insertScheduleRunLimitHistory(
   dbAccess: DBAccess,
@@ -73,7 +73,10 @@ export async function getScheduleRuns(dbAccess: DBAccess, scheduleId: string): P
 
 export async function getScheduleRun(dbAccess: DBAccess, runId: string): Promise<ScheduleRun> {
   return dbAccess.query(async ({ db }) => {
-    const result = await db.select().from(scheduleRuns).where(eq(scheduleRuns.id, runId));
+    const result = await db
+      .select()
+      .from(scheduleRuns)
+      .where(eq(scheduleRuns.id, parseInt(runId)));
     if (!result[0]) {
       throw new Error('Schedule run not found');
     }

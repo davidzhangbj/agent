@@ -28,13 +28,13 @@ import {
 import { Database, MoreVertical, PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Suspense, useState } from 'react';
-import { CloudProvider, Project } from '~/lib/db/schema';
+import { Project } from '~/lib/db/schema-sqlite';
 import { actionCreateProject, actionDeleteProject, actionUpdateProject } from './actions';
 
 interface ProjectListProps {
   projects: Project[];
 }
-
+type CloudProvider = 'aws' | 'gcp' | 'other';
 const CloudProviders: Array<{ name: string; value: CloudProvider }> = [
   // { name: 'AWS', value: 'aws' },
   // { name: 'GCP', value: 'gcp' },

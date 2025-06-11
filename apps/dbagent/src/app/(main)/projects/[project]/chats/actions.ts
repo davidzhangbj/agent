@@ -1,10 +1,10 @@
 'use server';
 
 import { generateText, Message } from 'ai';
+import { parse } from 'date-fns';
 import { getModelInstance } from '~/lib/ai/agent';
 import { deleteMessagesByChatIdAfterTimestamp, getMessageById } from '~/lib/db/chats';
 import { getUserSessionDBAccess } from '~/lib/db/db';
-
 export async function generateTitleFromUserMessage({ message }: { message: Message }) {
   const { text: title } = await generateText({
     model: await getModelInstance('title'),
@@ -29,6 +29,6 @@ export async function deleteTrailingMessages({ id }: { id: string }) {
 
   await deleteMessagesByChatIdAfterTimestamp(dbAccess, {
     chatId: message.chatId,
-    timestamp: message.createdAt
+    timestamp: parse(message.createdAt, 'yyyy-MM-dd HH:mm:ss', new Date())
   });
 }

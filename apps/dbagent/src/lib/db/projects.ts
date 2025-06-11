@@ -2,16 +2,11 @@
 
 import { format } from 'date-fns';
 import { eq } from 'drizzle-orm';
-import { generateUUID } from '~/components/chat/utils';
 import { DBAccess } from './db';
 import { Project, ProjectInsert, projectMembers, projects } from './schema-sqlite';
 
-export async function generateProjectId(): Promise<string> {
-  return generateUUID();
-}
-
 export async function createProject(dbAccess: DBAccess, project: ProjectInsert): Promise<string> {
-  const projectId = await generateProjectId();
+  const projectId = project.id;
   return await dbAccess.query(async ({ db, userId }) => {
     // Create the project
     await db.insert(projects).values({ ...project, id: projectId });

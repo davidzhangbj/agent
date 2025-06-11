@@ -1,4 +1,5 @@
 import { UIMessage, appendResponseMessages, createDataStreamResponse, smoothStream, streamText } from 'ai';
+import { format } from 'date-fns';
 import { notFound } from 'next/navigation';
 import { NextRequest } from 'next/server';
 import { generateTitleFromUserMessage } from '~/app/(main)/projects/[project]/chats/actions';
@@ -112,16 +113,16 @@ export async function POST(request: Request) {
                     id: userMessage.id,
                     projectId: connection.projectId,
                     role: 'user',
-                    parts: userMessage.parts,
-                    createdAt: new Date()
+                    parts: JSON.stringify(userMessage.parts),
+                    createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
                   },
                   {
                     id: assistantId,
                     projectId: connection.projectId,
                     chatId: id,
                     role: assistantMessage.role,
-                    parts: assistantMessage.parts,
-                    createdAt: new Date()
+                    parts: JSON.stringify(assistantMessage.parts),
+                    createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
                   }
                 ]
               );

@@ -4,7 +4,7 @@ import confetti from 'canvas-confetti';
 import { Check, Database } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Project } from '~/lib/db/schema';
+import { Project } from '~/lib/db/schema-sqlite';
 import { getCompletedTasks } from './actions';
 import { OnboardingProgress } from './onboarding-progress';
 import { OnboardingTask } from './onboarding-task';

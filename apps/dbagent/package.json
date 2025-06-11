@@ -16,7 +16,6 @@
     "db:init-obdoc": "tsx scripts/init-obdoc.ts",
     "load-test": "tsx scripts/load-testing/musicbrainz-loader.ts",
     "dev-scheduler": "tsx scripts/scheduler.ts",
-    "playground": "mastra dev -d playground",
     "build:mcp-servers": "tsc -p mcp-source/tsconfig.json"
   },
   "dependencies": {
@@ -37,8 +36,6 @@
     "@internal/components": "workspace:*",
     "@internal/theme": "workspace:*",
     "@libsql/client": "0.14.0",
-    "@mastra/core": "^0.8.3",
-    "@mastra/evals": "^0.1.18",
     "@modelcontextprotocol/sdk": "^1.9.0",
     "@tailwindcss/postcss": "^4.1.4",
     "@tanstack/react-query": "^5.74.4",
@@ -111,7 +108,6 @@
     "dockerode": "^4.0.6",
     "dotenv": "^16.5.0",
     "filenamify": "^6.0.0",
-    "mastra": "^0.4.9",
     "papaparse": "^5.5.2",
     "pg": "^8.14.1",
     "postcss": "^8.5.3",

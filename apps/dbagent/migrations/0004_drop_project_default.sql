@@ -1,1 +1,0 @@
-ALTER TABLE "projects" ALTER COLUMN "cloud_provider" DROP DEFAULT;

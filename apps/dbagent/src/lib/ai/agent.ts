@@ -1,5 +1,5 @@
 import { LanguageModel } from 'ai';
-import { CloudProvider } from '../db/schema';
+import { CloudProvider } from '../db/schema-sqlite';
 import { artifactsPrompt, chatSystemPrompt, commonSystemPrompt, monitoringSystemPrompt } from './prompts';
 import { getLanguageModel, getLanguageModelWithFallback } from './providers';
 

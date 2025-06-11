@@ -399,3 +399,4 @@ export const customTools = sqliteTable('custom_tools', {
 
 export type CustomTool = InferSelectModel<typeof customTools>;
 export type CustomToolInsert = InferInsertModel<typeof customTools>;
+export type CloudProvider = string;

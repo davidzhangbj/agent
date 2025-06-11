@@ -1,12 +1,14 @@
 'use server';
 
+import { generateUUID } from '~/components/chat/utils';
 import { getUserSessionDBAccess } from '~/lib/db/db';
 import { createProject, deleteProject, updateProject } from '~/lib/db/projects';
-import { CloudProvider, Project } from '~/lib/db/schema';
+import { CloudProvider, Project } from '~/lib/db/schema-sqlite';
 
 export async function actionCreateProject(name: string, cloudProvider: CloudProvider) {
   const dbAccess = await getUserSessionDBAccess();
-  return createProject(dbAccess, { name, cloudProvider });
+  const id = generateUUID();
+  return createProject(dbAccess, { id, name, cloudProvider });
 }
 
 export async function actionDeleteProject(id: string) {

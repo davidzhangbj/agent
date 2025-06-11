@@ -10,7 +10,6 @@ import { getCustomQueryTools } from './query';
 import { mergeToolsets } from './types';
 import { userMCPToolset } from './user-mcp';
 
-export * from './cluster';
 export * from './common';
 export * from './db';
 export * from './playbook';

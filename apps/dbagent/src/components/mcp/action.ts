@@ -50,7 +50,7 @@ export async function actionGetUserMcpServer(serverName: string, asUserId?: stri
     name: server.name,
     version: server.version,
     filePath: server.filePath,
-    enabled: server.enabled,
+    enabled: server.enabled === 1 ? true : false,
     args: server.args,
     env: server.env ? JSON.parse(server.env) : undefined
   };
@@ -63,7 +63,7 @@ export async function actionGetUserMcpServers(asUserId?: string): Promise<UserMc
     name: server.name,
     version: server.version,
     filePath: server.filePath,
-    enabled: server.enabled,
+    enabled: server.enabled === 1 ? true : false,
     args: server.args,
     env: server.env ? JSON.parse(server.env) : undefined
   }));

@@ -39,7 +39,7 @@ export async function PATCH(request: Request) {
     userId,
     chatId,
     messageId,
-    type: type
+    type: type === 'up' ? 1 : 0
   });
 
   return new Response('Message voted', { status: 200 });
