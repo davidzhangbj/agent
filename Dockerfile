@@ -5,5 +5,5 @@ COPY . /app/
 WORKDIR /app/apps/dbagent
 ENV PORT=8000
 EXPOSE 8000
-# Start both the scheduler and the Next.js application
+# Start the Next.js application
 CMD ["sh", "-c", "pnpm next start --port $PORT"] 
