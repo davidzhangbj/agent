@@ -5,7 +5,7 @@ import { inputRules } from 'prosemirror-inputrules';
 import { EditorState } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 import { memo, useEffect, useRef } from 'react';
-import { ArtifactSuggestion } from '~/lib/db/schema';
+import { ArtifactSuggestion } from '~/lib/db/schema-sqlite';
 import { documentSchema, handleTransaction, headingRule } from './config';
 import { buildContentFromDocument, buildDocumentFromContent, createDecorations } from './functions';
 import { projectWithPositions, suggestionsPlugin, suggestionsPluginKey } from './suggestions';

@@ -10,7 +10,7 @@ import {
 } from '@internal/components';
 import { CheckCircleIcon, ChevronDownIcon } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { Connection } from '~/lib/db/schema';
+import { Connection } from '~/lib/db/schema-sqlite';
 
 export function ConnectionSelector({
   connections,

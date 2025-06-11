@@ -2,10 +2,11 @@
 
 import { cn } from '@internal/components';
 import { useQuery } from '@tanstack/react-query';
+import { format } from 'date-fns';
 import equal from 'fast-deep-equal';
 import { FileIcon, FullscreenIcon, LoaderIcon } from 'lucide-react';
 import { memo, MouseEvent, useCallback, useEffect, useMemo, useRef } from 'react';
-import { ArtifactDocument } from '~/lib/db/schema';
+import { ArtifactDocument } from '~/lib/db/schema-sqlite';
 import { fetcher } from '../utils';
 import { ArtifactKind, UIArtifact } from './artifact';
 import { DocumentToolCall, DocumentToolResult } from './document';
@@ -74,7 +75,7 @@ export function DocumentPreview({ projectId, result, args }: DocumentPreviewProp
           kind: artifact.kind,
           content: artifact.content,
           id: artifact.documentId,
-          createdAt: new Date(),
+          createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
           userId: 'noop'
         }
       : null;

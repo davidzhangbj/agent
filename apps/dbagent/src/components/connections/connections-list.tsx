@@ -5,7 +5,7 @@ import { CheckIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Connection } from '~/lib/db/schema';
+import { Connection } from '~/lib/db/schema-sqlite';
 import { actionListConnections, actionMakeConnectionDefault } from './actions';
 
 function maskConnectionString(connString: string): string {
@@ -38,7 +38,7 @@ export function ConnectionsList() {
     setConnections(
       connections.map((conn) => ({
         ...conn,
-        isDefault: conn.id === id
+        isDefault: conn.id === id ? 1 : 0
       }))
     );
   };

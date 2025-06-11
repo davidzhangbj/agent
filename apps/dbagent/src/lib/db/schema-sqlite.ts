@@ -223,7 +223,7 @@ export const messages = sqliteTable(
     projectId: text('project_id').notNull(),
     chatId: text('chat_id').notNull(),
     role: text('role').$type<SDKMessage['role']>().notNull(),
-    parts: text('parts').$type<SDKMessage['parts']>().notNull(),
+    parts: text('parts').notNull(),
     createdAt: text('created_at').notNull()
   },
   (table) => [
@@ -313,7 +313,7 @@ export type ArtifactDocumentInsert = InferInsertModel<typeof artifactDocuments>;
 export const artifactSuggestions = sqliteTable(
   'artifact_suggestions',
   {
-    id: int().primaryKey({ autoIncrement: true }),
+    id: text().primaryKey(),
     projectId: text('project_id').notNull(),
     documentId: text('document_id').notNull(),
     documentCreatedAt: text('document_created_at').notNull(),
@@ -348,7 +348,7 @@ export type ArtifactSuggestionInsert = InferInsertModel<typeof artifactSuggestio
 export const playbooks = sqliteTable(
   'playbooks',
   {
-    id: int().primaryKey({ autoIncrement: true }),
+    id: text().primaryKey(),
     projectId: text('project_id').notNull(),
     name: text('name', { length: 255 }).notNull(),
     description: text('description'),

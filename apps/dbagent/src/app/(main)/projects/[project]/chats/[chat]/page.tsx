@@ -1,11 +1,12 @@
 import { UIMessage } from 'ai';
+import { parse } from 'date-fns';
 import { DataStreamHandler } from '~/components/chat/artifacts/data-stream-handler';
 import { Chat } from '~/components/chat/chat';
 import { getDefaultLanguageModel } from '~/lib/ai/providers';
 import { getMessagesByChatId } from '~/lib/db/chats';
 import { listConnections } from '~/lib/db/connections';
 import { getUserSessionDBAccess } from '~/lib/db/db';
-import { Message } from '~/lib/db/schema';
+import { Message } from '~/lib/db/schema-sqlite';
 
 type PageParams = {
   project: string;
@@ -30,19 +31,25 @@ export default async function Page({ params }: { params: Promise<PageParams> }) 
 
   function convertToUIMessages(messages: Array<Message>): Array<UIMessage> {
     console.log('messages', messages);
-    return messages.map((message) => ({
-      id: message.id,
-      parts: message.parts ?? [],
-      role: message.role,
-      // Note: content will soon be deprecated in @ai-sdk/react
-      content:
-        message.parts
-          ?.filter((part) => part.type === 'text')
-          .map((part) => part.text)
-          .join('\n')
-          .trim() ?? '',
-      createdAt: message.createdAt
-    }));
+    return messages.map((message) => {
+      let parsedParts: any[] = [];
+      if (message.parts) {
+        parsedParts = JSON.parse(message.parts); // 尝试解析 JSON 字符串
+      }
+      return {
+        id: message.id,
+        parts: parsedParts ?? [],
+        role: message.role,
+        // Note: content will soon be deprecated in @ai-sdk/react
+        content:
+          parsedParts
+            .filter((part) => part.type === 'text')
+            .map((part) => part.text)
+            .join('\n')
+            .trim() ?? '',
+        createdAt: parse(message.createdAt, 'yyyy-MM-dd HH:mm:ss', new Date())
+      };
+    });
   }
 
   return (

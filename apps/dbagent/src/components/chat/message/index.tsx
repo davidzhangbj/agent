@@ -7,7 +7,7 @@ import equal from 'fast-deep-equal';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Clock, PencilIcon, SparklesIcon } from 'lucide-react';
 import { memo, useState } from 'react';
-import { MessageVote } from '~/lib/db/schema';
+import { MessageVote } from '~/lib/db/schema-sqlite';
 import { DocumentToolCall, DocumentToolResult } from '../artifacts/document';
 import { DocumentPreview } from '../artifacts/document-preview';
 import { Markdown } from './markdown';

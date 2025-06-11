@@ -1,7 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { DBAccess } from './db';
-import { CustomToolInsert, customTools } from './schema';
-
+import { CustomToolInsert, customTools } from './schema-sqlite';
 export async function dbAddCustomTool(dbAccess: DBAccess, input: CustomToolInsert) {
   return await dbAccess.query(async ({ db }) => {
     const result = await db.insert(customTools).values(input).returning();

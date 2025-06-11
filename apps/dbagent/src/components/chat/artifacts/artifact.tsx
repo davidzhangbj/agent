@@ -7,7 +7,7 @@ import equal from 'fast-deep-equal';
 import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useDebounceCallback, useWindowSize } from 'usehooks-ts';
-import { ArtifactDocument, MessageVote } from '~/lib/db/schema';
+import { ArtifactDocument, MessageVote } from '~/lib/db/schema-sqlite';
 import { MultimodalInput } from '../multimodal-input';
 import { fetcher } from '../utils';
 import { ArtifactActions } from './artifact-actions';

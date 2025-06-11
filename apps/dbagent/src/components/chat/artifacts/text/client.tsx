@@ -1,6 +1,6 @@
 import { toast } from '@internal/components';
 import { CopyIcon, HistoryIcon, MessageCircleIcon, PenIcon, RedoIcon, UndoIcon } from 'lucide-react';
-import { ArtifactSuggestion } from '~/lib/db/schema';
+import { ArtifactSuggestion } from '~/lib/db/schema-sqlite';
 import { Artifact } from '../create-artifact';
 import { DocumentSkeleton } from '../document-skeleton';
 import { getSuggestions } from './actions';

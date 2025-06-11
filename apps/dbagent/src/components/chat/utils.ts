@@ -1,10 +1,12 @@
-import { ArtifactDocument } from '~/lib/db/schema';
-
+import { parse } from 'date-fns';
+import { ArtifactDocument } from '~/lib/db/schema-sqlite';
 export function getDocumentTimestampByIndex(documents: Array<ArtifactDocument>, index: number) {
   if (!documents) return new Date();
   if (index > documents.length) return new Date();
 
-  return documents[index]?.createdAt || new Date();
+  return documents[index]?.createdAt
+    ? parse(documents[index]?.createdAt, 'yyyy-MM-dd HH:mm:ss', new Date())
+    : new Date();
 }
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';

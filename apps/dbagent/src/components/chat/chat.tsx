@@ -5,7 +5,7 @@ import { toast } from '@internal/components';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { UIMessage } from 'ai';
 import { memo, useEffect, useRef, useState } from 'react';
-import { Connection, MessageVote } from '~/lib/db/schema';
+import { Connection, MessageVote } from '~/lib/db/schema-sqlite';
 import { Artifact } from './artifacts/artifact';
 import { useArtifactSelector } from './artifacts/use-artifact';
 import { ChatHeader } from './header';

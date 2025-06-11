@@ -17,7 +17,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { actionGetConnections, actionGetCustomToolsFromMCPServer } from '~/components/tools/action';
-import { Connection } from '~/lib/db/schema';
+import { Connection } from '~/lib/db/schema-sqlite';
 import { UserMcpServer } from '~/lib/tools/user-mcp-servers';
 import { actionCheckUserMcpServerExists, actionDeleteUserMcpServerFromDB } from './action';
 
@@ -49,7 +49,7 @@ export function McpView({ server }: { server: UserMcpServer }) {
 
         setIsInDb(serverExists);
 
-        const defaultConnection = connectionsData.find((c: Connection) => c.isDefault);
+        const defaultConnection = connectionsData.find((c: Connection) => c.isDefault === 1);
         if (defaultConnection) {
           const tools = await actionGetCustomToolsFromMCPServer(server);
           setTools(tools);
@@ -90,7 +90,7 @@ export function McpView({ server }: { server: UserMcpServer }) {
         <CardHeader>
           <CardTitle>MCP Server: {server.name}</CardTitle>
           <CardDescription>
-            <p className="text-muted-foreground">Version: {server.version}</p>
+            <span className="text-muted-foreground">Version: {server.version}</span>
           </CardDescription>
         </CardHeader>
         <CardContent>

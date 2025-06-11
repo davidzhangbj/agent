@@ -2,7 +2,7 @@
 
 import { useChat } from '@ai-sdk/react';
 import { useEffect, useRef } from 'react';
-import { ArtifactSuggestion } from '~/lib/db/schema';
+import { ArtifactSuggestion } from '~/lib/db/schema-sqlite';
 import { artifactDefinitions, ArtifactKind } from './artifact';
 import { initialArtifactData, useArtifact } from './use-artifact';
 

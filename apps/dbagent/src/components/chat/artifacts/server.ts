@@ -1,7 +1,7 @@
 import { DataStreamWriter } from 'ai';
 import { saveDocument } from '~/lib/db/chats';
 import { DBAccess } from '~/lib/db/db';
-import { ArtifactDocument } from '~/lib/db/schema';
+import { ArtifactDocument } from '~/lib/db/schema-sqlite';
 import { ArtifactKind } from './artifact';
 import { sheetDocumentHandler } from './sheet/server';
 import { textDocumentHandler } from './text/server';

@@ -18,7 +18,7 @@ export async function getUserMcpServers(dbAccess: DBAccess): Promise<UserMcpServ
     name: server.name,
     version: server.version,
     filePath: server.filePath,
-    enabled: server.enabled,
+    enabled: server.enabled === 1 ? true : false,
     args: server.args,
     env: server.env ? JSON.parse(server.env) : undefined
   }));
@@ -33,7 +33,7 @@ export async function getUserMcpServer(dbAccess: DBAccess, serverName: string): 
     name: server.name,
     version: server.version,
     filePath: server.filePath,
-    enabled: server.enabled,
+    enabled: server.enabled === 1 ? true : false,
     args: server.args,
     env: server.env ? JSON.parse(server.env) : undefined
   };

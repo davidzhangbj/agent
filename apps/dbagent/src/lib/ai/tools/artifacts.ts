@@ -1,10 +1,11 @@
 import { DataStreamWriter, streamObject, tool, Tool } from 'ai';
+import { format } from 'date-fns';
 import { z } from 'zod';
 import { artifactKinds, documentHandlersByArtifactKind } from '~/components/chat/artifacts/server';
 import { generateUUID } from '~/components/chat/utils';
 import { getDocumentById, saveSuggestions } from '~/lib/db/chats';
 import { DBAccess } from '~/lib/db/db';
-import { ArtifactSuggestion } from '~/lib/db/schema';
+import { ArtifactSuggestion } from '~/lib/db/schema-sqlite';
 import { getModelInstance } from '../agent';
 
 interface ArtifactToolProps {
@@ -172,7 +173,7 @@ export const requestSuggestions = ({ userId, projectId, dataStream, dbAccess }: 
           description: element.description,
           id: generateUUID(),
           documentId: documentId,
-          isResolved: false,
+          isResolved: 0,
           projectId
         };
 
@@ -189,7 +190,7 @@ export const requestSuggestions = ({ userId, projectId, dataStream, dbAccess }: 
           ...suggestion,
           userId,
           projectId,
-          createdAt: new Date(),
+          createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
           documentCreatedAt: document.createdAt
         }))
       });

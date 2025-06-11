@@ -1,6 +1,6 @@
 import { UseChatHelpers } from '@ai-sdk/react';
 import { ComponentType, Dispatch, ReactNode, SetStateAction } from 'react';
-import { ArtifactSuggestion } from '~/lib/db/schema';
+import { ArtifactSuggestion } from '~/lib/db/schema-sqlite';
 import { UIArtifact } from './artifact';
 import { DataStreamDelta } from './data-stream-handler';
 

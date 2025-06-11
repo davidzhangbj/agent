@@ -1,13 +1,14 @@
 import { Button, toast, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@internal/components';
 import { useQueryClient } from '@tanstack/react-query';
 import type { Message } from 'ai';
+import { format } from 'date-fns';
 import equal from 'fast-deep-equal';
 import { CopyIcon, ThumbsDownIcon, ThumbsUpIcon } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation';
 import { memo } from 'react';
 import { useCopyToClipboard } from 'usehooks-ts';
-import { MessageVote } from '~/lib/db/schema';
+import { MessageVote } from '~/lib/db/schema-sqlite';
 
 export function PureMessageActions({
   chatId,
@@ -63,7 +64,7 @@ export function PureMessageActions({
             <Button
               data-testid="message-upvote"
               className="text-muted-foreground !pointer-events-auto h-fit px-2 py-1"
-              disabled={vote?.isUpvoted}
+              disabled={vote?.isUpvoted === 1}
               variant="outline"
               onClick={async () => {
                 const upvote = fetch('/api/vote', {
@@ -87,11 +88,11 @@ export function PureMessageActions({
                         ...votesWithoutCurrent,
                         {
                           projectId,
-                          createdAt: new Date(),
+                          createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
                           userId: session.user.id,
                           chatId,
                           messageId: message.id,
-                          isUpvoted: true
+                          isUpvoted: 1
                         }
                       ];
                     });
@@ -137,11 +138,11 @@ export function PureMessageActions({
                         ...votesWithoutCurrent,
                         {
                           projectId,
-                          createdAt: new Date(),
+                          createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
                           userId: session.user.id,
                           chatId,
                           messageId: message.id,
-                          isUpvoted: false
+                          isUpvoted: 0
                         }
                       ];
                     });

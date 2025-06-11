@@ -6,7 +6,7 @@ import { isAfter } from 'date-fns';
 import { motion } from 'framer-motion';
 import { LoaderIcon } from 'lucide-react';
 import { useWindowSize } from 'usehooks-ts';
-import { ArtifactDocument } from '~/lib/db/schema';
+import { ArtifactDocument } from '~/lib/db/schema-sqlite';
 import { getDocumentTimestampByIndex } from '../utils';
 import { useArtifact } from './use-artifact';
 

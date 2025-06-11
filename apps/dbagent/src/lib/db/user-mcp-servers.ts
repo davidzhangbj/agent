@@ -1,8 +1,9 @@
 'use server';
 
+import { format } from 'date-fns';
 import { eq } from 'drizzle-orm';
 import { DBAccess } from '~/lib/db/db';
-import { mcpServers } from '~/lib/db/schema';
+import { mcpServers } from '~/lib/db/schema-sqlite';
 import { UserMcpServer } from '~/lib/tools/user-mcp-servers';
 
 export async function dbGetUserMcpServers(dbAccess: DBAccess) {
@@ -26,7 +27,7 @@ export async function dbUpdateUserMcpServer(dbAccess: DBAccess, input: UserMcpSe
     const result = await db
       .update(mcpServers)
       .set({
-        enabled: input.enabled
+        enabled: input.enabled ? 1 : 0
       })
       .where(eq(mcpServers.name, input.name))
       .returning();
@@ -56,8 +57,9 @@ export async function dbAddUserMcpServerToDB(dbAccess: DBAccess, input: UserMcpS
         serverName: input.name,
         version: input.version,
         filePath: input.filePath,
-        enabled: input.enabled,
-        env: input.env ? JSON.stringify(input.env) : null
+        enabled: input.enabled ? 1 : 0,
+        env: input.env ? JSON.stringify(input.env) : null,
+        createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
       })
       .returning();
 
@@ -71,7 +73,7 @@ export async function dbAddUserMcpServerToDB(dbAccess: DBAccess, input: UserMcpS
       name: server.name,
       version: server.version,
       filePath: server.filePath,
-      enabled: server.enabled,
+      enabled: server.enabled === 1 ? true : false,
       args: server.args,
       env: server.env ? JSON.parse(server.env) : undefined
     };

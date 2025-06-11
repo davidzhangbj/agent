@@ -1,8 +1,9 @@
 'use server';
 
+import { format } from 'date-fns';
 import { and, eq } from 'drizzle-orm';
 import { DBAccess } from '~/lib/db/db';
-import { playbooks } from '~/lib/db/schema';
+import { playbooks } from '~/lib/db/schema-sqlite';
 import { CustomPlaybook } from '~/lib/tools/custom-playbooks';
 import { Playbook } from '~/lib/tools/playbooks';
 
@@ -43,7 +44,8 @@ export async function dbCreatePlaybook(dbAccess: DBAccess, input: CustomPlaybook
         name: input.name,
         description: input.description,
         content: input.content,
-        createdBy: userId
+        createdBy: userId,
+        createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
       })
       .returning();
 

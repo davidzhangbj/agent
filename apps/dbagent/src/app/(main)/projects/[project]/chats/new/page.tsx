@@ -51,13 +51,14 @@ export default async function Page({
         chatId,
         projectId: project,
         role: message.role,
-        parts:
+        parts: JSON.stringify(
           message.parts ??
-          (message.content?.split('\n\n').map((text) => ({
-            type: 'text',
-            text
-          })) ||
-            []),
+            (message.content?.split('\n\n').map((text) => ({
+              type: 'text',
+              text
+            })) ||
+              [])
+        ),
         createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
       }))
     );
@@ -68,7 +69,7 @@ export default async function Page({
       {
         id: chatId,
         projectId: project,
-        userId,
+        userId: userId,
         model: 'chat',
         title: `Playbook ${playbook}`,
         createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
@@ -79,12 +80,12 @@ export default async function Page({
           chatId,
           projectId: project,
           role: 'user',
-          parts: [
+          parts: JSON.stringify([
             {
               type: 'text',
               text: `运行 playbook ${playbook}`
             }
-          ],
+          ]),
           createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
         }
       ]
@@ -107,12 +108,12 @@ export default async function Page({
           chatId,
           projectId: project,
           role: 'user',
-          parts: [
+          parts: JSON.stringify([
             {
               type: 'text',
               text: `Run tool ${tool}`
             }
-          ],
+          ]),
           createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
         }
       ]
@@ -134,12 +135,12 @@ export default async function Page({
           chatId,
           projectId: project,
           role: 'user',
-          parts: [
+          parts: JSON.stringify([
             {
               type: 'text',
               text: `Hi! I'd like an initial assessment of my database. Please analyze its configuration, settings, and current activity to provide recommendations for optimization and potential improvements.`
             }
-          ],
+          ]),
           createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
         }
       ]

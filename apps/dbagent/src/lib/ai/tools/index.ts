@@ -1,7 +1,7 @@
 import { DataStreamWriter, Tool } from 'ai';
 import { Pool } from 'mysql2/promise';
 import { getUserDBAccess } from '~/lib/db/db';
-import { Connection, Project } from '~/lib/db/schema';
+import { Connection, Project } from '~/lib/db/schema-sqlite';
 import { getArtifactTools } from './artifacts';
 import { commonToolset } from './common';
 import { getDBSQLTools } from './db';

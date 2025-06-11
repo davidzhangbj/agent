@@ -45,7 +45,7 @@ import {
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Chat, Project } from '~/lib/db/schema';
+import { Chat, Project } from '~/lib/db/schema-sqlite';
 import { fetcher } from '../chat/utils';
 import { Bot } from '../icons/bot';
 
