@@ -50,7 +50,7 @@ export function ToolView({ tool }: { tool: Tool }) {
         <CardHeader>
           <CardTitle>Tool: {tool.name}</CardTitle>
           <CardDescription>
-            <p className="text-muted-foreground">{tool.description}</p>
+            <span className="text-muted-foreground">{tool.description}</span>
           </CardDescription>
         </CardHeader>
         <CardContent>
