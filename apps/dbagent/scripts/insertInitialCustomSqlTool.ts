@@ -124,7 +124,7 @@ customToolsList.push({
 });
 customToolsList.push({
   name: 'getClusterArbitrationServiceInfo',
-  description: '查获取集群的仲裁服务信息询所有 zone 信息',
+  description: '获取集群的仲裁服务信息询所有 zone 信息',
   script: `
   use oceanbase;
   SELECT
@@ -390,19 +390,19 @@ customToolsList.push({
   use oceanbase;
   SELECT
   zone,
+  tenant_id
   svr_ip,
   role,
   COUNT(1) cnt
   FROM
     cdb_ob_table_locations
-  WHERE
-    tenant_id = 1012
   GROUP BY
+    tenant_id,
     svr_ip,
     role
   ORDER BY
   1,
-  3 DESC;`,
+  4 DESC;`,
   createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
 });
 customToolsList.push({
