@@ -1,4 +1,0 @@
-pgvector==0.4.0
-psycopg2_binary==2.9.10
-python-dotenv==1.1.0
-sentence_transformers==4.1.0

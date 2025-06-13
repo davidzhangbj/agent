@@ -11,12 +11,9 @@
     "tsc": "tsc --noEmit",
     "test": "vitest --passWithNoTests",
     "eval": "vitest --config vitesteval.config.ts",
-    "db:migrate": "drizzle-kit migrate",
-    "db:generate": "drizzle-kit generate",
-    "db:init-obdoc": "tsx scripts/init-obdoc.ts",
-    "load-test": "tsx scripts/load-testing/musicbrainz-loader.ts",
-    "dev-scheduler": "tsx scripts/scheduler.ts",
-    "build:mcp-servers": "tsc -p mcp-source/tsconfig.json"
+    "db:push": "drizzle-kit push",
+    "initCustomSqlTool": "tsx scripts/insertInitialCustomSqlTool.ts",
+    "dev-scheduler": "tsx scripts/scheduler.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^1.2.10",
