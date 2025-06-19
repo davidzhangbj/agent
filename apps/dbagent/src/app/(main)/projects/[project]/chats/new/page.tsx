@@ -111,7 +111,7 @@ export default async function Page({
           parts: JSON.stringify([
             {
               type: 'text',
-              text: `Run tool ${tool}`
+              text: `运行 tool ${tool}`
             }
           ]),
           createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss')

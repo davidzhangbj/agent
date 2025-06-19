@@ -5,14 +5,13 @@ export type Client = Connection;
 export type ClientBase = PoolConnection;
 
 const DEFAULT_CHARSET = 'utf8mb4'; // 或者 'utf8'，取决于你的数据库配置
-const DEFAULT_COLLATION = 'utf8mb4_general_ci'; // 或者其他的 collation
 
 export function getTargetDbPool(
   connectionString: string,
   poolConfig: Omit<mysql.PoolOptions, 'connectionString'> = {}
 ): Pool {
   const parsed = parseConnectionString(connectionString);
-  const config = { ...poolConfig, ...parsed, charset: DEFAULT_CHARSET, collation: DEFAULT_COLLATION };
+  const config = { ...poolConfig, ...parsed, charset: DEFAULT_CHARSET };
   if (!config.connectionLimit) config.connectionLimit = 1;
   return mysql.createPool(config);
 }
