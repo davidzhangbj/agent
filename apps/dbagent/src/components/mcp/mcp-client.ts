@@ -17,7 +17,6 @@ export async function getMCPClient(sseUrl: string): Promise<{ client: Client | u
       await client.connect(sseTransport);
       return { client, message: '' };
     } catch (error) {
-      // If that fails with a 4xx error, try the older SSE transport
       console.log('SSE connection failed, falling back to Streamable HTTP connection');
       client = new Client({
         name: 'streamable-http-client',

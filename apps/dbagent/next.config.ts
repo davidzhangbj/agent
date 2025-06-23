@@ -35,8 +35,7 @@ const nextConfig: NextConfig = {
         destination: '/_next/static/:path*.map'
       }
     ];
-  },
-  output: 'standalone'
+  }
 };
 
 export default nextConfig;
