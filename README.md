@@ -15,23 +15,21 @@ This project was modified from the [xata agent project](https://github.com/xatai
 
 ## Installation / self-hosted
 
-We provide docker images for the agent itself. The only other dependency is a Postgres database in which the agent will store its configuration, state, and history.
+We provide docker images for the agent itself.
 
-We provide a docker-compose file to start the agent and the Postgres database.
-
-Edit the `.env.production` file in the root of the project. If you are not using the official API addresses of Openai, Deepseek, Anthropic, or Gemini, you need to add the configurations of CUSTOM_BASE_URL, CUSTOM_API_KEY, and CUSTOM_CHAT_MODEL_NAME.
-
-Start a local instance via docker compose:
+Start a local instance via docker command:
 
 ```bash
-docker compose up or docker-compose up
+docker run -d \
+  --name ob-agent \
+  --env CUSTOM_BASE_URL='https://dashscope.aliyuncs.com/compatible-mode/v1' \
+  --env CUSTOM_API_KEY='sk-xxx' \
+  --env CUSTOM_CHAT_MODEL_NAME='qwen-max-latest' \
+  -p 8000:8000 \
+  davidzhangbj/oceanbaseagent:v0.2
 ```
-
-Open the app at `http://localhost:8000` (or the public URL you set in the `.env.production` file) and follow the onboarding steps.
-
-We have a more detailed [guide](https://github.com/xataio/agent/wiki/Xata-Agent-%E2%80%90-Deploy-on-EC2) on how to deploy via docker-compose on an EC2 instance.
-
-For authentication, you can use your own OAuth provider.
+Replace CUSTOM_BASE_URL, CUSTOM_API_KEY, and CUSTOM_CHAT_MODEL_NAME with the relevant information you are using.<br>
+Open the app at `http://localhost:8000`
 
 ## Development
 
