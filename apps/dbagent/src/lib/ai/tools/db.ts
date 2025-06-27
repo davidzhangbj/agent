@@ -1,6 +1,16 @@
 import { Tool, tool } from 'ai';
 import { z } from 'zod';
 import {
+  toolGetDatabaseIdByName,
+  toolGetDiskSpace,
+  toolGetDiskSpaceLimitRatio,
+  toolGetIndexTableId,
+  toolGetSumOfAllColumnLengthsOfTable,
+  toolGetTableId,
+  toolGetTableSpaceSize,
+  toolGetTenantIdByTenantName
+} from '~/lib/tools/insufficientDiskWhenAddIndex';
+import {
   toolGetSqlLockWaitTimeout,
   toolGetSqlOfBlockTrx,
   toolGetSqlOfHoldLockTrx,
@@ -42,7 +52,15 @@ export class DBSQLTools implements ToolsetGroup {
       getTrxOfBlock: this.getTrxOfBlock(),
       getSqlOfBlockTrx: this.getSqlOfBlockTrx(),
       getSqlLockWaitTimeout: this.getSqlLockWaitTimeout(),
-      executeSQL: this.executeSQL()
+      executeSQL: this.executeSQL(),
+      getTenantIdByTenantName: this.getTenantIdByTenantName(),
+      getDatabaseIdByName: this.getDatabaseIdByName(),
+      getTableId: this.getTableId(),
+      getTableSpaceSize: this.getTableSpaceSize(),
+      getIndexTableId: this.getIndexTableId(),
+      getSumOfAllColumnLengthsOfTable: this.getSumOfAllColumnLengthsOfTable(),
+      getDiskSpace: this.getDiskSpace(),
+      getDiskSpaceLimitRatio: this.getDiskSpaceLimitRatio()
     };
   }
 
@@ -218,6 +236,159 @@ export class DBSQLTools implements ToolsetGroup {
           return await withPoolConnection(pool, async (client) => await toolExecuteSQL(client, sql));
         } catch (error) {
           return `Error execute sql: ${error}`;
+        }
+      }
+    });
+  }
+
+  getTenantIdByTenantName(): Tool {
+    const pool = this.#pool;
+    return tool({
+      description: `根据租户名获取租户id`,
+      parameters: z.object({
+        tenant_name: z.string()
+      }),
+      execute: async ({ tenant_name }) => {
+        try {
+          return await withPoolConnection(
+            pool,
+            async (client) => await toolGetTenantIdByTenantName(client, tenant_name)
+          );
+        } catch (error) {
+          return `Error getTenantIdByTenantName: ${error}`;
+        }
+      }
+    });
+  }
+
+  getDatabaseIdByName(): Tool {
+    const pool = this.#pool;
+    return tool({
+      description: `根据database的名称,查询database_id`,
+      parameters: z.object({
+        database_name: z.string()
+      }),
+      execute: async ({ database_name }) => {
+        try {
+          return await withPoolConnection(pool, async (client) => await toolGetDatabaseIdByName(client, database_name));
+        } catch (error) {
+          return `Error getDatabaseIdByName: ${error}`;
+        }
+      }
+    });
+  }
+
+  getTableId(): Tool {
+    const pool = this.#pool;
+    return tool({
+      description: `根据表名、租户ID、数据库id查询table_id`,
+      parameters: z.object({
+        table_name: z.string(),
+        tenant_id: z.number(),
+        database_id: z.number()
+      }),
+      execute: async ({ table_name, tenant_id, database_id }) => {
+        try {
+          return await withPoolConnection(
+            pool,
+            async (client) => await toolGetTableId(client, table_name, tenant_id, database_id)
+          );
+        } catch (error) {
+          return `Error getTableId: ${error}`;
+        }
+      }
+    });
+  }
+
+  getTableSpaceSize(): Tool {
+    const pool = this.#pool;
+    return tool({
+      description: `根据table_id和租户ID获取DDL源表的空间大小`,
+      parameters: z.object({
+        tenant_id: z.number(),
+        table_id: z.number()
+      }),
+      execute: async ({ tenant_id, table_id }) => {
+        try {
+          return await withPoolConnection(
+            pool,
+            async (client) => await toolGetTableSpaceSize(client, tenant_id, table_id)
+          );
+        } catch (error) {
+          return `Error getTableSpaceSize: ${error}`;
+        }
+      }
+    });
+  }
+
+  getIndexTableId(): Tool {
+    const pool = this.#pool;
+    return tool({
+      description: `根据租户ID、数据表ID和索引名称查询索引表ID`,
+      parameters: z.object({
+        tenant_id: z.number(),
+        data_table_id: z.number(),
+        index_name: z.string()
+      }),
+      execute: async ({ tenant_id, data_table_id, index_name }) => {
+        try {
+          return await withPoolConnection(
+            pool,
+            async (client) => await toolGetIndexTableId(client, tenant_id, data_table_id, index_name)
+          );
+        } catch (error) {
+          return `Error getIndexTableId: ${error}`;
+        }
+      }
+    });
+  }
+
+  getSumOfAllColumnLengthsOfTable(): Tool {
+    const pool = this.#pool;
+    return tool({
+      description: `查询表中所有列所占字节大小的和`,
+      parameters: z.object({
+        tenant_id: z.number(),
+        table_id: z.number()
+      }),
+      execute: async ({ tenant_id, table_id }) => {
+        try {
+          return await withPoolConnection(
+            pool,
+            async (client) => await toolGetSumOfAllColumnLengthsOfTable(client, tenant_id, table_id)
+          );
+        } catch (error) {
+          return `Error getSumOfAllColumnLengthsOfTable: ${error}`;
+        }
+      }
+    });
+  }
+
+  getDiskSpace(): Tool {
+    const pool = this.#pool;
+    return tool({
+      description: `查询磁盘的总空间和已使用空间`,
+      parameters: z.object({}),
+      execute: async () => {
+        try {
+          return await withPoolConnection(pool, async (client) => await toolGetDiskSpace(client));
+        } catch (error) {
+          return `Error getDiskSpace: ${error}`;
+        }
+      }
+    });
+  }
+
+  getDiskSpaceLimitRatio(): Tool {
+    const pool = this.#pool;
+    return tool({
+      description: `查询用户可用磁盘空间占总磁盘空间的比例`,
+      parameters: z.object({}),
+      execute: async () => {
+        try {
+          return await withPoolConnection(pool, async (client) => await toolGetDiskSpaceLimitRatio(client));
+        } catch (error) {
+          return `Error getDiskSpaceLimitRatio: ${error}`;
         }
       }
     });
