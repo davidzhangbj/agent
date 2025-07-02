@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { Message } from 'ai';
 import { format } from 'date-fns';
 import equal from 'fast-deep-equal';
-import { CopyIcon, ThumbsDownIcon, ThumbsUpIcon } from 'lucide-react';
+import { CopyIcon, FullscreenIcon, ThumbsDownIcon, ThumbsUpIcon } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation';
 import { memo } from 'react';
@@ -28,7 +28,11 @@ export function PureMessageActions({
 
   if (isLoading) return null;
   if (message.role === 'user') return null;
-
+  const textFromParts = message.parts
+    ?.filter((part) => part.type === 'text')
+    .map((part) => part.text)
+    .join('\n')
+    .trim();
   return (
     <TooltipProvider delayDuration={0}>
       <div className="flex flex-row gap-2">
@@ -38,12 +42,6 @@ export function PureMessageActions({
               className="text-muted-foreground h-fit px-2 py-1"
               variant="outline"
               onClick={async () => {
-                const textFromParts = message.parts
-                  ?.filter((part) => part.type === 'text')
-                  .map((part) => part.text)
-                  .join('\n')
-                  .trim();
-
                 if (!textFromParts) {
                   toast.error("There's no text to copy!");
                   return;
@@ -58,7 +56,36 @@ export function PureMessageActions({
           </TooltipTrigger>
           <TooltipContent>Copy</TooltipContent>
         </Tooltip>
-
+        {textFromParts?.includes('```html') && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className="text-muted-foreground h-fit px-2 py-1"
+                variant="outline"
+                onClick={async () => {
+                  const textFromParts = message.parts
+                    ?.filter((part) => part.type === 'text')
+                    .map((part) => part.text)
+                    .join('\n')
+                    .trim();
+                  console.log('copy:', textFromParts);
+                  if (textFromParts?.includes('```html')) {
+                    const newWindow = window.open('', '_blank');
+                    if (newWindow) {
+                      newWindow.document.write(textFromParts.replace(/^```html\n/, '').replace(/\n```$/, ''));
+                      newWindow.document.close();
+                    } else {
+                      toast.error('Failed to open a new window. Please allow pop-ups for this site.');
+                    }
+                  }
+                }}
+              >
+                <FullscreenIcon />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Preview</TooltipContent>
+          </Tooltip>
+        )}
         <Tooltip>
           <TooltipTrigger asChild>
             <Button

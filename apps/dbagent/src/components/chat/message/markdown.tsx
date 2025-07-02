@@ -1,3 +1,4 @@
+import { html as beautify_html } from 'js-beautify';
 import Link from 'next/link';
 import { memo } from 'react';
 import ReactMarkdown, { type Components } from 'react-markdown';
@@ -40,9 +41,26 @@ const components: Partial<Components> = {
   // 代码块处理
   code: ({ node, className, children, ...props }) => {
     const match = /language-(\w+)/.exec(className || '');
+    console.log('children:', typeof children);
+    let codeString = '';
 
+    if (Array.isArray(children)) {
+      codeString = children.join('');
+    } else if (typeof children === 'string') {
+      codeString = children;
+    } else {
+      codeString = JSON.stringify(children ?? '');
+    }
     if (match) {
       // 多行代码块
+      if (match[1] === 'html') {
+        codeString = beautify_html(
+          JSON.stringify(children)
+            ?.replace(/\\n/g, '')
+            .replace(/\\/g, '')
+            .replace(/^["]|["]$/g, '')
+        );
+      }
       return (
         <div className="max-w-full overflow-x-auto">
           <SyntaxHighlighter
@@ -60,7 +78,7 @@ const components: Partial<Components> = {
               }
             }}
           >
-            {JSON.stringify(children)}
+            {codeString}
           </SyntaxHighlighter>
         </div>
       );
