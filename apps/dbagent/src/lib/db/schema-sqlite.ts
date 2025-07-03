@@ -95,7 +95,7 @@ export const schedules = sqliteTable(
     enabled: int('enabled').default(1).notNull(),
     lastRun: text('last_run'),
     nextRun: text('next_run'),
-    status: int('status').default(0).notNull(),
+    status: text('status').default('disabled').notNull(),
     failures: int('failures').default(0),
     keepHistory: int('keep_history').default(300).notNull(),
     model: text('model').notNull(),
