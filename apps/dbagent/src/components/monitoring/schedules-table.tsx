@@ -150,29 +150,15 @@ export function MonitoringScheduleTable({ connections }: { connections: Connecti
                 </TableCell>
                 <TableCell>{schedule.status}</TableCell>
                 <TableCell>
-                  {schedule.lastRun ? (
-                    <span title={schedule.lastRun}>
-                      {displayRelativeTime(new Date(Date.parse(schedule.lastRun)), new Date())} ago
-                    </span>
-                  ) : (
-                    '-'
-                  )}
+                  {schedule.lastRun ? <span title={schedule.lastRun}>{schedule.lastRun} ago</span> : '-'}
                 </TableCell>
                 <TableCell>
-                  {schedule.nextRun ? (
-                    <span title={schedule.nextRun}>
-                      {new Date(schedule.nextRun) <= new Date()
-                        ? 'now'
-                        : `in ${displayRelativeTime(new Date(), new Date(schedule.nextRun))}`}
-                    </span>
-                  ) : (
-                    '-'
-                  )}
+                  {schedule.nextRun ? <span title={schedule.nextRun}>around {schedule.nextRun}</span> : '-'}
                 </TableCell>
                 <TableCell>{schedule.failures}</TableCell>
                 <TableCell>
                   <Switch
-                    checked={schedule.enabled}
+                    checked={schedule.enabled === 1 ? true : false}
                     onCheckedChange={(checked) => handleToggleEnabled(schedule.id, checked)}
                   />
                 </TableCell>

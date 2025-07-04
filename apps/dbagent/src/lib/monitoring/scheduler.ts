@@ -8,6 +8,7 @@ import { runSchedule } from './runner';
 export function utcToLocalDate(utcString: string): Date {
   const date = new Date(utcString);
   const offset = date.getTimezoneOffset() * 60000; // Convert offset to milliseconds
+  console.log('date111:', new Date(date.getTime() - offset));
   return new Date(date.getTime() - offset);
 }
 
@@ -27,7 +28,9 @@ export function scheduleGetNextRun(schedule: ScheduleInsert, now: Date): Date {
 export function shouldRunSchedule(schedule: Schedule, now: Date): boolean {
   if (schedule.enabled === 0 || !schedule.nextRun) return false;
   const nextRun = utcToLocalDate(schedule.nextRun);
-
+  console.log('nextRun11:', nextRun);
+  console.log('now33:', now);
+  console.log('schedule222:', schedule);
   if (schedule.status !== 'scheduled') {
     if (
       schedule.status === 'running' &&
@@ -41,7 +44,7 @@ export function shouldRunSchedule(schedule: Schedule, now: Date): boolean {
     return false;
   }
 
-  return now >= nextRun;
+  return now.getMilliseconds() >= nextRun.getMilliseconds();
 }
 
 export async function checkAndRunJobsAsAdmin() {
@@ -59,7 +62,9 @@ export async function checkAndRunJobsAsAdmin() {
     const schedulesToRun = [];
     for (const schedule of schedules) {
       if (!schedule.enabled) continue;
+      console.log('aaa');
       const shouldRun = shouldRunSchedule(schedule, now);
+      console.log('shouldRun', shouldRun);
       if (shouldRun) {
         schedulesToRun.push(schedule);
       }

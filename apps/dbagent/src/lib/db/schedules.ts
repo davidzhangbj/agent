@@ -42,6 +42,7 @@ export async function getSchedule(dbAccess: DBAccess, id: string): Promise<Sched
     if (!result[0]) {
       throw new Error(`Schedule with id ${id} not found`);
     }
+    console.log('11111:', result[0]);
     return result[0];
   });
 }
@@ -82,10 +83,10 @@ export async function setScheduleStatusRunning(dbAccess: DBAccess, schedule: Sch
         .select({ status: schedules.status })
         .from(schedules)
         .where(eq(schedules.id, schedule.id));
-      if (result[0]?.status === 1) {
+      if (result[0]?.status === 'running') {
         throw new Error(`Schedule ${schedule.id} is already running`);
       }
-      await trx.update(schedules).set({ status: 1 }).where(eq(schedules.id, schedule.id));
+      await trx.update(schedules).set({ status: 'running' }).where(eq(schedules.id, schedule.id));
     });
   });
 }

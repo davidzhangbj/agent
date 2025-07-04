@@ -6,12 +6,14 @@ interface PageParams {
 }
 
 export default async function Page({ params }: { params: Promise<PageParams> }) {
+  console.log('222333');
   const { schedule: scheduleId } = await params;
   const schedule = await getProjectSchedule(scheduleId);
 
   return (
     <div className="container">
       <ScheduleRunsTable schedule={schedule} />
+      {/* hello */}
     </div>
   );
 }

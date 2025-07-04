@@ -2,6 +2,7 @@ import { Message } from '@ai-sdk/ui-utils';
 import { generateId, generateObject, generateText, LanguageModelV1 } from 'ai';
 import { format } from 'date-fns';
 import { z } from 'zod';
+import { generateUUID } from '~/components/chat/utils';
 import { getMonitoringModel, getMonitoringSystemPrompt } from '../ai/agent';
 import { getTools } from '../ai/tools';
 import { getConnectionFromSchedule } from '../db/connections';
@@ -196,15 +197,6 @@ In the Root cause analysis section, mention which playbooks you run.`;
   return summaryResult.text;
 }
 
-function shouldNotify(notifyLevel: 'alert' | 'warning' | 'info', notificationLevel: 'alert' | 'warning' | 'info') {
-  const levelMap = {
-    info: 1,
-    warning: 2,
-    alert: 3
-  };
-  return levelMap[notificationLevel] >= levelMap[notifyLevel];
-}
-
 export async function runSchedule(dbAccess: DBAccess, schedule: Schedule, now: Date) {
   console.log(`Running schedule ${schedule.id}`);
 
@@ -244,7 +236,7 @@ export async function runSchedule(dbAccess: DBAccess, schedule: Schedule, now: D
   console.log('notificationResult', notificationResult);
 
   // drilling down to more actionable playbooks
-  if (schedule.maxSteps && shouldNotify(schedule.notifyLevel, notificationResult.notificationLevel)) {
+  if (schedule.maxSteps) {
     let step = 1;
     while (step < schedule.maxSteps) {
       const recommendPlaybookResult = await decideNextPlaybook(
@@ -276,6 +268,7 @@ export async function runSchedule(dbAccess: DBAccess, schedule: Schedule, now: D
   const run = await insertScheduleRunLimitHistory(
     dbAccess,
     {
+      id: generateUUID(),
       projectId: connection.projectId,
       scheduleId: schedule.id,
       result: resultText,

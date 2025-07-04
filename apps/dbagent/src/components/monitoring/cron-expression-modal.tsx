@@ -10,7 +10,7 @@ import {
   DialogTitle,
   Input,
   Label
-} from '@xata.io/components';
+} from '@internal/components';
 import { useState } from 'react';
 import { generateCronExpression } from './actions';
 

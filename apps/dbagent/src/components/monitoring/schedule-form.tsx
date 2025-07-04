@@ -24,12 +24,13 @@ import {
   Textarea,
   useForm,
   zodResolver
-} from '@xata.io/components';
+} from '@internal/components';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import * as z from 'zod';
-import { Connection, Schedule } from '~/lib/db/schema';
+import { generateUUID } from '~/components/chat/utils';
+import { Connection, Schedule } from '~/lib/db/schema-sqlite';
 import { actionGetDefaultLanguageModel } from '../chat/actions';
 import { ModelSelector } from '../chat/model-selector';
 import { actionCreateSchedule, actionDeleteSchedule, actionGetSchedule, actionUpdateSchedule } from './actions';
@@ -45,7 +46,7 @@ const formSchema = z.object({
   cronExpression: z.string().optional(),
   additionalInstructions: z.string().optional(),
   maxSteps: z.string().optional(),
-  notifyLevel: z.enum(['info', 'warning', 'alert']),
+  notifyLevel: z.string().optional(),
   extraNotificationText: z.string().optional(),
   enabled: z.boolean()
 });
@@ -116,7 +117,7 @@ export function ScheduleForm({ projectId, isEditMode, scheduleId, playbooks, con
           maxSteps: schedule.maxSteps?.toString() || '0',
           notifyLevel: schedule.notifyLevel || 'alert',
           extraNotificationText: schedule.extraNotificationText ?? undefined,
-          enabled: schedule.enabled
+          enabled: schedule.enabled === 1 ? true : false
         });
       };
       void fetchSchedule();
@@ -135,9 +136,9 @@ export function ScheduleForm({ projectId, isEditMode, scheduleId, playbooks, con
       minInterval: Number(data.minInterval),
       maxInterval: Number(data.maxInterval),
       maxSteps: Number(data.maxSteps),
-      notifyLevel: data.notifyLevel,
+      notifyLevel: data.notifyLevel || 'info',
       extraNotificationText: data.extraNotificationText ?? null,
-      enabled: data.enabled,
+      enabled: data.enabled === true ? 1 : 0,
       keepHistory: 300,
       status: data.enabled ? 'scheduled' : 'disabled',
       lastRun: null,
@@ -147,7 +148,7 @@ export function ScheduleForm({ projectId, isEditMode, scheduleId, playbooks, con
     if (isEditMode) {
       await actionUpdateSchedule({ ...schedule, id: scheduleId });
     } else {
-      await actionCreateSchedule(schedule);
+      await actionCreateSchedule({ ...schedule, id: generateUUID() });
     }
 
     router.push(`/projects/${projectId}/monitoring`);
@@ -336,7 +337,7 @@ export function ScheduleForm({ projectId, isEditMode, scheduleId, playbooks, con
               )}
             />
 
-            <FormField
+            {/* <FormField
               control={form.control}
               name="notifyLevel"
               render={({ field }) => (
@@ -357,9 +358,9 @@ export function ScheduleForm({ projectId, isEditMode, scheduleId, playbooks, con
                   <FormDescription>At which level should the schedule trigger a notification.</FormDescription>
                 </FormItem>
               )}
-            />
+            /> */}
 
-            <FormField
+            {/* <FormField
               control={form.control}
               name="extraNotificationText"
               render={({ field }) => (
@@ -374,7 +375,7 @@ export function ScheduleForm({ projectId, isEditMode, scheduleId, playbooks, con
                   </FormDescription>
                 </FormItem>
               )}
-            />
+            /> */}
 
             <FormField
               control={form.control}

@@ -1,6 +1,7 @@
 'use server';
 
 import { generateText } from 'ai';
+import { format } from 'date-fns';
 import { auth } from '~/auth';
 import { getModelInstance } from '~/lib/ai/agent';
 import { getUserDBAccess, getUserSessionDBAccess } from '~/lib/db/db';
@@ -14,7 +15,7 @@ import {
   updateScheduleRunData
 } from '~/lib/db/schedules';
 import { Schedule, ScheduleInsert, ScheduleRun } from '~/lib/db/schema-sqlite';
-import { scheduleGetNextRun, utcToLocalDate } from '~/lib/monitoring/scheduler';
+import { scheduleGetNextRun } from '~/lib/monitoring/scheduler';
 import { listPlaybooks } from '~/lib/tools/playbooks';
 
 export async function generateCronExpression(description: string): Promise<string> {
@@ -57,14 +58,14 @@ export async function actionGetSchedules(): Promise<Schedule[]> {
   const dbAccess = await getUserSessionDBAccess();
   const schedules = await getSchedules(dbAccess);
   // Ensure last_run is serialized as string
-  schedules.forEach((schedule) => {
-    if (schedule.lastRun) {
-      schedule.lastRun = utcToLocalDate(schedule.lastRun).toString();
-    }
-    if (schedule.nextRun) {
-      schedule.nextRun = utcToLocalDate(schedule.nextRun).toString();
-    }
-  });
+  // schedules.forEach((schedule) => {
+  //   if (schedule.lastRun) {
+  //     schedule.lastRun = utcToLocalDate(schedule.lastRun).toString();
+  //   }
+  //   if (schedule.nextRun) {
+  //     schedule.nextRun = utcToLocalDate(schedule.nextRun).toString();
+  //   }
+  // });
   return schedules;
 }
 
@@ -86,14 +87,14 @@ export async function actionUpdateScheduleEnabled(scheduleId: string, enabled: b
   const dbAccess = await getUserSessionDBAccess();
   if (enabled) {
     const schedule = await getSchedule(dbAccess, scheduleId);
-    schedule.enabled = true;
+    schedule.enabled = 1;
     schedule.status = 'scheduled';
-    schedule.nextRun = scheduleGetNextRun(schedule, new Date()).toUTCString();
+    schedule.nextRun = format(scheduleGetNextRun(schedule, new Date()), 'yyyy-MM-dd HH:mm:ss');
     console.log('nextRun', schedule.nextRun);
     await updateScheduleRunData(dbAccess, schedule);
   } else {
     const schedule = await getSchedule(dbAccess, scheduleId);
-    schedule.enabled = false;
+    schedule.enabled = 0;
     schedule.status = 'disabled';
     schedule.nextRun = null;
     await updateScheduleRunData(dbAccess, schedule);

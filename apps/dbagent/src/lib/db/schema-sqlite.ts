@@ -128,7 +128,7 @@ export type ScheduleInsert = InferInsertModel<typeof schedules>;
 export const scheduleRuns = sqliteTable(
   'schedule_runs',
   {
-    id: int().primaryKey({ autoIncrement: true }),
+    id: text().primaryKey(),
     projectId: text('project_id').notNull(),
     scheduleId: text('schedule_id').notNull(),
     createdAt: text('created_at').notNull(),

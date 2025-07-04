@@ -17,27 +17,19 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
-} from '@xata.io/components';
+} from '@internal/components';
 import { format } from 'date-fns';
-import {
-  AlertCircle,
-  AlertTriangle,
-  Calendar,
-  ChevronDown,
-  ChevronRight,
-  Clock,
-  Info,
-  MessageSquare,
-  PlayCircle
-} from 'lucide-react';
+import { Calendar, ChevronDown, ChevronRight, Clock, MessageSquare, PlayCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { NotificationLevel, Schedule, ScheduleRun } from '~/lib/db/schema';
+import { Schedule, ScheduleRun } from '~/lib/db/schema-sqlite';
 import { actionGetScheduleRuns } from './actions';
 
 export function ScheduleRunsTable({ schedule }: { schedule: Schedule }) {
+  console.log('schedule:', schedule);
+  console.log('4444');
   const [isLoading, setIsLoading] = useState(true);
   const [runs, setRuns] = useState<ScheduleRun[]>([]);
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
@@ -61,17 +53,6 @@ export function ScheduleRunsTable({ schedule }: { schedule: Schedule }) {
       ...prev,
       [runId]: !prev[runId]
     }));
-  };
-
-  const getLevelIcon = (level: NotificationLevel) => {
-    switch (level) {
-      case 'info':
-        return <Info className="h-5 w-5 text-blue-500" />;
-      case 'warning':
-        return <AlertTriangle className="h-5 w-5 text-amber-500" />;
-      case 'alert':
-        return <AlertCircle className="h-5 w-5 text-red-500" />;
-    }
   };
 
   const SkeletonRow = () => (
@@ -130,9 +111,7 @@ export function ScheduleRunsTable({ schedule }: { schedule: Schedule }) {
                   <Calendar className="h-4 w-4" />
                   <span>Next Run</span>
                 </div>
-                <div className="font-medium">
-                  {schedule.nextRun ? format(schedule.nextRun, 'MMM d, yyyy HH:mm') : 'Not scheduled'}
-                </div>
+                <div className="font-medium">{schedule.nextRun ? schedule.nextRun : 'Not scheduled'}</div>
               </div>
             </div>
           </CardContent>
@@ -189,20 +168,6 @@ export function ScheduleRunsTable({ schedule }: { schedule: Schedule }) {
                             </Button>
                           </TableCell>
                           <TableCell className="font-medium">{format(run.createdAt, 'MMM d, yyyy HH:mm:ss')}</TableCell>
-                          <TableCell>
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <span className="inline-flex items-center justify-center">
-                                    {getLevelIcon(run.notificationLevel)}
-                                  </span>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p className="capitalize">{run.notificationLevel}</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </TableCell>
                           <TableCell>{run.summary}</TableCell>
                           <TableCell className="text-right">
                             <button className="" onClick={(e) => e.stopPropagation()}>
