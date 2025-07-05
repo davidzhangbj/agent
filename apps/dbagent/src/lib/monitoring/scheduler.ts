@@ -1,4 +1,5 @@
 import { CronExpressionParser } from 'cron-parser';
+import { format } from 'date-fns';
 import { incrementScheduleFailures, setScheduleStatusRunning, updateScheduleRunData } from '~/lib/db/schedules';
 import { DBAccess, DBUserAccess, getAdminAccess } from '../db/db';
 import { Schedule, ScheduleInsert, schedules as schedulesSchema } from '../db/schema-sqlite';
@@ -113,8 +114,8 @@ async function runJob(dbAccess: DBAccess, schedule: Schedule, now: Date) {
 
   // Schedule the next run (also in case of errors)
   schedule.status = 'scheduled';
-  schedule.lastRun = now.toUTCString();
-  schedule.nextRun = scheduleGetNextRun(schedule, now).toUTCString();
+  schedule.lastRun = format(now, 'yyyy-MM-dd HH:mm:ss');
+  schedule.nextRun = format(scheduleGetNextRun(schedule, now), 'yyyy-MM-dd HH:mm:ss');
   await updateScheduleRunData(dbAccess, schedule);
   console.log(`Wrote back ${JSON.stringify(schedule)} to the DB`);
 }

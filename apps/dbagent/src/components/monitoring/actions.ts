@@ -41,7 +41,7 @@ export async function actionCreateSchedule(schedule: Omit<ScheduleInsert, 'userI
   const userId = session?.user?.id ?? '';
   if (schedule.enabled) {
     schedule.status = 'scheduled';
-    schedule.nextRun = scheduleGetNextRun({ ...schedule, userId }, new Date()).toISOString();
+    schedule.nextRun = format(scheduleGetNextRun({ ...schedule, userId }, new Date()), 'yyyy-MM-dd HH:mm:ss');
   }
   const dbAccess = await getUserSessionDBAccess();
   return insertSchedule(dbAccess, { ...schedule, userId });

@@ -40,7 +40,8 @@ async function runModelPlaybook({
   });
 
   const monitoringSystemPrompt = getMonitoringSystemPrompt({ cloudProvider: project.cloudProvider });
-  const targetDb = getTargetDbPool(connection.connectionString);
+  const poolConfig = { user: connection.username, password: connection.password };
+  const targetDb = getTargetDbPool(connection.connectionString, poolConfig);
   try {
     const tools = await getTools({ project, connection, targetDb, userId: schedule.userId });
     const result = await generateText({
