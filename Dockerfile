@@ -1,7 +1,6 @@
-# Use Node.js 22 as the base image
-FROM node:22-alpine AS base
+FROM davidzhangbj/nodejs:v0.1 AS base
 ENV TZ=Asia/Shanghai
-RUN corepack enable && corepack prepare pnpm@10.5.2 --activate && apk add --no-cache tzdata
+RUN npm install -g pnpm@^10
 COPY . /app/
 WORKDIR /app/apps/dbagent
 ENV PORT 8000
