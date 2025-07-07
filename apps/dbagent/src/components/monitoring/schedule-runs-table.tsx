@@ -28,8 +28,6 @@ import { Schedule, ScheduleRun } from '~/lib/db/schema-sqlite';
 import { actionGetScheduleRuns } from './actions';
 
 export function ScheduleRunsTable({ schedule }: { schedule: Schedule }) {
-  console.log('schedule:', schedule);
-  console.log('4444');
   const [isLoading, setIsLoading] = useState(true);
   const [runs, setRuns] = useState<ScheduleRun[]>([]);
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
@@ -175,10 +173,8 @@ export function ScheduleRunsTable({ schedule }: { schedule: Schedule }) {
                                 <Tooltip>
                                   <TooltipTrigger asChild>
                                     <Link href={`/projects/${project}/chats/new?scheduleRun=${run.id}`}>
-                                      <span onClick={() => {}}>
-                                        <MessageSquare className="h-4 w-4" />
-                                        <span className="sr-only">Load in chat</span>
-                                      </span>
+                                      <MessageSquare className="h-4 w-4" />
+                                      <span className="sr-only">Load in chat</span>
                                     </Link>
                                   </TooltipTrigger>
                                   <TooltipContent>

@@ -89,8 +89,6 @@ class BuiltinProviderRegistry implements ProviderRegistry {
   }
 
   languageModel(id: string, useFallback?: boolean): ModelWithFallback {
-    console.log('id555:', id);
-    console.log('builtinModels:', builtinModels);
     const model = builtinModels[id];
     console.log('model:', model);
     if (!model) {

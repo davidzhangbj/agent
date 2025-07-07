@@ -9,7 +9,7 @@ import {
   toolGetTableId,
   toolGetTableSpaceSize,
   toolGetTenantIdByTenantName
-} from '~/lib/tools/insufficientDiskWhenAddIndex';
+} from '~/lib/tools/insufficient-disk-when-add-index';
 import {
   toolGetSqlLockWaitTimeout,
   toolGetSqlOfBlockTrx,
