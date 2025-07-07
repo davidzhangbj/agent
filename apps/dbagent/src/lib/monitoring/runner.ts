@@ -35,7 +35,7 @@ async function runModelPlaybook({
   messages.push({
     id: generateId(),
     role: 'user',
-    content: `Run this playbook: ${playbook}. ${additionalInstructions ?? ''}`,
+    content: `运行 this playbook: ${playbook}. ${additionalInstructions ?? ''}`,
     createdAt: new Date()
   });
 
@@ -275,8 +275,8 @@ export async function runSchedule(dbAccess: DBAccess, schedule: Schedule, now: D
       result: resultText,
       summary: notificationResult.summary,
       notificationLevel: notificationResult.notificationLevel,
-      messages: messages,
-      createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss') // using the start time
+      messages: JSON.stringify(messages),
+      createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
     },
     schedule.keepHistory
   );

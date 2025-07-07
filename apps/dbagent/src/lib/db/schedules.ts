@@ -42,7 +42,6 @@ export async function getSchedule(dbAccess: DBAccess, id: string): Promise<Sched
     if (!result[0]) {
       throw new Error(`Schedule with id ${id} not found`);
     }
-    console.log('11111:', result[0]);
     return result[0];
   });
 }

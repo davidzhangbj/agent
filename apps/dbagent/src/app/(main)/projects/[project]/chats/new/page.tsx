@@ -1,3 +1,4 @@
+import { Message as SDKMessage } from '@ai-sdk/ui-utils';
 import { format } from 'date-fns';
 import { redirect } from 'next/navigation';
 import { generateUUID } from '~/components/chat/utils';
@@ -35,6 +36,7 @@ export default async function Page({
   if (scheduleRun) {
     const run = await getScheduleRun(dbAccess, scheduleRun);
     const schedule = await getSchedule(dbAccess, run.scheduleId);
+    const messages: SDKMessage[] = JSON.parse(run.messages);
 
     await saveChat(
       dbAccess,
@@ -46,7 +48,7 @@ export default async function Page({
         title: `Schedule: ${schedule.playbook} - Run: ${run.id}`,
         createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
       },
-      run.messages.map((message) => ({
+      messages.map((message) => ({
         id: generateUUID(),
         chatId,
         projectId: project,

@@ -22,7 +22,7 @@ import { format } from 'date-fns';
 import { Calendar, ChevronDown, ChevronRight, Clock, MessageSquare, PlayCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Schedule, ScheduleRun } from '~/lib/db/schema-sqlite';
 import { actionGetScheduleRuns } from './actions';
@@ -127,7 +127,7 @@ export function ScheduleRunsTable({ schedule }: { schedule: Schedule }) {
                   <TableRow>
                     <TableHead className="w-[30px]"></TableHead>
                     <TableHead>Timestamp</TableHead>
-                    <TableHead>Level</TableHead>
+                    {/* <TableHead>Level</TableHead> */}
                     <TableHead className="w-[50%]">Summary</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -142,14 +142,14 @@ export function ScheduleRunsTable({ schedule }: { schedule: Schedule }) {
                   ) : runs.length === 0 ? (
                     <>
                       <TableRow>
-                        <TableCell colSpan={4} className="text-muted-foreground py-8 text-center">
+                        <TableCell colSpan={3} className="text-muted-foreground py-8 text-center">
                           No runs yet
                         </TableCell>
                       </TableRow>
                     </>
                   ) : (
                     runs.map((run) => (
-                      <>
+                      <React.Fragment key={run.id}>
                         <TableRow
                           key={run.id}
                           className={cn(
@@ -167,7 +167,7 @@ export function ScheduleRunsTable({ schedule }: { schedule: Schedule }) {
                               )}
                             </Button>
                           </TableCell>
-                          <TableCell className="font-medium">{format(run.createdAt, 'MMM d, yyyy HH:mm:ss')}</TableCell>
+                          <TableCell className="font-medium">{format(run.createdAt, 'yyyy-MM-dd HH:mm:ss')}</TableCell>
                           <TableCell>{run.summary}</TableCell>
                           <TableCell className="text-right">
                             <button className="" onClick={(e) => e.stopPropagation()}>
@@ -175,10 +175,10 @@ export function ScheduleRunsTable({ schedule }: { schedule: Schedule }) {
                                 <Tooltip>
                                   <TooltipTrigger asChild>
                                     <Link href={`/projects/${project}/chats/new?scheduleRun=${run.id}`}>
-                                      <Button variant="outline" size="icon" onClick={() => {}}>
+                                      <span onClick={() => {}}>
                                         <MessageSquare className="h-4 w-4" />
                                         <span className="sr-only">Load in chat</span>
-                                      </Button>
+                                      </span>
                                     </Link>
                                   </TooltipTrigger>
                                   <TooltipContent>
@@ -200,7 +200,7 @@ export function ScheduleRunsTable({ schedule }: { schedule: Schedule }) {
                             </TableCell>
                           </TableRow>
                         )}
-                      </>
+                      </React.Fragment>
                     ))
                   )}
                 </TableBody>

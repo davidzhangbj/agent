@@ -135,7 +135,7 @@ export const scheduleRuns = sqliteTable(
     result: text('result').notNull(),
     summary: text('summary'),
     notificationLevel: text('notification_level').default('info').notNull(),
-    messages: text('messages').$type<SDKMessage[]>().notNull()
+    messages: text('messages').notNull()
   },
   (table) => [
     foreignKey({

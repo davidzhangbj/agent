@@ -1,5 +1,5 @@
 import { CronExpressionParser } from 'cron-parser';
-import { format } from 'date-fns';
+import { format, parse } from 'date-fns';
 import { incrementScheduleFailures, setScheduleStatusRunning, updateScheduleRunData } from '~/lib/db/schedules';
 import { DBAccess, DBUserAccess, getAdminAccess } from '../db/db';
 import { Schedule, ScheduleInsert, schedules as schedulesSchema } from '../db/schema-sqlite';
@@ -9,7 +9,6 @@ import { runSchedule } from './runner';
 export function utcToLocalDate(utcString: string): Date {
   const date = new Date(utcString);
   const offset = date.getTimezoneOffset() * 60000; // Convert offset to milliseconds
-  console.log('date111:', new Date(date.getTime() - offset));
   return new Date(date.getTime() - offset);
 }
 
@@ -20,7 +19,7 @@ export function scheduleGetNextRun(schedule: ScheduleInsert, now: Date): Date {
   }
   if (schedule.scheduleType === 'automatic' && schedule.minInterval) {
     // TODO ask the model to get the interval, for now use the minInterval
-    const nextRun = new Date(now.getTime() + schedule.minInterval * 1000);
+    const nextRun = new Date(now.getTime() + schedule.minInterval * 60 * 1000);
     return nextRun;
   }
   return now;
@@ -28,10 +27,7 @@ export function scheduleGetNextRun(schedule: ScheduleInsert, now: Date): Date {
 
 export function shouldRunSchedule(schedule: Schedule, now: Date): boolean {
   if (schedule.enabled === 0 || !schedule.nextRun) return false;
-  const nextRun = utcToLocalDate(schedule.nextRun);
-  console.log('nextRun11:', nextRun);
-  console.log('now33:', now);
-  console.log('schedule222:', schedule);
+  const nextRun = parse(schedule.nextRun, 'yyyy-MM-dd HH:mm:ss', new Date());
   if (schedule.status !== 'scheduled') {
     if (
       schedule.status === 'running' &&
@@ -44,8 +40,7 @@ export function shouldRunSchedule(schedule: Schedule, now: Date): boolean {
     }
     return false;
   }
-
-  return now.getMilliseconds() >= nextRun.getMilliseconds();
+  return now.getTime() >= nextRun.getTime();
 }
 
 export async function checkAndRunJobsAsAdmin() {
@@ -63,9 +58,7 @@ export async function checkAndRunJobsAsAdmin() {
     const schedulesToRun = [];
     for (const schedule of schedules) {
       if (!schedule.enabled) continue;
-      console.log('aaa');
       const shouldRun = shouldRunSchedule(schedule, now);
-      console.log('shouldRun', shouldRun);
       if (shouldRun) {
         schedulesToRun.push(schedule);
       }

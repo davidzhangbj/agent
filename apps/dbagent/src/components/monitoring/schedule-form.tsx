@@ -25,6 +25,7 @@ import {
   useForm,
   zodResolver
 } from '@internal/components';
+import { format } from 'date-fns';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -142,7 +143,9 @@ export function ScheduleForm({ projectId, isEditMode, scheduleId, playbooks, con
       keepHistory: 300,
       status: data.enabled ? 'scheduled' : 'disabled',
       lastRun: null,
-      nextRun: data.enabled ? new Date(Date.now() + 1000 * 60 * Number(data.minInterval)).toISOString() : null,
+      nextRun: data.enabled
+        ? format(new Date(Date.now() + 1000 * 60 * Number(data.minInterval)), 'yyyy-MM-dd HH:mm:ss')
+        : null,
       failures: 0
     };
     if (isEditMode) {
