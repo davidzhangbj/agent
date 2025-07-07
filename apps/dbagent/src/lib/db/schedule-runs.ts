@@ -48,10 +48,7 @@ export async function insertScheduleRunLimitHistory(
   });
 }
 
-export async function insertScheduleRun(
-  dbAccess: DBAccess,
-  scheduleRun: Omit<ScheduleRun, 'id'>
-): Promise<ScheduleRun> {
+export async function insertScheduleRun(dbAccess: DBAccess, scheduleRun: ScheduleRun): Promise<ScheduleRun> {
   return dbAccess.query(async ({ db }) => {
     const result = await db.insert(scheduleRuns).values(scheduleRun).returning();
     if (!result[0]) {
@@ -73,10 +70,7 @@ export async function getScheduleRuns(dbAccess: DBAccess, scheduleId: string): P
 
 export async function getScheduleRun(dbAccess: DBAccess, runId: string): Promise<ScheduleRun> {
   return dbAccess.query(async ({ db }) => {
-    const result = await db
-      .select()
-      .from(scheduleRuns)
-      .where(eq(scheduleRuns.id, parseInt(runId)));
+    const result = await db.select().from(scheduleRuns).where(eq(scheduleRuns.id, runId));
     if (!result[0]) {
       throw new Error('Schedule run not found');
     }

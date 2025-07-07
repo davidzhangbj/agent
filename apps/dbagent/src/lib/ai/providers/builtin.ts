@@ -39,14 +39,15 @@ const openai = createOpenAI(config);
 const llmModel = env.CUSTOM_CHAT_MODEL_NAME || 'qwen-max-latest';
 const builtinOpenAIModels: BuiltinProvider = {
   info: {
-    name: 'OpenAI',
-    id: 'openai',
+    name: llmModel,
+    id: llmModel,
     kind: openai,
-    fallback: 'gpt-4o'
+    fallback: llmModel
   },
   models: [
     {
-      id: 'openai:gpt-4.1',
+      // id: 'openai:gpt-4.1',
+      id: llmModel,
       providerId: llmModel,
       // name: 'GPT-4.1'
       name: llmModel
@@ -63,7 +64,7 @@ const builtinProviderModels: Record<string, BuiltinModel> = Object.fromEntries(
   })
 );
 
-export const defaultLanguageModel = builtinProviderModels['openai:gpt-4.1']!;
+export const defaultLanguageModel = builtinProviderModels[llmModel]!;
 
 const builtinCustomModels: Record<string, BuiltinModel> = {
   chat: defaultLanguageModel,
@@ -88,14 +89,17 @@ class BuiltinProviderRegistry implements ProviderRegistry {
   }
 
   languageModel(id: string, useFallback?: boolean): ModelWithFallback {
+    console.log('id555:', id);
+    console.log('builtinModels:', builtinModels);
     const model = builtinModels[id];
+    console.log('model:', model);
     if (!model) {
       throw new Error(`Model ${id} not found`);
     }
     return {
       info: () => model.info(),
       instance: () => model.instance(),
-      isFallback: useFallback ?? false,
+      isFallback: false,
       requestedModelId: id
     } as ModelWithFallback;
   }

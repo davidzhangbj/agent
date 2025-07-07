@@ -32,6 +32,7 @@ import {
 } from '@internal/components';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  ActivityIcon,
   DatabaseIcon,
   Drill,
   HistoryIcon,
@@ -209,13 +210,13 @@ export function SideNav({ className, project, onboardingComplete }: SideNavProps
       url: `${basePath}/mcp`,
       icon: WrenchIcon,
       className: 'text-sm'
+    },
+    {
+      title: 'Monitoring',
+      url: `${basePath}/monitoring`,
+      icon: ActivityIcon,
+      className: 'text-sm'
     }
-    // {
-    //   title: 'Monitoring',
-    //   url: `${basePath}/monitoring`,
-    //   icon: ActivityIcon,
-    //   className: 'text-sm'
-    // }
   ];
 
   return (

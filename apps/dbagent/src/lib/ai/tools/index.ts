@@ -17,14 +17,14 @@ export * from './types';
 
 export async function getTools({
   project,
-  _connection,
+  connection,
   targetDb,
   userId,
   useArtifacts = false,
   dataStream
 }: {
   project: Project;
-  _connection: Connection;
+  connection: Connection;
   targetDb: Pool;
   userId: string;
   useArtifacts?: boolean;

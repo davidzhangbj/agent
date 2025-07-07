@@ -65,7 +65,7 @@ export async function POST(request: Request) {
 
     return createDataStreamResponse({
       execute: async (dataStream) => {
-        const tools = await getTools({ project, _connection: connection, targetDb, useArtifacts, userId, dataStream });
+        const tools = await getTools({ project, connection: connection, targetDb, useArtifacts, userId, dataStream });
 
         const result = streamText({
           model: model.instance(),

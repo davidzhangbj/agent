@@ -95,7 +95,7 @@ export const schedules = sqliteTable(
     enabled: int('enabled').default(1).notNull(),
     lastRun: text('last_run'),
     nextRun: text('next_run'),
-    status: int('status').default(0).notNull(),
+    status: text('status').default('disabled').notNull(),
     failures: int('failures').default(0),
     keepHistory: int('keep_history').default(300).notNull(),
     model: text('model').notNull(),
@@ -128,14 +128,14 @@ export type ScheduleInsert = InferInsertModel<typeof schedules>;
 export const scheduleRuns = sqliteTable(
   'schedule_runs',
   {
-    id: int().primaryKey({ autoIncrement: true }),
+    id: text().primaryKey(),
     projectId: text('project_id').notNull(),
     scheduleId: text('schedule_id').notNull(),
     createdAt: text('created_at').notNull(),
     result: text('result').notNull(),
     summary: text('summary'),
     notificationLevel: text('notification_level').default('info').notNull(),
-    messages: text('messages').$type<SDKMessage[]>().notNull()
+    messages: text('messages').notNull()
   },
   (table) => [
     foreignKey({
