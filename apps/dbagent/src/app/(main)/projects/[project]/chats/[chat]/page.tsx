@@ -19,7 +19,7 @@ export default async function Page({ params }: { params: Promise<PageParams> }) 
   const suggestedActions = [
     {
       title: 'Are there any slow queries with my database?',
-      action: 'Are there any slow queries with my database?'
+      action: '运行 Playbook oceanbaseSlowQuery'
     }
   ];
 
