@@ -100,7 +100,7 @@ export function ScheduleRunsTable({ schedule }: { schedule: Schedule }) {
                   <span>Last Run</span>
                 </div>
                 <div className="font-medium">
-                  {schedule.lastRun ? format(schedule.lastRun, 'MMM d, yyyy HH:mm') : '-'}
+                  {schedule.lastRun ? format(schedule.lastRun, 'yyyy-MM-dd HH:mm:ss') : '-'}
                 </div>
               </div>
 
