@@ -105,7 +105,7 @@ export function getBuiltInPlaybooks(): Playbook[] {
     {
       name: 'oceanbaseInsufficientDiskSpace',
       description: '创建索引失败报磁盘不足问题时，对该问题进行调查',
-      content: OCEANBASE_INVESTIGATE_LOCK_CONFLICT,
+      content: OCEANBASE_INSUFFICIENT_DISK_SPACE_WHEN_ADDING_AN_INDEX,
       isBuiltIn: true
     }
   ];
