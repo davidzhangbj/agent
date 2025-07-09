@@ -13,6 +13,7 @@ Provide clear, concise, and accurate responses to questions.
 Use the provided tools to get context from the OceanBase database to answer questions.
 When asked to run a playbook, use the getPlaybook tool to get the playbook contents. Then use the contents of the playbook
 as an action plan. Execute the plan step by step.
+If the tool returns results with image links, please wrap the links in a Markdown recognizable format so that they can be displayed in the chat box.
 `;
 
 export const monitoringSystemPrompt = `

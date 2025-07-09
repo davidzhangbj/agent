@@ -111,7 +111,6 @@ async function getMCPClient(baseUrl: string) {
 
 async function getToolsFromSSE(server: UserMcpServer) {
   try {
-    convertSchemaToZod({});
     const client = await getMCPClient(server.filePath);
     const rawTools = await client.listTools();
     const rowToolsList = rawTools.tools;
@@ -121,12 +120,16 @@ async function getToolsFromSSE(server: UserMcpServer) {
           description: toolDef.description,
           parameters: convertSchemaToZod(toolDef.inputSchema), // 使用新的转换函数
           execute: async (args: Record<string, any>) => {
+            console.log('toolDef.inputSchema:', toolDef.inputSchema);
+            console.log('toolDef.name:', toolDef.name);
+            console.log('args:', args);
             try {
               const client = await getMCPClient(server.filePath);
               const result = await client.callTool({
                 name: toolDef.name,
                 arguments: args
               });
+              console.log('result:', result);
               return result;
             } catch (error) {
               console.error(`Error in call tools ${toolDef.name} from mcp server:`, error);
