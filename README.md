@@ -26,8 +26,9 @@ docker run -d \
   --env CUSTOM_API_KEY='sk-xxx' \
   --env CUSTOM_CHAT_MODEL_NAME='qwen-max-latest' \
   -p 8000:8000 \
-  davidzhangbj/oceanbaseagent:v0.2
+  davidzhangbj/oceanbaseagent:latest
 ```
+
 Replace CUSTOM_BASE_URL, CUSTOM_API_KEY, and CUSTOM_CHAT_MODEL_NAME with the relevant information you are using.<br>
 Open the app at `http://localhost:8000`
 
