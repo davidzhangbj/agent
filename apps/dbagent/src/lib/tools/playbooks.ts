@@ -70,7 +70,7 @@ const OCEANBASE_INSUFFICIENT_DISK_SPACE_WHEN_ADDING_AN_INDEX = `
 如果索引预计占用的空间大小小于可用磁盘空间,则反馈磁盘空间是足够的,反之反馈磁盘空间不足,并把所有查询和计算出的数据反馈给用户
 `;
 
-export function getPlaybook(name: string): string {
+export function getAgent(name: string): string {
   switch (name) {
     case 'oceanbaseSlowQuery':
       return OCEANBASE_SLOW_QUERIES_PLAYBOOK;

@@ -200,7 +200,7 @@ export function ScheduleForm({ projectId, isEditMode, scheduleId, playbooks, con
               name="playbook"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Playbook</FormLabel>
+                  <FormLabel>Agent</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>

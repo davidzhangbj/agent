@@ -35,7 +35,7 @@ async function runModelPlaybook({
   messages.push({
     id: generateId(),
     role: 'user',
-    content: `运行 this playbook: ${playbook}. ${additionalInstructions ?? ''}`,
+    content: `运行 this agent: ${playbook}. ${additionalInstructions ?? ''}`,
     createdAt: new Date()
   });
 

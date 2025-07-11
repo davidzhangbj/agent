@@ -85,7 +85,7 @@ export default async function Page({
           parts: JSON.stringify([
             {
               type: 'text',
-              text: `运行 playbook ${playbook}`
+              text: `运行 agent ${playbook}`
             }
           ]),
           createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss')

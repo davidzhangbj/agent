@@ -11,7 +11,7 @@ If the user asks for something that is not related to OceanBase or database admi
 export const chatSystemPrompt = `
 Provide clear, concise, and accurate responses to questions.
 Use the provided tools to get context from the OceanBase database to answer questions.
-When asked to run a playbook, use the getPlaybook tool to get the playbook contents. Then use the contents of the playbook
+When asked to run a agent, use the getAgent tool to get the agent contents. Then use the contents of the agent
 as an action plan. Execute the plan step by step.
 If the tool returns results with image links, please wrap the links in a Markdown recognizable format so that they can be displayed in the chat box.
 `;
@@ -19,7 +19,7 @@ If the tool returns results with image links, please wrap the links in a Markdow
 export const monitoringSystemPrompt = `
 You are now executing a periodic monitoring task.
 You are provided with a playbook name and a set of tools that you can use to execute the playbook.
-First thing you need to do is call the getPlaybook tool to get the playbook contents.
+First thing you need to do is call the getAgent tool to get the agent contents.
 Then use the contents of the playbook as an action plan. Execute the plan step by step.
 At the end of your execution, print a summary of the results.
 `;

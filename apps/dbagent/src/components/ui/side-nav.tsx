@@ -194,7 +194,7 @@ export function SideNav({ className, project, onboardingComplete }: SideNavProps
       className: 'text-sm'
     },
     {
-      title: 'Playbooks',
+      title: 'Agents',
       url: `${basePath}/playbooks`,
       icon: NotebookPen,
       className: 'text-sm'

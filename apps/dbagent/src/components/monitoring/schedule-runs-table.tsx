@@ -74,7 +74,7 @@ export function ScheduleRunsTable({ schedule }: { schedule: Schedule }) {
               <div className="space-y-1">
                 <div className="text-muted-foreground flex items-center gap-1 text-sm">
                   <PlayCircle className="h-4 w-4" />
-                  <span>Playbook</span>
+                  <span>Agent</span>
                 </div>
                 <div className="font-medium">{schedule.playbook}</div>
               </div>

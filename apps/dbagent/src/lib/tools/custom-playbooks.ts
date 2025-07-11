@@ -1,6 +1,6 @@
 import { dbGetCustomPlaybooks } from '../db/custom-playbooks';
 import { DBAccess } from '../db/db';
-import { getPlaybook, listPlaybooks } from './playbooks';
+import { getAgent, listPlaybooks } from './playbooks';
 
 export interface CustomPlaybook {
   name: string;
@@ -92,7 +92,7 @@ export async function getCustomPlaybookContent(
 
 //gets content for either a custom playbook or a built in playbook
 export async function getCustomPlaybookAndPlaybookTool(db: DBAccess, name: string, projectId: string): Promise<string> {
-  const playBookContent = getPlaybook(name);
+  const playBookContent = getAgent(name);
   const customPlaybookContent = await getCustomPlaybookContent(db, projectId, name);
   return customPlaybookContent !== null ? customPlaybookContent : playBookContent;
 }

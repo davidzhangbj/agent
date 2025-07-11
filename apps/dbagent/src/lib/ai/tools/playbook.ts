@@ -2,7 +2,7 @@ import { tool, Tool } from 'ai';
 import { z } from 'zod';
 import { DBAccess } from '~/lib/db/db';
 import { getCustomPlaybookAndPlaybookTool, listCustomPlaybooksAndPlaybookTool } from '~/lib/tools/custom-playbooks';
-import { getPlaybook, listPlaybooks } from '~/lib/tools/playbooks';
+import { getAgent, listPlaybooks } from '~/lib/tools/playbooks';
 import { ToolsetGroup } from './types';
 
 export function getPlaybookToolset(dbAccess: DBAccess, projectId: string): Record<string, Tool> {
@@ -11,7 +11,7 @@ export function getPlaybookToolset(dbAccess: DBAccess, projectId: string): Recor
 
 function playbookFetchTool(execute: (name: string) => Promise<string>): Tool {
   return tool({
-    description: `Get a playbook contents by name. A playbook is a list of steps to follow to achieve a goal. Follow it step by step.`,
+    description: `Get a agent contents by name. A agent is a list of steps to follow to achieve a goal. Follow it step by step.`,
     parameters: z.object({
       name: z.string()
     }),
@@ -21,15 +21,15 @@ function playbookFetchTool(execute: (name: string) => Promise<string>): Tool {
 
 function playbookListTool(execute: () => Promise<string[]>): Tool {
   return tool({
-    description: `List the available playbooks.`,
+    description: `List the available agents.`,
     parameters: z.object({}),
     execute: async () => execute()
   });
 }
 
 export const builtinPlaybookToolset = {
-  getPlaybookTool: playbookFetchTool(async (name: string) => getPlaybook(name)),
-  listPlaybooksTool: playbookListTool(async () => listPlaybooks())
+  getAgentTool: playbookFetchTool(async (name: string) => getAgent(name)),
+  listAgentsTool: playbookListTool(async () => listPlaybooks())
 };
 
 export class playbookTools implements ToolsetGroup {
@@ -43,12 +43,12 @@ export class playbookTools implements ToolsetGroup {
 
   toolset(): Record<string, Tool> {
     return {
-      getPlaybookTool: this.getPlaybookTool(),
-      listPlaybooksTool: this.listPlaybooksTool()
+      getAgentTool: this.getAgentTool(),
+      listAgentsTool: this.listAgentsTool()
     };
   }
 
-  private getPlaybookTool(): Tool {
+  private getAgentTool(): Tool {
     const db = this.#dbAccess;
     const getter = this.#connProjectId;
     return playbookFetchTool(async (name: string) => {
@@ -57,7 +57,7 @@ export class playbookTools implements ToolsetGroup {
     });
   }
 
-  private listPlaybooksTool(): Tool {
+  private listAgentsTool(): Tool {
     const db = this.#dbAccess;
     const getter = this.#connProjectId;
     return playbookListTool(async () => {

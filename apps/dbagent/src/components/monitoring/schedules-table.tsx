@@ -106,7 +106,7 @@ export function MonitoringScheduleTable({ connections }: { connections: Connecti
           <TableRow>
             <TableHead className="w-[150px]">Database</TableHead>
             <TableHead className="w-[150px]">Model</TableHead>
-            <TableHead className="w-[150px]">Playbook</TableHead>
+            <TableHead className="w-[150px]">Agent</TableHead>
             <TableHead className="w-[150px]">Schedule</TableHead>
             <TableHead className="w-[150px]">Status</TableHead>
             <TableHead className="w-[150px]">Last Run</TableHead>

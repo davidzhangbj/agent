@@ -15,13 +15,13 @@ export function PlaybookView({ playbook }: { playbook: Playbook }) {
         <Button variant="ghost" className="flex items-center pl-0" asChild>
           <Link href={`/projects/${project}/playbooks`}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Playbooks
+            Back to Agent
           </Link>
         </Button>
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>Playbook:{playbook.name}</CardTitle>
+          <CardTitle>Agent:{playbook.name}</CardTitle>
           <CardDescription>{playbook.description}</CardDescription>
         </CardHeader>
         <CardContent>
@@ -31,13 +31,13 @@ export function PlaybookView({ playbook }: { playbook: Playbook }) {
           <Link href={`/projects/${project}/monitoring/schedule/add?playbook=${playbook.name}`}>
             <Button variant="outline">
               <Clock className="mr-2 h-4 w-4" />
-              Schedule Playbook
+              Schedule Agent
             </Button>
           </Link>
           <Link href={`/projects/${project}/chats/new?playbook=${playbook.name}`}>
             <Button>
               <PlayCircle className="mr-2 h-4 w-4" />
-              Run Playbook
+              Run Agent
             </Button>
           </Link>
         </CardFooter>

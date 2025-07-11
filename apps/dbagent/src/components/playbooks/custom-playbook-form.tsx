@@ -118,14 +118,14 @@ export function CustomPlaybookForm({ initialData, isEditing = false }: CustomPla
         <Button variant="ghost" className="flex items-center pl-0" asChild>
           <Link href={`/projects/${project}/playbooks`}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Playbooks
+            Back to Agent
           </Link>
         </Button>
       </div>
       <Card>
         <form onSubmit={handleSubmit}>
           <CardHeader>
-            <CardTitle>{isEditing ? 'Edit Playbook' : 'Create New Playbook'}</CardTitle>
+            <CardTitle>{isEditing ? 'Edit Agent' : 'Create New Agent'}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {error && (
@@ -163,7 +163,7 @@ export function CustomPlaybookForm({ initialData, isEditing = false }: CustomPla
 
             <div className="space-y-2">
               <label htmlFor="content" className="text-sm font-medium">
-                Playbook Content
+                Agent Content
               </label>
               <div className="mb-2 flex justify-end">
                 <Button
@@ -177,7 +177,7 @@ export function CustomPlaybookForm({ initialData, isEditing = false }: CustomPla
                         ? 'Please fill in the name'
                         : !description
                           ? 'Please fill in the description'
-                          : 'Generate playbook content'
+                          : 'Generate agent content'
                   }
                   onClick={() => {
                     if (!name && !description) {
@@ -203,7 +203,7 @@ export function CustomPlaybookForm({ initialData, isEditing = false }: CustomPla
                 required
               />
               <p className="text-muted-foreground text-xs">
-                Write your playbook with clear steps and instructions for the AI agent to follow.
+                Write your agent with clear steps and instructions for the AI agent to follow.
               </p>
             </div>
           </CardContent>
@@ -241,7 +241,7 @@ export function CustomPlaybookForm({ initialData, isEditing = false }: CustomPla
               </>
             )}
             <Button type="submit" disabled={loading}>
-              {loading ? 'Saving...' : isEditing ? 'Update Playbook' : 'Create Playbook'}
+              {loading ? 'Saving...' : isEditing ? 'Update Playbook' : 'Create Agent'}
             </Button>
           </CardFooter>
         </form>

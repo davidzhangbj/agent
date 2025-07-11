@@ -41,4 +41,4 @@ Go to the `apps/dbagent` directory and follow the instructions in the [README](.
 The agent can be extended via the following mechanisms:
 
 - **Tools**: These are functions that the agent can call to get information about the database. They are written in TypeScript.
-- **Playbooks**: These are sequences of steps that the agent can follow to troubleshoot an issue. They are simply written in english.
+- **Agents**: These are sequences of steps that the agent can follow to troubleshoot an issue. They are simply written in english.

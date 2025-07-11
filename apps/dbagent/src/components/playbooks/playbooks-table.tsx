@@ -64,9 +64,9 @@ export function PlaybooksTable() {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Playbooks</h1>
-        <Button title="Create Custom Playbook" onClick={() => router.push(`/projects/${project}/playbooks/new`)}>
-          Create Custom Playbook
+        <h1 className="text-2xl font-bold">Agent</h1>
+        <Button title="Create Custom Agent" onClick={() => router.push(`/projects/${project}/playbooks/new`)}>
+          Create Custom Agent
         </Button>
       </div>
       <Table>
@@ -126,7 +126,7 @@ export function PlaybooksTable() {
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleCopyBuiltInPlaybook(playbook.name)}>
                         <CopyIcon className="mr-2 h-3 w-3" />
-                        Copy Playbook
+                        Copy Agent
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -183,7 +183,7 @@ export function PlaybooksTable() {
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleCopyCustomPlaybook(customPlaybook.id)}>
                         <CopyIcon className="mr-2 h-3 w-3" />
-                        Copy Playbook
+                        Copy Agent
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
