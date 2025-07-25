@@ -1,7 +1,7 @@
 // import { openai } from '@ai-sdk/openai';
-import { createOpenAI } from '@ai-sdk/openai';
 import { LanguageModel } from 'ai';
 import { env } from '~/lib/env/server';
+import { createOpenAICompatible } from '../compatible/openai-compatible-provider';
 
 import { Model, ModelWithFallback, Provider, ProviderInfo, ProviderModel, ProviderRegistry } from './types';
 
@@ -32,10 +32,11 @@ class BuiltinModel implements Model {
   }
 }
 const config = {
-  baseURL: env.CUSTOM_BASE_URL,
-  apiKey: env.CUSTOM_API_KEY
+  baseURL: env.CUSTOM_BASE_URL!,
+  apiKey: env.CUSTOM_API_KEY,
+  name: 'custome'
 };
-const openai = createOpenAI(config);
+const openai = createOpenAICompatible(config);
 const llmModel = env.CUSTOM_CHAT_MODEL_NAME || 'qwen-max-latest';
 const builtinOpenAIModels: BuiltinProvider = {
   info: {
@@ -90,7 +91,6 @@ class BuiltinProviderRegistry implements ProviderRegistry {
 
   languageModel(id: string, useFallback?: boolean): ModelWithFallback {
     const model = builtinModels[id];
-    console.log('model:', model);
     if (!model) {
       throw new Error(`Model ${id} not found`);
     }
