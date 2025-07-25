@@ -6,7 +6,7 @@ const env = dotenvx.config({ path: '.env.eval' }).parsed;
 
 export default defineConfig({
   test: {
-    include: ['**/*.eval.ts'],
+    include: ['**/judge-eval.test.ts'],
     exclude: ['**/node_modules/**'],
     watch: false,
     maxConcurrency: 2,

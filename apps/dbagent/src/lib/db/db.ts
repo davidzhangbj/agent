@@ -1,7 +1,14 @@
-import { drizzle } from 'drizzle-orm/libsql';
-
+import { sql } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import pg from 'pg';
 import { requireUserSession } from '~/utils/route';
 import { env } from '../env/server';
+import { authenticatedUser } from './schema';
+
+const pool = new pg.Pool({
+  connectionString: env.DATABASE_URL,
+  max: 20
+});
 
 /**
  * Interface for database access that provides a consistent way to execute queries
@@ -22,8 +29,13 @@ export interface DBAccess {
  */
 export class DBAdminAccess implements DBAccess {
   async query<T>(callback: (params: { db: ReturnType<typeof drizzle>; userId: string }) => Promise<T>): Promise<T> {
-    const db = drizzle(env.DATABASE_URL);
-    return await callback({ db, userId: 'admin' });
+    const client = await pool.connect();
+    try {
+      const db = drizzle(client);
+      return await callback({ db, userId: 'admin' });
+    } finally {
+      client.release(true);
+    }
   }
 }
 
@@ -35,15 +47,22 @@ export class DBUserAccess implements DBAccess {
   private readonly _userId: string;
 
   constructor(userId: string) {
-    if (userId !== '' && userId !== 'local' && !/^[0-9a-f-]*$/i.test(userId)) {
+    if (userId !== '' && userId !== 'local' && !/^[0-9a-z-]*$/i.test(userId)) {
       throw new Error('Invalid user ID format');
     }
     this._userId = userId;
   }
 
   async query<T>(callback: (params: { db: ReturnType<typeof drizzle>; userId: string }) => Promise<T>): Promise<T> {
-    const db = drizzle(env.DATABASE_URL);
-    return await callback({ db, userId: this._userId });
+    const client = await pool.connect();
+    try {
+      const db = drizzle(client);
+      await db.execute(sql.raw(`SET ROLE "${authenticatedUser.name}"`));
+      await db.execute(sql.raw(`SET "app.current_user" = '${this._userId}'`));
+      return await callback({ db, userId: this._userId });
+    } finally {
+      client.release(true);
+    }
   }
 }
 

@@ -1,15 +1,16 @@
 import { DataStreamWriter, Tool } from 'ai';
-import { Pool } from 'mysql2/promise';
+import { Pool } from 'pg';
 import { getUserDBAccess } from '~/lib/db/db';
-import { Connection, Project } from '~/lib/db/schema-sqlite';
+import { Connection, Project } from '~/lib/db/schema';
 import { getArtifactTools } from './artifacts';
+import { getDBClusterTools } from './cluster';
 import { commonToolset } from './common';
 import { getDBSQLTools } from './db';
 import { getPlaybookToolset } from './playbook';
-import { getCustomQueryTools } from './query';
 import { mergeToolsets } from './types';
-import { userMCPToolset } from './user-mcp';
+import { mcpToolset } from './user-mcp';
 
+export * from './cluster';
 export * from './common';
 export * from './db';
 export * from './playbook';
@@ -33,21 +34,12 @@ export async function getTools({
   const dbAccess = await getUserDBAccess(userId);
 
   const dbTools = getDBSQLTools(targetDb);
-  // const clusterTools = getDBClusterTools(dbAccess, connection, project.cloudProvider);
+  const clusterTools = getDBClusterTools(dbAccess, connection, project.cloudProvider);
   const playbookToolset = getPlaybookToolset(dbAccess, project.id);
-  const customQueryTools = await getCustomQueryTools(targetDb);
-  const mcpTools = await userMCPToolset.getTools(userId);
+  // const mcpTools = await mcpToolset.listMCPTools();
 
   const artifactsToolset =
     useArtifacts && dataStream ? getArtifactTools({ dbAccess, userId, projectId: project.id, dataStream }) : {};
 
-  return mergeToolsets(
-    mcpTools,
-    customQueryTools,
-    commonToolset,
-    playbookToolset,
-    dbTools,
-    // clusterTools,
-    artifactsToolset
-  );
+  return mergeToolsets( commonToolset, playbookToolset, dbTools, clusterTools, artifactsToolset);
 }

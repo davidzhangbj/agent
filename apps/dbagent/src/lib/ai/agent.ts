@@ -1,7 +1,8 @@
 import { LanguageModel } from 'ai';
-import { CloudProvider } from '../db/schema-sqlite';
+import { CloudProvider } from '../db/schema';
 import { artifactsPrompt, chatSystemPrompt, commonSystemPrompt, monitoringSystemPrompt } from './prompts';
 import { getLanguageModel, getLanguageModelWithFallback, ModelWithFallback } from './providers';
+import { createOpenAI } from '@ai-sdk/openai';
 
 function getCloudProviderPrompt(cloudProvider: string): string {
   switch (cloudProvider) {
@@ -46,8 +47,13 @@ export function getMonitoringSystemPrompt({ cloudProvider }: { cloudProvider: Cl
 }
 
 export async function getModelInstance(name: string): Promise<LanguageModel> {
-  const model = await getLanguageModel(name);
-  return model.instance();
+  // const model = await getLanguageModel(name);
+  const config = {
+    baseURL: '',
+    apiKey: ''
+  };
+  const openai = createOpenAI(config);
+  return openai('qwen-max-latest');
 }
 
 export async function getMonitoringModel(name: string): Promise<ModelWithFallback> {

@@ -1,9 +1,11 @@
+import { anthropic } from '@ai-sdk/anthropic';
+import { deepseek } from '@ai-sdk/deepseek';
+import { google } from '@ai-sdk/google';
 // import { openai } from '@ai-sdk/openai';
-import { createOpenAI } from '@ai-sdk/openai';
-import { LanguageModel } from 'ai';
 import { env } from '~/lib/env/server';
-
-import { Model, ModelWithFallback, Provider, ProviderInfo, ProviderModel, ProviderRegistry } from './types';
+import { createOpenAI } from '@ai-sdk/openai';
+import { Model, Provider, ProviderModel, ProviderRegistry } from './types';
+import { createModel, createRegistryFromModels } from './utils';
 
 type BuiltinProvider = Provider & {
   models: BuiltinProviderModel[];
@@ -12,98 +14,158 @@ type BuiltinProvider = Provider & {
 type BuiltinProviderModel = ProviderModel & {
   providerId: string;
 };
-
-class BuiltinModel implements Model {
-  #model: BuiltinProviderModel;
-  #provider: ProviderInfo;
-
-  constructor(provider: ProviderInfo, model: BuiltinProviderModel) {
-    this.#model = model;
-    this.#provider = provider;
-  }
-
-  info(): BuiltinProviderModel {
-    return this.#model;
-  }
-
-  instance(): LanguageModel {
-    const model = this.info();
-    return this.#provider.kind.languageModel(model.providerId);
-  }
-}
 const config = {
-  baseURL: env.CUSTOM_BASE_URL,
-  apiKey: env.CUSTOM_API_KEY
+  baseURL: '',
+  apiKey: ''
 };
 const openai = createOpenAI(config);
-const llmModel = env.CUSTOM_CHAT_MODEL_NAME || 'qwen-max-latest';
 const builtinOpenAIModels: BuiltinProvider = {
   info: {
-    name: llmModel,
-    id: llmModel,
+    name: 'OpenAI',
+    id: 'openai',
     kind: openai,
-    fallback: llmModel
+    fallback: 'gpt-4o'
   },
   models: [
     {
-      // id: 'openai:gpt-4.1',
-      id: llmModel,
-      providerId: llmModel,
-      // name: 'GPT-4.1'
-      name: llmModel
+      id: 'openai:gpt-4.1',
+      providerId: 'qwen-max-latest',
+      name: 'qwen-max-latest'
+    },
+    {
+      id: 'openai:gpt-4.1-mini',
+      providerId: 'gpt-4.1-mini',
+      name: 'GPT-4.1 Mini'
+    },
+    {
+      id: 'openai:gpt-4o',
+      providerId: 'gpt-4o',
+      name: 'GPT-4o'
+    },
+    {
+      id: 'openai:gpt-4-turbo',
+      providerId: 'gpt-4-turbo',
+      name: 'GPT-4 Turbo'
+    },
+    {
+      id: 'openai:o4-mini',
+      providerId: 'o4-mini',
+      name: 'OpenAI o4-mini'
+    },
+    {
+      id: 'openai:o1',
+      providerId: 'o1',
+      name: 'OpenAI o1'
     }
   ]
 };
 
-const builtinProviderModels: Record<string, BuiltinModel> = Object.fromEntries(
-  [builtinOpenAIModels].flatMap((p) => {
-    return p.models.map((model) => {
-      const modelInstance = new BuiltinModel(p.info, model as BuiltinProviderModel);
-      return [modelInstance.info().id, modelInstance];
-    });
-  })
-);
-
-export const defaultLanguageModel = builtinProviderModels[llmModel]!;
-
-const builtinCustomModels: Record<string, BuiltinModel> = {
-  chat: defaultLanguageModel,
-  // title: builtinProviderModels['openai:gpt-4.1-mini']!,
-  // summary: builtinProviderModels['openai:gpt-4.1-mini']!
-  title: defaultLanguageModel,
-  summary: defaultLanguageModel
-};
-
-const builtinModels: Record<string, BuiltinModel> = {
-  ...builtinProviderModels,
-  ...builtinCustomModels
-};
-
-class BuiltinProviderRegistry implements ProviderRegistry {
-  listLanguageModels(): Model[] {
-    return Object.values(builtinProviderModels);
-  }
-
-  defaultLanguageModel(): Model {
-    return defaultLanguageModel;
-  }
-
-  languageModel(id: string, useFallback?: boolean): ModelWithFallback {
-    const model = builtinModels[id];
-    console.log('model:', model);
-    if (!model) {
-      throw new Error(`Model ${id} not found`);
+const builtinDeepseekModels: BuiltinProvider = {
+  info: {
+    name: 'DeepSeek',
+    id: 'deepseek',
+    kind: deepseek
+  },
+  models: [
+    {
+      id: 'deepseek:chat',
+      providerId: 'deepseek-chat',
+      name: 'DeepSeek Chat'
     }
-    return {
-      info: () => model.info(),
-      instance: () => model.instance(),
-      isFallback: false,
-      requestedModelId: id
-    } as ModelWithFallback;
-  }
-}
+  ]
+};
 
-const builtinProviderRegistry = new BuiltinProviderRegistry();
+const builtinAnthropicModels: BuiltinProvider = {
+  info: {
+    name: 'Anthropic',
+    id: 'anthropic',
+    kind: anthropic
+  },
+  models: [
+    {
+      id: 'anthropic:claude-3-7-sonnet',
+      providerId: 'claude-3-7-sonnet-20250219',
+      name: 'Claude 3.7 Sonnet'
+    },
+    {
+      id: 'anthropic:claude-3-5-haiku',
+      providerId: 'claude-3-5-haiku-20241022',
+      name: 'Claude 3.5 Haiku'
+    }
+  ]
+};
+
+const builtinGoogleModels: BuiltinProvider = {
+  info: {
+    name: 'Google',
+    id: 'google',
+    kind: google
+  },
+  models: [
+    {
+      id: 'google:gemini-2.5-pro',
+      providerId: 'gemini-2.5-pro-preview-03-25',
+      name: 'Gemini 2.5 Pro'
+    },
+    {
+      id: 'google:gemini-2.0-flash',
+      providerId: 'gemini-2.0-flash',
+      name: 'Gemini 2.0 Flash'
+    },
+    {
+      id: 'google:gemini-2.0-flash-lite',
+      providerId: 'gemini-2.0-flash-lite',
+      name: 'Gemini 2.0 Flash Lite'
+    }
+  ]
+};
+
+const builtinProviderModels: Record<string, Model> = (function () {
+  const activeList: BuiltinProvider[] = [];
+  if (env.OPENAI_API_KEY) {
+    activeList.push(builtinOpenAIModels);
+  }
+  if (env.DEEPSEEK_API_KEY) {
+    activeList.push(builtinDeepseekModels);
+  }
+  if (env.ANTHROPIC_API_KEY) {
+    activeList.push(builtinAnthropicModels);
+  }
+  if (env.GOOGLE_GENERATIVE_AI_API_KEY) {
+    activeList.push(builtinGoogleModels);
+  }
+
+  if (activeList.length === 0) {
+    throw new Error('No providers enabled. Please configure API keys');
+  }
+  return Object.fromEntries(
+    activeList.flatMap((p) => {
+      const factory = p.info.kind;
+      return p.models.map((model: BuiltinProviderModel) => {
+        const modelInstance = createModel(model, () => factory.languageModel(model.providerId));
+        return [modelInstance.info().id, modelInstance];
+      });
+    })
+  );
+})();
+
+// We default to OpenAI GPT-4.1 if available, otherwise fallback to the first model in the list
+const fallbackModel = Object.values(builtinProviderModels)[0]!;
+const defaultLanguageModel = builtinProviderModels['openai:gpt-4.1'] ?? fallbackModel;
+const defaultTitleModel = builtinProviderModels['openai:gpt-4.1-mini'] ?? fallbackModel;
+const defaultSummaryModel = builtinProviderModels['openai:gpt-4.1-mini'] ?? fallbackModel;
+
+const builtinModelAliases: Record<string, string> = {
+  chat: defaultLanguageModel.info().id,
+  title: defaultTitleModel.info().id,
+  summary: defaultSummaryModel.info().id
+};
+
+const builtinProviderRegistry = createRegistryFromModels({
+  models: builtinProviderModels,
+  aliases: builtinModelAliases,
+  defaultModel: defaultLanguageModel
+});
 
 export function getBuiltinProviderRegistry(): ProviderRegistry {
   return builtinProviderRegistry;
