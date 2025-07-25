@@ -1,4 +1,12 @@
-import { UIMessage, appendResponseMessages, createDataStreamResponse, smoothStream, streamText } from 'ai';
+import {
+  UIMessage,
+  convertToModelMessages,
+  createUIMessageStream,
+  createUIMessageStreamResponse,
+  smoothStream,
+  stepCountIs,
+  streamText
+} from 'ai';
 import { format } from 'date-fns';
 import { notFound } from 'next/navigation';
 import { NextRequest } from 'next/server';
@@ -37,7 +45,16 @@ export async function GET(request: NextRequest) {
 export async function POST(request: Request) {
   try {
     const { id, messages, connectionId, model: modelId, useArtifacts } = await request.json();
-
+    // const openai = createOpenAICompatible({
+    //   baseURL: '',
+    //   apiKey: '',
+    //   name: 'custom'
+    // });
+    // const result = streamText({
+    //   model: openai('qwen-max-latest'),
+    //   messages: convertToModelMessages(messages)
+    // });
+    // return result.toUIMessageStreamResponse();
     const userId = await requireUserSession();
     const dbAccess = await getUserSessionDBAccess();
     const connection = await getConnection(dbAccess, connectionId);
@@ -63,86 +80,62 @@ export async function POST(request: Request) {
     const context = getChatSystemPrompt({ cloudProvider: project.cloudProvider, useArtifacts });
     const model = await getLanguageModel(modelId);
 
-    return createDataStreamResponse({
-      execute: async (dataStream) => {
+    const stream = createUIMessageStream({
+      execute: async ({ writer: dataStream }) => {
         const tools = await getTools({ project, connection: connection, targetDb, useArtifacts, userId, dataStream });
 
         const result = streamText({
           model: model.instance(),
           system: context,
-          messages,
-          maxSteps: 20,
-          toolCallStreaming: true,
-          experimental_transform: smoothStream({ chunking: 'word' }),
-          experimental_generateMessageId: generateUUID,
+          messages: convertToModelMessages(messages),
+          stopWhen: stepCountIs(20),
+          experimental_transform: smoothStream({ chunking: /[\u4E00-\u9FFF]|\S+\s+/ }),
           tools,
-          onFinish: async ({ response }) => {
-            try {
-              const assistantId = getTrailingMessageId({
-                messages: response.messages.filter((message) => message.role === 'assistant')
-              });
-
-              if (!assistantId) {
-                throw new Error('No assistant message found!');
-              }
-
-              const [, assistantMessage] = appendResponseMessages({
-                messages: [userMessage],
-                responseMessages: response.messages
-              });
-
-              if (!assistantMessage) {
-                throw new Error('No assistant message found!');
-              }
-
-              const title =
-                !chat.title || chat.title === 'New chat'
-                  ? await generateTitleFromUserMessage({ message: userMessage })
-                  : chat.title;
-
-              await saveChat(
-                dbAccess,
-                {
-                  ...chat,
-                  title,
-                  model: model.info().id
-                },
-                [
-                  {
-                    chatId: id,
-                    id: userMessage.id,
-                    projectId: connection.projectId,
-                    role: 'user',
-                    parts: JSON.stringify(userMessage.parts),
-                    createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
-                  },
-                  {
-                    id: assistantId,
-                    projectId: connection.projectId,
-                    chatId: id,
-                    role: assistantMessage.role,
-                    parts: JSON.stringify(assistantMessage.parts),
-                    createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
-                  }
-                ]
-              );
-            } catch (error) {
-              console.error('Failed to save chat', error);
-            } finally {
-              await targetDb.end();
-            }
+          onChunk: (chunk) => {
+            // console.log('chunk',chunk)
           }
         });
-
-        void result.consumeStream();
-
-        result.mergeIntoDataStream(dataStream, { sendReasoning: true });
+        // console.log('result:',result.content);
+        dataStream.merge(result.toUIMessageStream());
+      },
+      onFinish: async ({ messages }) => {
+        const title =
+          !chat.title || chat.title === 'New chat'
+            ? await generateTitleFromUserMessage({ message: userMessage })
+            : chat.title;
+        await saveChat(
+          dbAccess,
+          {
+            ...chat,
+            title,
+            model: model.info().id
+          },
+          [
+            {
+              chatId: id,
+              id: userMessage.id,
+              projectId: connection.projectId,
+              role: 'user',
+              parts: JSON.stringify(userMessage.parts),
+              createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
+            },
+            {
+              id: generateUUID(),
+              projectId: connection.projectId,
+              chatId: id,
+              role: 'assistant',
+              parts: JSON.stringify(messages?.at(-1)?.parts),
+              createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
+            }
+          ]
+        );
       },
       onError: (error) => {
         console.error('Error in data stream:', error);
         return 'An error occurred while processing your request';
       }
     });
+    return createUIMessageStreamResponse({ stream });
   } catch (error) {
     console.error('Error in chat API:', error);
     return new Response('An error occurred while processing your request!', {
@@ -207,12 +200,4 @@ export async function PATCH(request: Request) {
 function getMostRecentUserMessage(messages: Array<UIMessage>) {
   const userMessages = messages.filter((message) => message.role === 'user');
   return userMessages.at(-1);
-}
-
-function getTrailingMessageId({ messages }: { messages: Array<{ id: string }> }): string | null {
-  const trailingMessage = messages.at(-1);
-
-  if (!trailingMessage) return null;
-
-  return trailingMessage.id;
 }

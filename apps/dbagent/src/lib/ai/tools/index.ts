@@ -1,4 +1,4 @@
-import { DataStreamWriter, Tool } from 'ai';
+import { Tool, UIMessageStreamWriter } from 'ai';
 import { Pool } from 'mysql2/promise';
 import { getUserDBAccess } from '~/lib/db/db';
 import { Connection, Project } from '~/lib/db/schema-sqlite';
@@ -28,7 +28,7 @@ export async function getTools({
   targetDb: Pool;
   userId: string;
   useArtifacts?: boolean;
-  dataStream?: DataStreamWriter;
+  dataStream?: UIMessageStreamWriter;
 }): Promise<Record<string, Tool>> {
   const dbAccess = await getUserDBAccess(userId);
 

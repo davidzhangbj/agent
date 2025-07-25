@@ -1,5 +1,5 @@
-// import { openai } from '@ai-sdk/openai';
 import { createOpenAI } from '@ai-sdk/openai';
+// import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { LanguageModel } from 'ai';
 import { env } from '~/lib/env/server';
 
@@ -32,8 +32,9 @@ class BuiltinModel implements Model {
   }
 }
 const config = {
-  baseURL: env.CUSTOM_BASE_URL,
-  apiKey: env.CUSTOM_API_KEY
+  baseURL: env.CUSTOM_BASE_URL!,
+  apiKey: env.CUSTOM_API_KEY,
+  name: 'custom'
 };
 const openai = createOpenAI(config);
 const llmModel = env.CUSTOM_CHAT_MODEL_NAME || 'qwen-max-latest';

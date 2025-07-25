@@ -22,7 +22,7 @@ export type DataStreamDelta = {
 };
 
 export function DataStreamHandler({ id }: { id: string }) {
-  const { data: dataStream } = useChat({ id });
+  const { messages: dataStream } = useChat({ id });
   const { artifact, setArtifact, setMetadata } = useArtifact();
   const lastProcessedIndex = useRef(-1);
 
@@ -31,8 +31,15 @@ export function DataStreamHandler({ id }: { id: string }) {
 
     const newDeltas = dataStream.slice(lastProcessedIndex.current + 1);
     lastProcessedIndex.current = dataStream.length - 1;
+    const newDeltaParts = newDeltas.flatMap((message) => {
+      return message.parts.map((e) => {
+        if (e.type === 'text') {
+          return { type: 'text', content: e.text };
+        }
+      });
+    });
 
-    (newDeltas as DataStreamDelta[]).forEach((delta: DataStreamDelta) => {
+    (newDeltaParts as DataStreamDelta[]).forEach((delta: DataStreamDelta) => {
       const artifactDefinition = artifactDefinitions.find(
         (artifactDefinition) => artifactDefinition.kind === artifact.kind
       );

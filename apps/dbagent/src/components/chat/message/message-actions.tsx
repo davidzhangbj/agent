@@ -1,6 +1,6 @@
 import { Button, toast, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@internal/components';
 import { useQueryClient } from '@tanstack/react-query';
-import type { Message } from 'ai';
+import type { UIMessage } from 'ai';
 import { format } from 'date-fns';
 import equal from 'fast-deep-equal';
 import { CopyIcon, FullscreenIcon, ThumbsDownIcon, ThumbsUpIcon } from 'lucide-react';
@@ -17,7 +17,7 @@ export function PureMessageActions({
   isLoading
 }: {
   chatId: string;
-  message: Message;
+  message: UIMessage;
   vote: MessageVote | undefined;
   isLoading: boolean;
 }) {

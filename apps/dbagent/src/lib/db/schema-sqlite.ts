@@ -1,4 +1,4 @@
-import { Message as SDKMessage } from '@ai-sdk/ui-utils';
+import { UIMessage as SDKMessage } from 'ai';
 import { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { foreignKey, index, int, primaryKey, sqliteTable, text, unique } from 'drizzle-orm/sqlite-core';
 

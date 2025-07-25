@@ -1,4 +1,4 @@
-import { LanguageModelV1 } from '@ai-sdk/provider';
+import { LanguageModelV2 } from '@ai-sdk/provider';
 import { defaultSettingsMiddleware, wrapLanguageModel } from 'ai';
 import { Ollama, ShowResponse } from 'ollama';
 import { createOllama, OllamaProvider } from 'ollama-ai-provider';
@@ -70,7 +70,7 @@ function createOllamaModel(provider: OllamaProvider, model: OllamaModel) {
     });
 
     return wrapLanguageModel({
-      model: languageModel as unknown as LanguageModelV1,
+      model: languageModel as unknown as LanguageModelV2,
       middleware: [
         defaultSettingsMiddleware({
           settings: {

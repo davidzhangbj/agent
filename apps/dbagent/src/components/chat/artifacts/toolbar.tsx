@@ -2,7 +2,7 @@
 
 import { UseChatHelpers } from '@ai-sdk/react';
 import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@internal/components';
-import type { ChatRequestOptions, CreateMessage, Message } from 'ai';
+import type { UIMessage } from 'ai';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowUpIcon, StopCircleIcon } from 'lucide-react';
 import { type Dispatch, memo, ReactNode, RefObject, type SetStateAction, useEffect, useRef, useState } from 'react';
@@ -18,11 +18,8 @@ type ToolProps = {
   isToolbarVisible?: boolean;
   setIsToolbarVisible?: Dispatch<SetStateAction<boolean>>;
   isAnimating: boolean;
-  append: (
-    message: Message | CreateMessage,
-    chatRequestOptions?: ChatRequestOptions
-  ) => Promise<string | null | undefined>;
-  onClick: ({ appendMessage }: { appendMessage: UseChatHelpers['append'] }) => void;
+  append: UseChatHelpers<UIMessage>['sendMessage'];
+  onClick: ({ appendMessage }: { appendMessage: UseChatHelpers<UIMessage>['sendMessage'] }) => void;
 };
 
 const Tool = ({
@@ -117,10 +114,7 @@ export const Tools = ({
   isToolbarVisible: boolean;
   selectedTool: string | null;
   setSelectedTool: Dispatch<SetStateAction<string | null>>;
-  append: (
-    message: Message | CreateMessage,
-    chatRequestOptions?: ChatRequestOptions
-  ) => Promise<string | null | undefined>;
+  append: UseChatHelpers<UIMessage>['sendMessage'];
   isAnimating: boolean;
   setIsToolbarVisible: Dispatch<SetStateAction<boolean>>;
   tools: Array<ArtifactToolbarItem>;
@@ -178,10 +172,10 @@ const PureToolbar = ({
 }: {
   isToolbarVisible: boolean;
   setIsToolbarVisible: Dispatch<SetStateAction<boolean>>;
-  status: UseChatHelpers['status'];
-  append: UseChatHelpers['append'];
-  stop: UseChatHelpers['stop'];
-  setMessages: Dispatch<SetStateAction<Message[]>>;
+  status: UseChatHelpers<UIMessage>['status'];
+  append: UseChatHelpers<UIMessage>['sendMessage'];
+  stop: UseChatHelpers<UIMessage>['stop'];
+  setMessages: Dispatch<SetStateAction<UIMessage[]>>;
   artifactKind: ArtifactKind;
 }) => {
   const toolbarRef = useRef<HTMLDivElement>(null);
@@ -282,8 +276,8 @@ const PureToolbar = ({
             animate={{ scale: 1.4 }}
             exit={{ scale: 1 }}
             className="p-3"
-            onClick={() => {
-              stop();
+            onClick={async () => {
+              await stop();
               setMessages((messages) => messages);
             }}
           >

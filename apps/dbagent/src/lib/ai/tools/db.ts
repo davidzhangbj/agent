@@ -69,7 +69,7 @@ export class DBSQLTools implements ToolsetGroup {
     return tool({
       description: `Contains request time the query was called,elapsed time in milliseconds, 
       the execution time in milliseconds, and the query sql itself.`,
-      parameters: z.object({}),
+      inputSchema: z.object({}),
       execute: async () => {
         try {
           // 单位是微秒,100000是0.1秒
@@ -94,7 +94,7 @@ export class DBSQLTools implements ToolsetGroup {
       2. 如***字段不需要，可以从查询条件中移除
       3. **字段使用了全表扫描,建议增加索引
       4. ....`,
-      parameters: z.object({
+      inputSchema: z.object({
         query: z.string()
       }),
       execute: async ({ query }) => {
@@ -114,7 +114,7 @@ export class DBSQLTools implements ToolsetGroup {
     const pool = this.#pool;
     return tool({
       description: `Describe a table. If you know the schema, pass it as a parameter. If you don't, use test.`,
-      parameters: z.object({
+      inputSchema: z.object({
         schema: z.string(),
         table: z.string()
       }),
@@ -132,7 +132,7 @@ export class DBSQLTools implements ToolsetGroup {
     const pool = this.#pool;
     return tool({
       description: `Find the schema of a table. Use this tool to find the schema of a table.`,
-      parameters: z.object({
+      inputSchema: z.object({
         table: z.string()
       }),
       execute: async ({ table }) => {
@@ -149,7 +149,7 @@ export class DBSQLTools implements ToolsetGroup {
     const pool = this.#pool;
     return tool({
       description: `查看当前持有锁的事务`,
-      parameters: z.object({}),
+      inputSchema: z.object({}),
       execute: async () => {
         try {
           return await withPoolConnection(pool, async (client) => await toolGetTrxOfHoldLock(client));
@@ -164,7 +164,7 @@ export class DBSQLTools implements ToolsetGroup {
     const pool = this.#pool;
     return tool({
       description: `查看当前持有锁的事务正在执行的Sql语句`,
-      parameters: z.object({
+      inputSchema: z.object({
         trans_id: z.string()
       }),
       execute: async ({ trans_id }) => {
@@ -181,7 +181,7 @@ export class DBSQLTools implements ToolsetGroup {
     const pool = this.#pool;
     return tool({
       description: `查看当前被阻塞的事务`,
-      parameters: z.object({}),
+      inputSchema: z.object({}),
       execute: async () => {
         try {
           return await withPoolConnection(pool, async (client) => await toolGetTrxOfBlock(client));
@@ -196,7 +196,7 @@ export class DBSQLTools implements ToolsetGroup {
     const pool = this.#pool;
     return tool({
       description: `查看当前持有锁的事务正在执行的Sql语句`,
-      parameters: z.object({
+      inputSchema: z.object({
         trans_id: z.string()
       }),
       execute: async ({ trans_id }) => {
@@ -213,7 +213,7 @@ export class DBSQLTools implements ToolsetGroup {
     const pool = this.#pool;
     return tool({
       description: `查看曾经等待锁超时的Sql`,
-      parameters: z.object({}),
+      inputSchema: z.object({}),
       execute: async () => {
         try {
           return await withPoolConnection(pool, async (client) => await toolGetSqlLockWaitTimeout(client));
@@ -228,7 +228,7 @@ export class DBSQLTools implements ToolsetGroup {
     const pool = this.#pool;
     return tool({
       description: `执行SQL，结果返回JSON格式，应当在 code 区域渲染成表格`,
-      parameters: z.object({
+      inputSchema: z.object({
         sql: z.string()
       }),
       execute: async ({ sql }) => {
@@ -245,7 +245,7 @@ export class DBSQLTools implements ToolsetGroup {
     const pool = this.#pool;
     return tool({
       description: `根据租户名获取租户id`,
-      parameters: z.object({
+      inputSchema: z.object({
         tenant_name: z.string()
       }),
       execute: async ({ tenant_name }) => {
@@ -265,7 +265,7 @@ export class DBSQLTools implements ToolsetGroup {
     const pool = this.#pool;
     return tool({
       description: `根据database的名称,查询database_id`,
-      parameters: z.object({
+      inputSchema: z.object({
         database_name: z.string()
       }),
       execute: async ({ database_name }) => {
@@ -282,7 +282,7 @@ export class DBSQLTools implements ToolsetGroup {
     const pool = this.#pool;
     return tool({
       description: `根据表名、租户ID、数据库id查询table_id`,
-      parameters: z.object({
+      inputSchema: z.object({
         table_name: z.string(),
         tenant_id: z.number(),
         database_id: z.number()
@@ -304,7 +304,7 @@ export class DBSQLTools implements ToolsetGroup {
     const pool = this.#pool;
     return tool({
       description: `根据table_id和租户ID获取DDL源表的空间大小`,
-      parameters: z.object({
+      inputSchema: z.object({
         tenant_id: z.number(),
         table_id: z.number()
       }),
@@ -325,7 +325,7 @@ export class DBSQLTools implements ToolsetGroup {
     const pool = this.#pool;
     return tool({
       description: `根据租户ID、数据表ID和索引名称查询索引表ID`,
-      parameters: z.object({
+      inputSchema: z.object({
         tenant_id: z.number(),
         data_table_id: z.number(),
         index_name: z.string()
@@ -347,7 +347,7 @@ export class DBSQLTools implements ToolsetGroup {
     const pool = this.#pool;
     return tool({
       description: `查询表中所有列所占字节大小的和`,
-      parameters: z.object({
+      inputSchema: z.object({
         tenant_id: z.number(),
         table_id: z.number()
       }),
@@ -368,7 +368,7 @@ export class DBSQLTools implements ToolsetGroup {
     const pool = this.#pool;
     return tool({
       description: `查询磁盘的总空间和已使用空间`,
-      parameters: z.object({}),
+      inputSchema: z.object({}),
       execute: async () => {
         try {
           return await withPoolConnection(pool, async (client) => await toolGetDiskSpace(client));
@@ -383,7 +383,7 @@ export class DBSQLTools implements ToolsetGroup {
     const pool = this.#pool;
     return tool({
       description: `查询用户可用磁盘空间占总磁盘空间的比例`,
-      parameters: z.object({}),
+      inputSchema: z.object({}),
       execute: async () => {
         try {
           return await withPoolConnection(pool, async (client) => await toolGetDiskSpaceLimitRatio(client));

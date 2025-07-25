@@ -2,21 +2,23 @@
 
 import { UseChatHelpers } from '@ai-sdk/react';
 import { Button, Textarea } from '@internal/components';
-import { Message } from 'ai';
+import { UIMessage } from 'ai';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { deleteTrailingMessages } from '~/app/(main)/projects/[project]/chats/actions';
 
 export type MessageEditorProps = {
-  message: Message;
+  message: UIMessage;
   setMode: Dispatch<SetStateAction<'view' | 'edit'>>;
-  setMessages: UseChatHelpers['setMessages'];
-  reload: UseChatHelpers['reload'];
+  setMessages: UseChatHelpers<UIMessage>['setMessages'];
+  reload: UseChatHelpers<UIMessage>['regenerate'];
 };
 
 export function MessageEditor({ message, setMode, setMessages, reload }: MessageEditorProps) {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const [draftContent, setDraftContent] = useState<string>(message.content);
+  const [draftContent, setDraftContent] = useState<string>(
+    message.parts[0]?.type === 'text' ? message.parts[0]?.text : ''
+  );
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {

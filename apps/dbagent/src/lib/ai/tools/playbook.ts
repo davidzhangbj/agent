@@ -12,7 +12,7 @@ export function getPlaybookToolset(dbAccess: DBAccess, projectId: string): Recor
 function playbookFetchTool(execute: (name: string) => Promise<string>): Tool {
   return tool({
     description: `Get a agent contents by name. A agent is a list of steps to follow to achieve a goal. Follow it step by step.`,
-    parameters: z.object({
+    inputSchema: z.object({
       name: z.string()
     }),
     execute: async ({ name }: { name: string }) => execute(name)
@@ -22,7 +22,7 @@ function playbookFetchTool(execute: (name: string) => Promise<string>): Tool {
 function playbookListTool(execute: () => Promise<string[]>): Tool {
   return tool({
     description: `List the available agents.`,
-    parameters: z.object({}),
+    inputSchema: z.object({}),
     execute: async () => execute()
   });
 }

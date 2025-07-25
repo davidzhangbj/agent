@@ -1,4 +1,4 @@
-import { Message as SDKMessage } from '@ai-sdk/ui-utils';
+import { UIMessage as SDKMessage } from 'ai';
 import { InferInsertModel, InferSelectModel, sql } from 'drizzle-orm';
 import {
   boolean,

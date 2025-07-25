@@ -1,5 +1,12 @@
-import { Message } from '@ai-sdk/ui-utils';
-import { generateId, generateObject, generateText, LanguageModelV1 } from 'ai';
+import {
+  convertToModelMessages,
+  generateId,
+  generateObject,
+  generateText,
+  LanguageModel,
+  stepCountIs,
+  UIMessage
+} from 'ai';
 import { format } from 'date-fns';
 import { z } from 'zod';
 import { generateUUID } from '~/components/chat/utils';
@@ -14,8 +21,8 @@ import { getTargetDbPool } from '../targetdb/db-oceanbase';
 import { listPlaybooks } from '../tools/playbooks';
 
 type RunModelPlaybookParams = {
-  messages: Message[];
-  modelInstance: LanguageModelV1;
+  messages: UIMessage[];
+  modelInstance: LanguageModel;
   connection: Connection;
   schedule: Schedule;
   playbook: string;
@@ -35,8 +42,8 @@ async function runModelPlaybook({
   messages.push({
     id: generateId(),
     role: 'user',
-    content: `运行 this agent: ${playbook}. ${additionalInstructions ?? ''}`,
-    createdAt: new Date()
+    parts: [{ type: 'text', text: `运行 this agent: ${playbook}. ${additionalInstructions ?? ''}` }],
+    metadata: { createdAt: new Date() }
   });
 
   const monitoringSystemPrompt = getMonitoringSystemPrompt({ cloudProvider: project.cloudProvider });
@@ -47,16 +54,16 @@ async function runModelPlaybook({
     const result = await generateText({
       model: modelInstance,
       system: monitoringSystemPrompt,
-      maxSteps: 20,
+      stopWhen: stepCountIs(20),
       tools,
-      messages
+      messages: convertToModelMessages(messages)
     });
 
     messages.push({
       id: generateId(),
       role: 'assistant',
-      content: result.text,
-      createdAt: new Date()
+      parts: [{ type: 'text', text: result.text }],
+      metadata: { createdAt: new Date() }
     });
 
     return result;
@@ -66,8 +73,8 @@ async function runModelPlaybook({
 }
 
 async function decideNotificationLevel(
-  messages: Message[],
-  modelInstance: LanguageModelV1,
+  messages: UIMessage[],
+  modelInstance: LanguageModel,
   monitoringSystemPrompt: string
 ) {
   const prompt = `Decide a level of notification for the previous result of the playbook run. Choose one of these levels:
@@ -81,14 +88,14 @@ Also provide a one sentence summary of the result. It can be something like "No 
   messages.push({
     id: generateId(),
     role: 'user',
-    content: prompt,
-    createdAt: new Date()
+    parts: [{ type: 'text', text: prompt }],
+    metadata: { createdAt: new Date() }
   });
 
   const notificationResult = await generateObject({
     model: modelInstance,
     system: monitoringSystemPrompt,
-    messages: messages,
+    messages: convertToModelMessages(messages),
     schema: z.object({
       summary: z.string(),
       notificationLevel: z.enum(['info', 'warning', 'alert'])
@@ -104,17 +111,17 @@ Also provide a one sentence summary of the result. It can be something like "No 
   messages.push({
     id: generateId(),
     role: 'assistant',
-    content: JSON.stringify(notificationResult.object),
-    createdAt: new Date()
+    parts: [{ type: 'text', text: JSON.stringify(notificationResult.object) }],
+    metadata: { createdAt: new Date() }
   });
 
   return notificationResult.object;
 }
 
 async function decideNextPlaybook(
-  messages: Message[],
+  messages: UIMessage[],
   schedule: Schedule,
-  modelInstance: LanguageModelV1,
+  modelInstance: LanguageModel,
   monitoringSystemPrompt: string
 ) {
   const prompt = `Based on the previous conversation, would you recommend running another specific playbook.
@@ -129,14 +136,14 @@ Return:
   messages.push({
     id: generateId(),
     role: 'user',
-    content: prompt,
-    createdAt: new Date()
+    parts: [{ type: 'text', text: prompt }],
+    metadata: { createdAt: new Date() }
   });
 
   const recommendPlaybookResult = await generateObject({
     model: modelInstance,
     system: monitoringSystemPrompt,
-    messages: messages,
+    messages: convertToModelMessages(messages),
     schema: z.object({
       shouldRunPlaybook: z.boolean(),
       recommendedPlaybook: z.string().optional()
@@ -152,14 +159,14 @@ Return:
   messages.push({
     id: generateId(),
     role: 'assistant',
-    content: recommendPlaybookResult.object.recommendedPlaybook ?? 'No playbook recommended',
-    createdAt: new Date()
+    parts: [{ type: 'text', text: recommendPlaybookResult.object.recommendedPlaybook ?? 'No playbook recommended' }],
+    metadata: { createdAt: new Date() }
   });
 
   return recommendPlaybookResult.object;
 }
 
-async function summarizeResult(messages: Message[], modelInstance: LanguageModelV1, monitoringSystemPrompt: string) {
+async function summarizeResult(messages: UIMessage[], modelInstance: LanguageModel, monitoringSystemPrompt: string) {
   const prompt = `Summarize the results above and highlight what made you investigate, the root cause, and the recommended actions.
 Be as specific as possible, like including the DDL to run. Use the following headers:
 
@@ -172,14 +179,14 @@ In the Root cause analysis section, mention which playbooks you run.`;
   messages.push({
     id: generateId(),
     role: 'user',
-    content: prompt,
-    createdAt: new Date()
+    parts: [{ type: 'text', text: prompt }],
+    metadata: { createdAt: new Date() }
   });
 
   const summaryResult = await generateText({
     model: modelInstance,
     system: monitoringSystemPrompt,
-    messages: messages,
+    messages: convertToModelMessages(messages),
     experimental_telemetry: {
       isEnabled: true,
       metadata: {
@@ -191,8 +198,8 @@ In the Root cause analysis section, mention which playbooks you run.`;
   messages.push({
     id: generateId(),
     role: 'assistant',
-    content: summaryResult.text,
-    createdAt: new Date()
+    parts: [{ type: 'text', text: summaryResult.text }],
+    metadata: { createdAt: new Date() }
   });
 
   return summaryResult.text;
@@ -211,7 +218,7 @@ export async function runSchedule(dbAccess: DBAccess, schedule: Schedule, now: D
   }
 
   const modelInstance = model.instance();
-  const messages: Message[] = [];
+  const messages: UIMessage[] = [];
   const project = await getProjectById(dbAccess, connection.projectId);
   if (!project) {
     throw new Error(`Project ${connection.projectId} not found`);
@@ -229,8 +236,8 @@ export async function runSchedule(dbAccess: DBAccess, schedule: Schedule, now: D
   messages.push({
     id: generateId(),
     role: 'assistant',
-    content: result.text,
-    createdAt: new Date()
+    parts: [{ type: 'text', text: result.text }],
+    metadata: { createdAt: new Date() }
   });
 
   const notificationResult = await decideNotificationLevel(messages, modelInstance, monitoringSystemPrompt);

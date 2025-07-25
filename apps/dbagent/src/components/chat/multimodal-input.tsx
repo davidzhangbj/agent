@@ -5,7 +5,7 @@ import type React from 'react';
 import { memo, useCallback, useEffect, useRef } from 'react';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
 
-import type { UseChatHelpers } from '@ai-sdk/react';
+import type { UseChatHelpers, UseCompletionHelpers } from '@ai-sdk/react';
 import { Button, cn, Textarea, toast } from '@internal/components';
 import { ArrowUpIcon, CircleStopIcon } from 'lucide-react';
 import { SuggestedAction, SuggestedActions } from './suggested-actions';
@@ -25,14 +25,14 @@ function PureMultimodalInput({
 }: {
   suggestedActions?: SuggestedAction[];
   chatId: string;
-  input: UseChatHelpers['input'];
-  setInput: UseChatHelpers['setInput'];
-  status: UseChatHelpers['status'];
+  input: UseCompletionHelpers['input'];
+  setInput: UseCompletionHelpers['setInput'];
+  status: UseChatHelpers<UIMessage>['status'];
   stop: () => void;
   messages: Array<UIMessage>;
-  setMessages: UseChatHelpers['setMessages'];
-  append: UseChatHelpers['append'];
-  handleSubmit: UseChatHelpers['handleSubmit'];
+  setMessages: UseChatHelpers<UIMessage>['setMessages'];
+  append: UseChatHelpers<UIMessage>['sendMessage'];
+  handleSubmit: UseCompletionHelpers['handleSubmit'];
   className?: string;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -136,7 +136,13 @@ export const MultimodalInput = memo(PureMultimodalInput, (prevProps, nextProps) 
   return true;
 });
 
-function PureStopButton({ stop, setMessages }: { stop: () => void; setMessages: UseChatHelpers['setMessages'] }) {
+function PureStopButton({
+  stop,
+  setMessages
+}: {
+  stop: () => void;
+  setMessages: UseChatHelpers<UIMessage>['setMessages'];
+}) {
   return (
     <Button
       data-testid="stop-button"

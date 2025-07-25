@@ -10,11 +10,11 @@ import { UIArtifact } from './artifact';
 interface ArtifactMessagesProps {
   projectId: string;
   chatId: string;
-  status: UseChatHelpers['status'];
+  status: UseChatHelpers<UIMessage>['status'];
   votes: Array<MessageVote> | undefined;
   messages: Array<UIMessage>;
-  setMessages: UseChatHelpers['setMessages'];
-  reload: UseChatHelpers['reload'];
+  setMessages: UseChatHelpers<UIMessage>['setMessages'];
+  reload: UseChatHelpers<UIMessage>['regenerate'];
   artifactStatus: UIArtifact['status'];
 }
 

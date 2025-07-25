@@ -1,4 +1,4 @@
-import { UseChatHelpers } from '@ai-sdk/react';
+import { UseChatHelpers, UseCompletionHelpers } from '@ai-sdk/react';
 import { useSidebar } from '@internal/components';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { UIMessage } from 'ai';
@@ -54,15 +54,15 @@ function PureArtifact({
   chatId: string;
   projectId: string;
   input: string;
-  setInput: UseChatHelpers['setInput'];
-  status: UseChatHelpers['status'];
-  stop: UseChatHelpers['stop'];
+  setInput: UseCompletionHelpers['setInput'];
+  status: UseChatHelpers<UIMessage>['status'];
+  stop: UseChatHelpers<UIMessage>['stop'];
   messages: Array<UIMessage>;
-  setMessages: UseChatHelpers['setMessages'];
+  setMessages: UseChatHelpers<UIMessage>['setMessages'];
   votes: Array<MessageVote> | undefined;
-  append: UseChatHelpers['append'];
-  handleSubmit: UseChatHelpers['handleSubmit'];
-  reload: UseChatHelpers['reload'];
+  append: UseChatHelpers<UIMessage>['sendMessage'];
+  handleSubmit: UseCompletionHelpers['handleSubmit'];
+  reload: UseChatHelpers<UIMessage>['regenerate'];
 }) {
   const { artifact, setArtifact, metadata, setMetadata } = useArtifact();
   const queryClient = useQueryClient();

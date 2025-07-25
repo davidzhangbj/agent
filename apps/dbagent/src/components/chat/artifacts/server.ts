@@ -1,4 +1,4 @@
-import { DataStreamWriter } from 'ai';
+import { UIMessageStreamWriter } from 'ai';
 import { saveDocument } from '~/lib/db/chats';
 import { DBAccess } from '~/lib/db/db';
 import { ArtifactDocument } from '~/lib/db/schema-sqlite';
@@ -17,7 +17,7 @@ export interface SaveDocumentProps {
 export interface CreateDocumentCallbackProps {
   id: string;
   title: string;
-  dataStream: DataStreamWriter;
+  dataStream: UIMessageStreamWriter;
   userId: string;
   projectId: string;
   dbAccess: DBAccess;
@@ -26,7 +26,7 @@ export interface CreateDocumentCallbackProps {
 export interface UpdateDocumentCallbackProps {
   document: ArtifactDocument;
   description: string;
-  dataStream: DataStreamWriter;
+  dataStream: UIMessageStreamWriter;
   userId: string;
   projectId: string;
   dbAccess: DBAccess;

@@ -13,7 +13,7 @@ export async function getCustomQueryTools(targetDb: Pool) {
         ...acc,
         [row.name]: tool({
           description: row.description ?? undefined,
-          parameters: z.object({}),
+          inputSchema: z.object({}),
           execute: async () => {
             try {
               const result = await withPoolConnection(targetDb, async (client) => client.query(row.script));

@@ -1,9 +1,10 @@
 'use client';
 
+import type { UseCompletionHelpers } from '@ai-sdk/react';
 import { useChat } from '@ai-sdk/react';
 import { toast } from '@internal/components';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import type { UIMessage } from 'ai';
+import { DefaultChatTransport, type UIMessage } from 'ai';
 import { memo, useEffect, useRef, useState } from 'react';
 import { Connection, MessageVote } from '~/lib/db/schema-sqlite';
 import { Artifact } from './artifacts/artifact';
@@ -35,21 +36,33 @@ function PureChat({
   const defaultConnection = connections.find((c) => c.isDefault);
   const [connectionId, setConnectionId] = useState<string>(defaultConnection?.id || '');
   const [model, setModel] = useState<string>(defaultLanguageModel);
-
-  const { messages, setMessages, handleSubmit, input, setInput, append, status, stop, reload } = useChat({
+  const [input, setInput] = useState(initialInput ?? '');
+  const handleSubmit: UseCompletionHelpers['handleSubmit'] = async (e) => {
+    if (e && e.preventDefault) {
+      e.preventDefault();
+    }
+    await sendMessage({ text: input });
+    setInput('');
+  };
+  const { messages, setMessages, status, stop, sendMessage, regenerate } = useChat({
+    transport: new DefaultChatTransport({
+      body: { id, connectionId, model, useArtifacts: true }
+    }),
     id,
-    body: { id, connectionId, model, useArtifacts: true },
-    initialMessages,
-    initialInput,
+    messages: initialMessages,
     experimental_throttle: 100,
-    sendExtraMessageFields: true,
     generateId: generateUUID,
+
     onFinish: () => {
       void queryClient.invalidateQueries({ queryKey: ['chats'] });
     },
+
     onError: (error) => {
       console.error(error.message);
       toast.error('An error occured, please try again!');
+    },
+    onData: (dataPart) => {
+      console.log('dataPart', dataPart);
     }
   });
 
@@ -78,10 +91,10 @@ function PureChat({
 
       // If chat has been loaded without an assistant message, we need to reload the chat
       if (initialMessages?.[initialMessages.length - 1]?.role === 'user') {
-        void reload();
+        void regenerate();
       }
     }
-  }, [initialized, initialMessages, reload]);
+  }, [initialized, initialMessages, regenerate]);
 
   return (
     <>
@@ -103,7 +116,7 @@ function PureChat({
             votes={votes}
             messages={messages}
             setMessages={setMessages}
-            reload={reload}
+            reload={regenerate}
             isArtifactVisible={isArtifactVisible}
           />
         </div>
@@ -119,7 +132,7 @@ function PureChat({
             stop={stop}
             messages={messages}
             setMessages={setMessages}
-            append={append}
+            append={sendMessage}
           />
         </form>
       </div>
@@ -132,10 +145,10 @@ function PureChat({
         handleSubmit={handleSubmit}
         status={status}
         stop={stop}
-        append={append}
+        append={sendMessage}
         messages={messages}
         setMessages={setMessages}
-        reload={reload}
+        reload={regenerate}
         votes={votes}
       />
     </>

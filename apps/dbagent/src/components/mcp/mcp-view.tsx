@@ -50,8 +50,11 @@ export function McpView({ server }: { server: UserMcpServer }) {
         setIsInDb(serverExists);
 
         const defaultConnection = connectionsData.find((c: Connection) => c.isDefault === 1);
+        console.log('defaultConnection:', defaultConnection);
         if (defaultConnection) {
           const tools = await actionGetCustomToolsFromMCPServer(server);
+          // const tools = [];
+          console.log('tools:', tools.length);
           setTools(tools);
         }
         setError(null);

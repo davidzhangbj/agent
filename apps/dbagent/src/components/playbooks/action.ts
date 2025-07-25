@@ -1,7 +1,7 @@
 'use server';
 
-// import { openai } from '@ai-sdk/openai';
-import { createOpenAI } from '@ai-sdk/openai';
+// import { createOpenAI } from '@ai-sdk/openai';
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { generateText } from 'ai';
 import { auth } from '~/auth';
 import { env } from '~/lib/env/server';
@@ -18,10 +18,11 @@ import {
 } from '~/lib/tools/custom-playbooks';
 import { Playbook } from '~/lib/tools/playbooks';
 const config = {
-  baseURL: env.CUSTOM_BASE_URL,
-  apiKey: env.CUSTOM_API_KEY
+  baseURL: env.CUSTOM_BASE_URL!,
+  apiKey: env.CUSTOM_API_KEY,
+  name: 'custom'
 };
-const openai = createOpenAI(config);
+const openai = createOpenAICompatible(config);
 const llmModel = env.CUSTOM_CHAT_MODEL_NAME || 'qwen-max-latest';
 //playbook content generation
 export async function actionGeneratePlaybookContent(name: string, description: string): Promise<string> {
@@ -53,8 +54,7 @@ export async function actionGeneratePlaybookContent(name: string, description: s
     //lower values for temperature and topP are more deterministic higher are more creative(max 2.0)
     //0.1 is deterministic, 0.7 is creative
     temperature: 0.2,
-    topP: 0.1,
-    maxTokens: 1000
+    topP: 0.1
   });
 
   try {

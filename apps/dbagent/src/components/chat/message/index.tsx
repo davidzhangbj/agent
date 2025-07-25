@@ -2,11 +2,10 @@
 
 import { UseChatHelpers } from '@ai-sdk/react';
 import { Button, cn, Code, Tooltip, TooltipContent, TooltipTrigger } from '@internal/components';
-import type { UIMessage } from 'ai';
-import equal from 'fast-deep-equal';
+import type { ToolUIPart, UIMessage } from 'ai';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Clock, PencilIcon, SparklesIcon } from 'lucide-react';
-import { memo, useState } from 'react';
+import { useState } from 'react';
 import { MessageVote } from '~/lib/db/schema-sqlite';
 import { DocumentToolCall, DocumentToolResult } from '../artifacts/document';
 import { DocumentPreview } from '../artifacts/document-preview';
@@ -29,11 +28,24 @@ const PurePreviewMessage = ({
   message: UIMessage;
   vote: MessageVote | undefined;
   isLoading: boolean;
-  setMessages: UseChatHelpers['setMessages'];
-  reload: UseChatHelpers['reload'];
+  setMessages: UseChatHelpers<UIMessage>['setMessages'];
+  reload: UseChatHelpers<UIMessage>['regenerate'];
 }) => {
   const [mode, setMode] = useState<'view' | 'edit'>('view');
 
+  // return (
+  //   <div>
+  //     {
+  //       message.parts.map((part, index) => {
+  //         switch (part.type) {
+  //           case 'text':
+  //             return <div key={`${message.id}-${index}`}>{part.text}</div>;
+  //         }
+
+  //       })
+  //     }
+  //   </div>
+  // );
   return (
     <AnimatePresence>
       <motion.div
@@ -62,11 +74,12 @@ const PurePreviewMessage = ({
 
           <div className="flex w-full flex-col gap-4">
             {message.parts?.map((part, index) => {
+              console.log('part:', part);
               const { type } = part;
               const key = `message-${message.id}-part-${index}`;
 
               if (type === 'reasoning') {
-                return <MessageReasoning key={key} isLoading={isLoading} reasoning={part.reasoning} />;
+                return <MessageReasoning key={key} isLoading={isLoading} reasoningText={part.text} />;
               }
 
               if (type === 'text') {
@@ -122,55 +135,66 @@ const PurePreviewMessage = ({
                   );
                 }
               }
-
-              if (type === 'tool-invocation') {
-                const { toolInvocation } = part;
-                const { toolName, toolCallId, state } = toolInvocation;
-
-                if (state === 'call') {
-                  const { args } = toolInvocation;
-
+              if (type === 'tool-createDocument') {
+                const { toolCallId, state, input, output } = part;
+                if (state === 'input-available') {
                   return (
                     <div key={toolCallId}>
-                      {toolName === 'createDocument' ? (
-                        <DocumentPreview projectId={projectId} args={args} />
-                      ) : toolName === 'updateDocument' ? (
-                        <DocumentToolCall type="update" args={args} />
-                      ) : toolName === 'requestSuggestions' ? (
-                        <DocumentToolCall type="request-suggestions" args={args} />
-                      ) : (
-                        <div className="text-muted-foreground mt-1 text-xs">
-                          <Clock className="mr-1 inline-block h-4 w-4" />
-                          Tool called: <Code>{part.toolInvocation.toolName}</Code>
-                        </div>
-                      )}
+                      <DocumentPreview projectId={projectId} args={input} />
+                    </div>
+                  );
+                } else if (state === 'output-available') {
+                  return (
+                    <div key={toolCallId}>
+                      <DocumentPreview projectId={projectId} result={output} />
                     </div>
                   );
                 }
-
-                if (state === 'result') {
-                  const { result } = toolInvocation;
-
+              } else if (type === 'tool-updateDocument' && part.state === 'input-available') {
+                const { toolCallId, state } = part;
+                if (state === 'input-available') {
+                  const { input } = part;
                   return (
                     <div key={toolCallId}>
-                      {toolName === 'createDocument' ? (
-                        <DocumentPreview projectId={projectId} result={result} />
-                      ) : toolName === 'updateDocument' ? (
-                        <DocumentToolResult type="update" result={result} />
-                      ) : toolName === 'requestSuggestions' ? (
-                        <DocumentToolResult type="request-suggestions" result={result} />
-                      ) : (
-                        <div className="text-muted-foreground mt-1 text-xs">
-                          <Clock className="mr-1 inline-block h-4 w-4" />
-                          Tool called: <Code>{part.toolInvocation.toolName}</Code>
-                        </div>
-                      )}
+                      <DocumentToolCall type="update" args={input as { title: string }} />
+                    </div>
+                  );
+                } else if (state === 'output-available') {
+                  const { output } = part;
+                  return (
+                    <div key={toolCallId}>
+                      <DocumentToolResult type="update" result={output} />
                     </div>
                   );
                 }
+              } else if (type === 'tool-requestSuggestions' && part.state === 'input-available') {
+                const { toolCallId, state, input } = part;
+                if (state === 'input-available') {
+                  return (
+                    <div key={toolCallId}>
+                      <DocumentToolCall type="request-suggestions" args={input as { title: string }} />
+                    </div>
+                  );
+                } else if (state === 'output-available') {
+                  const { output } = part;
+                  return (
+                    <div key={toolCallId}>
+                      <DocumentToolResult type="request-suggestions" result={output} />
+                    </div>
+                  );
+                }
+              } else if (type.includes('tool-')) {
+                const { toolCallId, type } = part as ToolUIPart;
+                return (
+                  <div key={toolCallId}>
+                    <div className="text-muted-foreground mt-1 text-xs">
+                      <Clock className="mr-1 inline-block h-4 w-4" />
+                      Tool called: <Code>{type}</Code>
+                    </div>
+                  </div>
+                );
               }
             })}
-
             <MessageActions
               key={`action-${message.id}`}
               chatId={chatId}
@@ -185,16 +209,16 @@ const PurePreviewMessage = ({
   );
 };
 
-export const PreviewMessage = memo(PurePreviewMessage, (prevProps, nextProps) => {
-  if (prevProps.isLoading !== nextProps.isLoading) return false;
-  if (prevProps.message.id !== nextProps.message.id) return false;
-  if (prevProps.projectId !== nextProps.projectId) return false;
-  if (!equal(prevProps.message.parts, nextProps.message.parts)) return false;
-  if (!equal(prevProps.vote, nextProps.vote)) return false;
+// export const PreviewMessage = memo(PurePreviewMessage, (prevProps, nextProps) => {
+//   if (prevProps.isLoading !== nextProps.isLoading) return false;
+//   if (prevProps.message.id !== nextProps.message.id) return false;
+//   if (prevProps.projectId !== nextProps.projectId) return false;
+//   if (!equal(prevProps.message.parts, nextProps.message.parts)) return false;
+//   if (!equal(prevProps.vote, nextProps.vote)) return false;
 
-  return true;
-});
-
+//   return true;
+// });
+export { PurePreviewMessage as PreviewMessage };
 export const ThinkingMessage = () => {
   const role = 'assistant';
 
@@ -223,5 +247,17 @@ export const ThinkingMessage = () => {
         </div>
       </div>
     </motion.div>
+  );
+};
+export const MyPreviewMessage = ({ message }: { message: UIMessage }) => {
+  return (
+    <div>
+      {message.parts.map((part, index) => {
+        switch (part.type) {
+          case 'text':
+            return <div key={`${message.id}-${index}`}>{part.text}</div>;
+        }
+      })}
+    </div>
   );
 };

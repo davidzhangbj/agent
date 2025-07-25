@@ -1,4 +1,4 @@
-import { DataStreamWriter, streamObject, tool, Tool } from 'ai';
+import { streamObject, tool, Tool, UIMessageStreamWriter } from 'ai';
 import { format } from 'date-fns';
 import { z } from 'zod';
 import { artifactKinds, documentHandlersByArtifactKind } from '~/components/chat/artifacts/server';
@@ -11,7 +11,7 @@ import { getModelInstance } from '../agent';
 interface ArtifactToolProps {
   userId: string;
   projectId: string;
-  dataStream: DataStreamWriter;
+  dataStream: UIMessageStreamWriter;
   dbAccess: DBAccess;
 }
 
@@ -32,31 +32,55 @@ export const createDocument = ({ userId, projectId, dataStream, dbAccess }: Arti
   tool({
     description:
       'Create a document for a writing or content creation activities. This tool will call other functions that will generate the contents of the document based on the title and kind.',
-    parameters: z.object({
+    inputSchema: z.object({
       title: z.string(),
       kind: z.enum(artifactKinds)
     }),
     execute: async ({ title, kind }) => {
       const id = generateUUID();
 
-      dataStream.writeData({
-        type: 'kind',
-        content: kind
+      dataStream.write({
+        type: 'data-kind',
+
+        data: [
+          {
+            type: 'kind',
+            content: kind
+          }
+        ]
       });
 
-      dataStream.writeData({
-        type: 'id',
-        content: id
+      dataStream.write({
+        type: 'data-id',
+
+        data: [
+          {
+            type: 'id',
+            content: id
+          }
+        ]
       });
 
-      dataStream.writeData({
-        type: 'title',
-        content: title
+      dataStream.write({
+        type: 'data-title',
+
+        data: [
+          {
+            type: 'title',
+            content: title
+          }
+        ]
       });
 
-      dataStream.writeData({
-        type: 'clear',
-        content: ''
+      dataStream.write({
+        type: 'data-clear',
+
+        data: [
+          {
+            type: 'clear',
+            content: ''
+          }
+        ]
       });
 
       const documentHandler = documentHandlersByArtifactKind.find(
@@ -76,7 +100,10 @@ export const createDocument = ({ userId, projectId, dataStream, dbAccess }: Arti
         dbAccess
       });
 
-      dataStream.writeData({ type: 'finish', content: '' });
+      dataStream.write({
+        type: 'data-finish',
+        data: [{ type: 'finish', content: '' }]
+      });
 
       return {
         id,
@@ -90,7 +117,7 @@ export const createDocument = ({ userId, projectId, dataStream, dbAccess }: Arti
 export const updateDocument = ({ userId, projectId, dataStream, dbAccess }: ArtifactToolProps) =>
   tool({
     description: 'Update a document with the given description.',
-    parameters: z.object({
+    inputSchema: z.object({
       id: z.string().describe('The ID of the document to update'),
       description: z.string().describe('The description of changes that need to be made')
     }),
@@ -103,9 +130,15 @@ export const updateDocument = ({ userId, projectId, dataStream, dbAccess }: Arti
         };
       }
 
-      dataStream.writeData({
-        type: 'clear',
-        content: document.title
+      dataStream.write({
+        type: 'data-clear',
+
+        data: [
+          {
+            type: 'clear',
+            content: document.title
+          }
+        ]
       });
 
       const documentHandler = documentHandlersByArtifactKind.find(
@@ -125,7 +158,10 @@ export const updateDocument = ({ userId, projectId, dataStream, dbAccess }: Arti
         dbAccess
       });
 
-      dataStream.writeData({ type: 'finish', content: '' });
+      dataStream.write({
+        type: 'data-finish',
+        data: [{ type: 'finish', content: '' }]
+      });
 
       return {
         id,
@@ -139,7 +175,7 @@ export const updateDocument = ({ userId, projectId, dataStream, dbAccess }: Arti
 export const requestSuggestions = ({ userId, projectId, dataStream, dbAccess }: ArtifactToolProps) =>
   tool({
     description: 'Request suggestions for a document',
-    parameters: z.object({
+    inputSchema: z.object({
       documentId: z.string().describe('The ID of the document to request edits')
     }),
     execute: async ({ documentId }) => {
@@ -177,9 +213,15 @@ export const requestSuggestions = ({ userId, projectId, dataStream, dbAccess }: 
           projectId
         };
 
-        dataStream.writeData({
-          type: 'suggestion',
-          content: suggestion
+        dataStream.write({
+          type: 'data-suggestion',
+
+          data: [
+            {
+              type: 'suggestion',
+              content: suggestion
+            }
+          ]
         });
 
         suggestions.push(suggestion);

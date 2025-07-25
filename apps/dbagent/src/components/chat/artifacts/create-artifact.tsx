@@ -1,4 +1,4 @@
-import { UseChatHelpers } from '@ai-sdk/react';
+import { UIMessage, UseChatHelpers } from '@ai-sdk/react';
 import { ComponentType, Dispatch, ReactNode, SetStateAction } from 'react';
 import { ArtifactSuggestion } from '~/lib/db/schema-sqlite';
 import { UIArtifact } from './artifact';
@@ -23,7 +23,7 @@ type ArtifactAction<M = any> = {
 };
 
 export type ArtifactToolbarContext = {
-  appendMessage: UseChatHelpers['append'];
+  appendMessage: UseChatHelpers<UIMessage>['sendMessage'];
 };
 
 export type ArtifactToolbarItem = {

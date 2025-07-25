@@ -12,7 +12,7 @@ async function getToolsFromAllEnabledMCPServers(userId?: string) {
   //gets all the enabled mcp servers tools by checking the enabled status from the db
   try {
     const servers = await actionGetUserMcpServers(userId);
-
+    console.log('servers111:', servers);
     //gets mcp server file and looks at the enabled status of the server
     const mcpServersTools = await Promise.all(
       servers.map(async (server) => {
@@ -27,7 +27,7 @@ async function getToolsFromAllEnabledMCPServers(userId?: string) {
 
     return mcpServersTools.reduce((acc, tools) => ({ ...acc, ...tools }), {});
   } catch (error) {
-    console.error('Error in getToolsFromMCPServer:', error);
+    console.error('Error in getToolsFromAllEnabledMCPServers:', error);
     return {};
   }
 }
@@ -118,18 +118,14 @@ async function getToolsFromSSE(server: UserMcpServer) {
       (acc, [_toolName, toolDef]) => {
         acc[toolDef.name] = tool({
           description: toolDef.description,
-          parameters: convertSchemaToZod(toolDef.inputSchema), // 使用新的转换函数
+          inputSchema: convertSchemaToZod(toolDef.inputSchema), // 使用新的转换函数
           execute: async (args: Record<string, any>) => {
-            console.log('toolDef.inputSchema:', toolDef.inputSchema);
-            console.log('toolDef.name:', toolDef.name);
-            console.log('args:', args);
             try {
               const client = await getMCPClient(server.filePath);
               const result = await client.callTool({
                 name: toolDef.name,
                 arguments: args
               });
-              console.log('result:', result);
               return result;
             } catch (error) {
               console.error(`Error in call tools ${toolDef.name} from mcp server:`, error);
@@ -142,9 +138,10 @@ async function getToolsFromSSE(server: UserMcpServer) {
       },
       {} as Record<string, any>
     );
+    // return {};
     return wrappedTools;
   } catch (error) {
-    console.error('Error in getToolsFromMCPServer:', error);
+    console.error('Error in getToolsFromSSE:', error);
     return {};
   }
 }
@@ -153,6 +150,7 @@ export async function getToolsFromMCPServer(server: UserMcpServer) {
   try {
     //used in mcp-view when getting mcp tools for non-enabled servers that are not in the db
     //later when in mcp-view the tools are allowed to be ran only if the mcp server is enabled
+    // return {};
     return await getToolsFromSSE(server);
   } catch (error) {
     console.error('Error in getToolsFromMCPServer:', error);

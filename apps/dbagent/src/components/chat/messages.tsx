@@ -9,17 +9,31 @@ import { useScrollToBottom } from './use-scroll-to-bottom';
 interface MessagesProps {
   projectId: string;
   chatId: string;
-  status: UseChatHelpers['status'];
+  status: UseChatHelpers<UIMessage>['status'];
   votes: Array<MessageVote> | undefined;
   messages: Array<UIMessage>;
-  setMessages: UseChatHelpers['setMessages'];
-  reload: UseChatHelpers['reload'];
+  setMessages: UseChatHelpers<UIMessage>['setMessages'];
+  reload: UseChatHelpers<UIMessage>['regenerate'];
   isArtifactVisible: boolean;
 }
 
 function PureMessages({ projectId, chatId, status, votes, messages, setMessages, reload }: MessagesProps) {
   const [messagesContainerRef, messagesEndRef] = useScrollToBottom<HTMLDivElement>();
-
+  // return (
+  //   <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
+  //     {messages.map(message => (
+  //       <div key={message.id} className="whitespace-pre-wrap">
+  //         {message.role === 'user' ? 'User: ' : 'AI: '}
+  //         {message.parts.map((part, i) => {
+  //           console.log('part111111:',part);
+  //           console.log('status222:',status);
+  //           switch (part.type) {
+  //             case 'text':
+  //               return <div key={`${message.id}-${i}`}>{part.text}</div>;
+  //           }
+  //         })}
+  //       </div>
+  //     ))}</div>);
   return (
     <div ref={messagesContainerRef} className="flex h-full flex-1 flex-col gap-6">
       {messages.length === 0 && (
@@ -40,6 +54,18 @@ function PureMessages({ projectId, chatId, status, votes, messages, setMessages,
           setMessages={setMessages}
           reload={reload}
         />
+        // <div key={message.id} className="whitespace-pre-wrap">
+        //    {message.role === 'user' ? 'User: ' : 'AI: '}
+        //   {message.parts.map((part, i) => {
+        //     console.log('part111111:',part);
+        //     console.log('status222:',status);
+        //     switch (part.type) {
+        //       case 'text':
+        //         return <div key={`${message.id}-${i}`}>{part.text}</div>;
+        //     }
+        //   })}
+        // </div>
+        // <MyPreviewMessage message={message}></MyPreviewMessage>
       ))}
 
       {status === 'submitted' && messages.length > 0 && messages[messages.length - 1]?.role === 'user' && (

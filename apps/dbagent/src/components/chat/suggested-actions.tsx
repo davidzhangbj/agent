@@ -1,9 +1,11 @@
 'use client';
 
+import { UseChatHelpers } from '@ai-sdk/react';
 import { Button } from '@internal/components';
-import { ChatRequestOptions, CreateMessage, Message } from 'ai';
+import { UIMessage } from 'ai';
 import { motion } from 'framer-motion';
 import { memo } from 'react';
+import { generateUUID } from '~/components/chat/utils';
 
 export type SuggestedAction = {
   title: string;
@@ -12,10 +14,7 @@ export type SuggestedAction = {
 
 interface SuggestedActionsProps {
   suggestedActions?: SuggestedAction[];
-  append: (
-    message: Message | CreateMessage,
-    chatRequestOptions?: ChatRequestOptions
-  ) => Promise<string | null | undefined>;
+  append: UseChatHelpers<UIMessage>['sendMessage'];
 }
 
 function PureSuggestedActions({ suggestedActions = [], append }: SuggestedActionsProps) {
@@ -34,8 +33,9 @@ function PureSuggestedActions({ suggestedActions = [], append }: SuggestedAction
             variant="ghost"
             onClick={async () => {
               void append({
+                id: generateUUID(),
                 role: 'user',
-                content: suggestedAction.action
+                parts: [{ type: 'text', text: suggestedAction.action }]
               });
             }}
             className="h-auto w-full flex-1 items-start justify-start gap-1 rounded-xl border px-4 py-3.5 text-left text-sm sm:flex-col"

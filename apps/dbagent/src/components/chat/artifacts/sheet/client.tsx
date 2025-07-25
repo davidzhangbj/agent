@@ -82,7 +82,7 @@ export const sheetArtifact = new Artifact<'sheet', Metadata>({
       onClick: ({ appendMessage }) => {
         void appendMessage({
           role: 'user',
-          content: 'Can you please format and clean the data?'
+          parts: [{ type: 'text', text: 'Can you please format and clean the data?' }]
         });
       }
     }

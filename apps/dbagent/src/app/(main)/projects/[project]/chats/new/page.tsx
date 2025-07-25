@@ -1,4 +1,4 @@
-import { Message as SDKMessage } from '@ai-sdk/ui-utils';
+import { UIMessage as SDKMessage } from 'ai';
 import { format } from 'date-fns';
 import { redirect } from 'next/navigation';
 import { generateUUID } from '~/components/chat/utils';
@@ -53,14 +53,7 @@ export default async function Page({
         chatId,
         projectId: project,
         role: message.role,
-        parts: JSON.stringify(
-          message.parts ??
-            (message.content?.split('\n\n').map((text) => ({
-              type: 'text',
-              text
-            })) ||
-              [])
-        ),
+        parts: JSON.stringify(message.parts ?? []),
         createdAt: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
       }))
     );
