@@ -1,11 +1,12 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
-import { tool } from 'ai';
+import { jsonSchema, tool } from 'ai';
 import { z } from 'zod';
 import { actionGetUserMcpServers } from '~/components/mcp/action';
 import { UserMcpServer } from '~/lib/tools/user-mcp-servers';
 // 导入json-schema-to-zod库
+import { JSONSchema7 } from '@ai-sdk/provider';
 import { jsonSchemaToZod } from 'json-schema-to-zod';
 
 async function getToolsFromAllEnabledMCPServers(userId?: string) {
@@ -118,16 +119,17 @@ async function getToolsFromSSE(server: UserMcpServer) {
       (acc, [_toolName, toolDef]) => {
         acc[toolDef.name] = tool({
           description: toolDef.description,
-          parameters: convertSchemaToZod(toolDef.inputSchema), // 使用新的转换函数
-          execute: async (args: Record<string, any>) => {
-            console.log('toolDef.inputSchema:', toolDef.inputSchema);
+          parameters: jsonSchema(toolDef.inputSchema as JSONSchema7), // 使用新的转换函数
+          execute: async (args: unknown) => {
+            const toolArgs = args as Record<string, any>;
+            console.log('toolDef.inputSchema:', console.log(JSON.stringify(toolDef.inputSchema, null, 2)));
             console.log('toolDef.name:', toolDef.name);
             console.log('args:', args);
             try {
               const client = await getMCPClient(server.filePath);
               const result = await client.callTool({
                 name: toolDef.name,
-                arguments: args
+                arguments: toolArgs
               });
               console.log('result:', result);
               return result;
