@@ -89,7 +89,7 @@ export class OpenAICompatibleChatLanguageModel implements LanguageModelV1 {
   }
 
   private get providerOptionsName(): string {
-    return this.config.provider.split('.')[0].trim();
+    return this.config.provider.split('.')[0]!.trim();
   }
 
   private getArgs({
@@ -264,30 +264,30 @@ export class OpenAICompatibleChatLanguageModel implements LanguageModelV1 {
     const completionTokenDetails = responseBody.usage?.completion_tokens_details;
     const promptTokenDetails = responseBody.usage?.prompt_tokens_details;
     if (completionTokenDetails?.reasoning_tokens != null) {
-      providerMetadata[this.providerOptionsName].reasoningTokens = completionTokenDetails?.reasoning_tokens;
+      providerMetadata[this.providerOptionsName]!.reasoningTokens = completionTokenDetails?.reasoning_tokens;
     }
     if (completionTokenDetails?.accepted_prediction_tokens != null) {
-      providerMetadata[this.providerOptionsName].acceptedPredictionTokens =
+      providerMetadata[this.providerOptionsName]!.acceptedPredictionTokens =
         completionTokenDetails?.accepted_prediction_tokens;
     }
     if (completionTokenDetails?.rejected_prediction_tokens != null) {
-      providerMetadata[this.providerOptionsName].rejectedPredictionTokens =
+      providerMetadata[this.providerOptionsName]!.rejectedPredictionTokens =
         completionTokenDetails?.rejected_prediction_tokens;
     }
     if (promptTokenDetails?.cached_tokens != null) {
-      providerMetadata[this.providerOptionsName].cachedPromptTokens = promptTokenDetails?.cached_tokens;
+      providerMetadata[this.providerOptionsName]!.cachedPromptTokens = promptTokenDetails?.cached_tokens;
     }
 
     return {
-      text: choice.message.content ?? undefined,
-      reasoning: choice.message.reasoning_content ?? undefined,
-      toolCalls: choice.message.tool_calls?.map((toolCall) => ({
+      text: choice!.message.content ?? undefined,
+      reasoning: choice!.message.reasoning_content ?? undefined,
+      toolCalls: choice!.message.tool_calls?.map((toolCall) => ({
         toolCallType: 'function',
         toolCallId: toolCall.id ?? generateId(),
         toolName: toolCall.function.name,
         args: toolCall.function.arguments!
       })),
-      finishReason: mapOpenAICompatibleFinishReason(choice.finish_reason),
+      finishReason: mapOpenAICompatibleFinishReason(choice!.finish_reason),
       usage: {
         promptTokens: responseBody.usage?.prompt_tokens ?? NaN,
         completionTokens: responseBody.usage?.completion_tokens ?? NaN
@@ -396,7 +396,7 @@ export class OpenAICompatibleChatLanguageModel implements LanguageModelV1 {
     }> = [];
 
     let finishReason: LanguageModelV1FinishReason = 'unknown';
-    let usage: {
+    const usage: {
       completionTokens: number | undefined;
       completionTokensDetails: {
         reasoningTokens: number | undefined;
@@ -420,7 +420,7 @@ export class OpenAICompatibleChatLanguageModel implements LanguageModelV1 {
       }
     };
     let isFirstChunk = true;
-    let providerOptionsName = this.providerOptionsName;
+    const providerOptionsName = this.providerOptionsName;
 
     return {
       stream: response.pipeThrough(
@@ -622,18 +622,18 @@ export class OpenAICompatibleChatLanguageModel implements LanguageModelV1 {
               ...metadataExtractor?.buildMetadata()
             };
             if (usage.completionTokensDetails.reasoningTokens != null) {
-              providerMetadata[providerOptionsName].reasoningTokens = usage.completionTokensDetails.reasoningTokens;
+              providerMetadata[providerOptionsName]!.reasoningTokens = usage.completionTokensDetails.reasoningTokens;
             }
             if (usage.completionTokensDetails.acceptedPredictionTokens != null) {
-              providerMetadata[providerOptionsName].acceptedPredictionTokens =
+              providerMetadata[providerOptionsName]!.acceptedPredictionTokens =
                 usage.completionTokensDetails.acceptedPredictionTokens;
             }
             if (usage.completionTokensDetails.rejectedPredictionTokens != null) {
-              providerMetadata[providerOptionsName].rejectedPredictionTokens =
+              providerMetadata[providerOptionsName]!.rejectedPredictionTokens =
                 usage.completionTokensDetails.rejectedPredictionTokens;
             }
             if (usage.promptTokensDetails.cachedTokens != null) {
-              providerMetadata[providerOptionsName].cachedPromptTokens = usage.promptTokensDetails.cachedTokens;
+              providerMetadata[providerOptionsName]!.cachedPromptTokens = usage.promptTokensDetails.cachedTokens;
             }
 
             controller.enqueue({

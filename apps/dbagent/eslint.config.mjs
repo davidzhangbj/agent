@@ -31,6 +31,7 @@ export default [
       '@typescript-eslint/no-unnecessary-type-assertion': 'warn', // 对于不必要的类型断言只发出警告
       'no-unused-private-class-members': 'warn', // 对于未使用的私有类成员只发出警告
       'no-empty': 'warn', // 对于空的代码块只发出警告
+      '@typescript-eslint/no-base-to-string': 'warn'
     },
     languageOptions: {
       parserOptions: {
