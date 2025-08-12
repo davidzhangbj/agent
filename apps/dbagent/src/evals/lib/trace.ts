@@ -31,12 +31,12 @@ const parseRequestBody = (response: GenerateTextResponse) => {
 
 const getSystemPromptFromResponse = (response: GenerateTextResponse) => {
   const body = parseRequestBody(response);
-  return body.system[0].text;
+  return body.messages[0].content;
 };
 
 const getUserPromptFromResponse = (response: GenerateTextResponse) => {
   const body = parseRequestBody(response);
-  return body.messages[0].content[0].text;
+  return body.messages[1].content;
 };
 
 export const traceVercelAiResponse = (response: GenerateTextResponse, expect: ExpectStatic) => {

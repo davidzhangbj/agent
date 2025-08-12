@@ -1,9 +1,9 @@
 import { anthropic } from '@ai-sdk/anthropic';
 import { deepseek } from '@ai-sdk/deepseek';
 import { google } from '@ai-sdk/google';
-import { openai } from '@ai-sdk/openai';
+// import { openai } from '@ai-sdk/openai';
+import { createOpenAI } from '@ai-sdk/openai';
 import { env } from '~/lib/env/server';
-
 import { Model, Provider, ProviderModel, ProviderRegistry } from './types';
 import { createModel, createRegistryFromModels } from './utils';
 
@@ -14,7 +14,11 @@ type BuiltinProvider = Provider & {
 type BuiltinProviderModel = ProviderModel & {
   providerId: string;
 };
-
+const config = {
+  baseURL: '',
+  apiKey: ''
+};
+const openai = createOpenAI(config);
 const builtinOpenAIModels: BuiltinProvider = {
   info: {
     name: 'OpenAI',
@@ -25,8 +29,8 @@ const builtinOpenAIModels: BuiltinProvider = {
   models: [
     {
       id: 'openai:gpt-4.1',
-      providerId: 'gpt-4.1',
-      name: 'GPT-4.1'
+      providerId: 'qwen-max-latest',
+      name: 'qwen-max-latest'
     },
     {
       id: 'openai:gpt-4.1-mini',

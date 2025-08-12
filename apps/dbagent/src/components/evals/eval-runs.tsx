@@ -144,7 +144,7 @@ const CurrentEval = ({
         return (
           <TabsContent
             value={file.fileName}
-            className="mt-4 h-[calc(100%-40px)] rounded-md border p-4"
+            className="mt-4 h-[calc(100%-112px)] rounded-md border p-4"
             key={file.fileName}
           >
             <ScrollArea className="h-full">

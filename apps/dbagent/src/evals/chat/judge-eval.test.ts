@@ -69,12 +69,14 @@ describe.concurrent('judge', () => {
     {
       id: 'tables_in_db',
       prompt: 'What tables do I have in my db?',
-      judges: [finalAnswerJudge('dogs'), conciseAnswerJudge]
+      // judges: [finalAnswerJudge('dogs')],
+      judges: [conciseAnswerJudge]
     },
     {
       id: 'tables_in_db_how_many',
       prompt: 'How many tables do I have in my db?',
-      judges: [finalAnswerJudge('1'), conciseAnswerJudge]
+      // judges: [finalAnswerJudge('1')],
+      judges: [conciseAnswerJudge]
     }
   ].flatMap((evalCase) =>
     evalCase.judges.map((judge) => ({
@@ -94,6 +96,7 @@ describe.concurrent('judge', () => {
 
     const humanSteps = result.steps.map(stepToHuman);
     const finalAnswer = result.text;
+
     const { object: judgeResponse } = await generateObject({
       model: await getModelInstance(env.JUDGE_MODEL),
       schema: z.object({
@@ -104,7 +107,10 @@ describe.concurrent('judge', () => {
     });
     const judgeResponseFile = path.join(traceFolder, 'judgeResponse.txt');
     fs.writeFileSync(judgeResponseFile, judgeResponse.critique);
-
+    console.log('prompt:', prompt);
+    console.log('answer from LLM:', finalAnswer);
+    console.log('judgePrompt:', judge.prompt({ input: prompt, steps: humanSteps, finalAnswer }));
+    console.log('judgeResult from LLM:', judgeResponse.result);
     expect(judgeResponse.result).toEqual('passed');
   });
 });

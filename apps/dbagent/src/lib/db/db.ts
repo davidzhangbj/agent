@@ -47,7 +47,7 @@ export class DBUserAccess implements DBAccess {
   private readonly _userId: string;
 
   constructor(userId: string) {
-    if (userId !== '' && userId !== 'local' && !/^[0-9a-f-]*$/i.test(userId)) {
+    if (userId !== '' && userId !== 'local' && !/^[0-9a-z-]*$/i.test(userId)) {
       throw new Error('Invalid user ID format');
     }
     this._userId = userId;
