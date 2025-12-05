@@ -11,7 +11,7 @@
 
 # Introduce
 
-> **⚠️ Disclaimer**: This is a personal experimental project and is not an official project. Use at your own risk.
+> **⚠️ Disclaimer**: This is a personal experimental project and is not an official project. 
 
 This project was modified from the [xata agent project](https://github.com/xataio/agent).
 
