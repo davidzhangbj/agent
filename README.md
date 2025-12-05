@@ -1,6 +1,6 @@
-<div align="center">
+<!-- <div align="center">
   <img src="brand-kit/banner/obAgent.png" alt="oceanbase agent logo" />
-</div>
+</div> -->
 
 <p align="center">
   <a href="https://github.com/xataio/agent/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-green" alt="License - Apache 2.0"></a>&nbsp;
@@ -10,6 +10,8 @@
 </p>
 
 # Introduce
+
+> **⚠️ Disclaimer**: This is a personal experimental project and is not an official project. Use at your own risk.
 
 This project was modified from the [xata agent project](https://github.com/xataio/agent).
 
